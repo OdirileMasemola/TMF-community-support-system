@@ -7,13 +7,13 @@ export function AppLayout() {
   const { profile, signOut } = useAuth();
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-muted">
       <Sidebar />
       <main className="flex-1">
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
+        <header className="flex items-center justify-between border-b border-border bg-background px-5 py-4">
           <div>
-            <p className="text-sm text-slate-500">Logged in as</p>
-            <p className="font-semibold text-slate-900">{profile?.full_name ?? "User"} - {profile?.role ?? "Loading"}</p>
+            <p className="text-sm text-muted-foreground">Logged in as</p>
+            <p className="font-semibold text-foreground">{profile?.full_name ?? "User"} - {profile?.role ?? "Loading"}</p>
           </div>
           <Button variant="secondary" onClick={signOut}>Sign out</Button>
         </header>

@@ -8,7 +8,7 @@ export function NotificationsPage() {
 
       <Card className="mt-6">
         <h2 className="text-lg font-bold">No notifications yet</h2>
-        <p className="mt-2 text-slate-600">Connect this page to the notifications table.</p>
+        <p className="mt-2 text-muted-foreground">Connect this page to the notifications table.</p>
       </Card>
     </div>
   );

@@ -19,6 +19,7 @@
     "class-variance-authority": "latest",
     "clsx": "latest",
     "date-fns": "latest",
+    "framer-motion": "^12.42.0",
     "jspdf": "latest",
     "jspdf-autotable": "latest",
     "lucide-react": "latest",

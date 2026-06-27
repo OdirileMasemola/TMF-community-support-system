@@ -21,7 +21,7 @@ export function UserManagementPage() {
         {isLoading ? <p>Loading users...</p> : (
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b text-slate-500">
+              <tr className="border-b text-muted-foreground">
                 <th className="py-3">Name</th>
                 <th>Email</th>
                 <th>Phone</th>

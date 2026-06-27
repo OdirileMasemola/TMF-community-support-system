@@ -1,0 +1,93 @@
+/* TMF Official Colour Palette
+   Carbon Black: #222222
+   Baltic Blue:  #1C5D99
+   Pacific Blue: #639FAB
+   Powder Blue:  #BBCDE5
+   White:        #FFFFFF
+   Light Grey:   #F5F5F5
+*/
+
+:root,
+[data-theme="system"] {
+  --background: #ffffff;
+  --foreground: #222222;
+  --card: #ffffff;
+  --card-foreground: #222222;
+  --primary: #1c5d99;
+  --primary-foreground: #ffffff;
+  --secondary: #639fab;
+  --secondary-foreground: #ffffff;
+  --muted: #f5f5f5;
+  --muted-foreground: #222222;
+  --accent: #bbcde5;
+  --accent-foreground: #222222;
+  --border: #bbcde5;
+  --ring: #1c5d99;
+  --footer: #222222;
+  --footer-foreground: #ffffff;
+  --footer-accent: #bbcde5;
+  --footer-border: #639fab;
+}
+
+[data-theme="blue"] {
+  --background: #ffffff;
+  --foreground: #222222;
+  --card: #ffffff;
+  --card-foreground: #222222;
+  --primary: #1c5d99;
+  --primary-foreground: #ffffff;
+  --secondary: #639fab;
+  --secondary-foreground: #ffffff;
+  --muted: #f5f5f5;
+  --muted-foreground: #222222;
+  --accent: #bbcde5;
+  --accent-foreground: #222222;
+  --border: #639fab;
+  --ring: #1c5d99;
+  --footer: #222222;
+  --footer-foreground: #ffffff;
+  --footer-accent: #bbcde5;
+  --footer-border: #639fab;
+}
+
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #222222;
+  --card: #f5f5f5;
+  --card-foreground: #222222;
+  --primary: #1c5d99;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #222222;
+  --muted: #f5f5f5;
+  --muted-foreground: #222222;
+  --accent: #bbcde5;
+  --accent-foreground: #222222;
+  --border: #bbcde5;
+  --ring: #1c5d99;
+  --footer: #222222;
+  --footer-foreground: #ffffff;
+  --footer-accent: #bbcde5;
+  --footer-border: #639fab;
+}
+
+[data-theme="dark"] {
+  --background: #222222;
+  --foreground: #ffffff;
+  --card: #222222;
+  --card-foreground: #ffffff;
+  --primary: #1c5d99;
+  --primary-foreground: #ffffff;
+  --secondary: #639fab;
+  --secondary-foreground: #ffffff;
+  --muted: #222222;
+  --muted-foreground: #bbcde5;
+  --accent: #639fab;
+  --accent-foreground: #ffffff;
+  --border: #bbcde5;
+  --ring: #639fab;
+  --footer: #222222;
+  --footer-foreground: #ffffff;
+  --footer-accent: #bbcde5;
+  --footer-border: #639fab;
+}

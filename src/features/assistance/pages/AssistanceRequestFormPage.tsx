@@ -21,9 +21,9 @@ export function AssistanceRequestFormPage() {
       <Card className="mt-6 max-w-2xl">
         <form className="form-grid" onSubmit={handleSubmit}>
           <Input label="Request type" value={requestType} onChange={(event) => setRequestType(event.target.value)} required />
-          <label className="grid gap-2 text-sm font-medium text-slate-700">
+          <label className="grid gap-2 text-sm font-medium text-foreground">
             Request description
-            <textarea className="min-h-32 rounded-lg border border-slate-300 px-3 py-2" value={description} onChange={(event) => setDescription(event.target.value)} required />
+            <textarea className="min-h-32 rounded-lg border border-border bg-card px-3 py-2 text-card-foreground" value={description} onChange={(event) => setDescription(event.target.value)} required />
           </label>
           <Button type="submit">Submit request</Button>
         </form>

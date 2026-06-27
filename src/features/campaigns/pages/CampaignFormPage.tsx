@@ -48,9 +48,9 @@ export function CampaignFormPage() {
       <Card className="mt-6 max-w-2xl">
         <form className="form-grid" onSubmit={handleSubmit}>
           <Input label="Campaign title" value={title} onChange={(event) => setTitle(event.target.value)} required />
-          <label className="grid gap-2 text-sm font-medium text-slate-700">
+          <label className="grid gap-2 text-sm font-medium text-foreground">
             Description
-            <textarea className="min-h-28 rounded-lg border border-slate-300 px-3 py-2" value={description} onChange={(event) => setDescription(event.target.value)} required />
+            <textarea className="min-h-28 rounded-lg border border-border bg-card px-3 py-2 text-card-foreground" value={description} onChange={(event) => setDescription(event.target.value)} required />
           </label>
           <Input label="Location" value={location} onChange={(event) => setLocation(event.target.value)} required />
           <Input label="Start date" type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} required />

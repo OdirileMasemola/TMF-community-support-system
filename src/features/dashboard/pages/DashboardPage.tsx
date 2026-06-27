@@ -19,15 +19,15 @@ export function DashboardPage() {
       <div className="card-grid mt-6">
         {stats.map((stat) => (
           <Card key={stat.label}>
-            <p className="text-sm text-slate-500">{stat.label}</p>
-            <p className="mt-2 text-3xl font-bold text-slate-900">{stat.value}</p>
+            <p className="text-sm text-muted-foreground">{stat.label}</p>
+            <p className="mt-2 text-3xl font-bold text-foreground">{stat.value}</p>
           </Card>
         ))}
       </div>
 
       <Card className="mt-6">
         <h2 className="text-lg font-bold">Next build step</h2>
-        <p className="mt-2 text-slate-600">Connect this dashboard to Supabase counts for users, campaigns, donations, sponsorships, and assistance requests.</p>
+        <p className="mt-2 text-muted-foreground">Connect this dashboard to Supabase counts for users, campaigns, donations, sponsorships, and assistance requests.</p>
       </Card>
     </div>
   );

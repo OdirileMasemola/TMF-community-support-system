@@ -27,11 +27,11 @@ export function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-100 p-5">
+    <main className="grid min-h-screen place-items-center bg-muted p-5">
       <Card className="w-full max-w-md">
-        <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Themba Molefe Foundation</p>
+        <p className="text-sm font-semibold uppercase tracking-wide text-primary">Themba Molefe Foundation</p>
         <h1 className="mt-2 text-2xl font-bold">Login</h1>
-        <p className="mt-2 text-sm text-slate-600">Access your role-based dashboard.</p>
+        <p className="mt-2 text-sm text-muted-foreground">Access your role-based dashboard.</p>
 
         <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
           <Input label="Email address" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
@@ -39,8 +39,8 @@ export function LoginPage() {
           <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Signing in..." : "Sign in"}</Button>
         </form>
 
-        <p className="mt-5 text-sm text-slate-600">
-          No account yet? <Link className="font-semibold text-teal-700" to="/register">Create one</Link>
+        <p className="mt-5 text-sm text-muted-foreground">
+          No account yet? <Link className="font-semibold text-primary" to="/register">Create one</Link>
         </p>
       </Card>
     </main>

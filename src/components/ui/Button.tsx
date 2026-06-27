@@ -1,21 +1,41 @@
 import type { ButtonHTMLAttributes } from "react";
+import { Link } from "react-router";
 import { cn } from "@/lib/utils";
 
+type ButtonVariant = "primary" | "secondary" | "outline" | "danger";
+
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "danger";
+  variant?: ButtonVariant;
+  to?: string;
 };
 
-export function Button({ className, variant = "primary", ...props }: ButtonProps) {
+const variantClasses: Record<ButtonVariant, string> = {
+  primary: "bg-primary text-primary-foreground hover:opacity-90",
+  secondary: "bg-secondary text-secondary-foreground hover:opacity-90",
+  outline: "border border-border bg-transparent text-primary hover:bg-accent",
+  danger: "bg-foreground text-background hover:opacity-90",
+};
+
+function buttonClassName(variant: ButtonVariant, className?: string) {
+  return cn(
+    "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60",
+    variantClasses[variant],
+    className,
+  );
+}
+
+export function Button({ className, variant = "primary", to, children, ...props }: ButtonProps) {
+  if (to) {
+    return (
+      <Link to={to} className={buttonClassName(variant, className)}>
+        {children}
+      </Link>
+    );
+  }
+
   return (
-    <button
-      className={cn(
-        "rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60",
-        variant === "primary" && "bg-teal-700 text-white hover:bg-teal-800",
-        variant === "secondary" && "border border-slate-300 bg-white text-slate-900 hover:bg-slate-50",
-        variant === "danger" && "bg-red-600 text-white hover:bg-red-700",
-        className,
-      )}
-      {...props}
-    />
+    <button className={buttonClassName(variant, className)} {...props}>
+      {children}
+    </button>
   );
 }

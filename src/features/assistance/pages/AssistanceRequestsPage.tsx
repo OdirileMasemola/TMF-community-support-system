@@ -18,7 +18,7 @@ export function AssistanceRequestsPage() {
 
       <Card className="mt-6">
         <h2 className="text-lg font-bold">Module skeleton</h2>
-        <p className="mt-2 text-slate-600">Build request lists, request status tracking, and document verification here.</p>
+        <p className="mt-2 text-muted-foreground">Build request lists, request status tracking, and document verification here.</p>
       </Card>
     </div>
   );

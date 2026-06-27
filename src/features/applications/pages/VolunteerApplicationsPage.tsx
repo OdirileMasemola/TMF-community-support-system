@@ -8,7 +8,7 @@ export function VolunteerApplicationsPage() {
 
       <Card className="mt-6">
         <h2 className="text-lg font-bold">Module skeleton</h2>
-        <p className="mt-2 text-slate-600">Build application creation, application status tracking, and admin approval here.</p>
+        <p className="mt-2 text-muted-foreground">Build application creation, application status tracking, and admin approval here.</p>
       </Card>
     </div>
   );

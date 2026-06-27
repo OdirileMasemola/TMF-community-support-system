@@ -14,7 +14,7 @@ export function RoleGate({ allowedRoles, children }: RoleGateProps) {
     return (
       <Card>
         <h2 className="text-lg font-bold">Access denied</h2>
-        <p className="mt-2 text-slate-600">Your role does not have permission to open this page.</p>
+        <p className="mt-2 text-muted-foreground">Your role does not have permission to open this page.</p>
       </Card>
     );
   }

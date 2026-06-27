@@ -1,20 +1,32 @@
 @import "tailwindcss";
+@import "./theme.css";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --primary: #0f766e;
-  --primary-dark: #115e59;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-footer: var(--footer);
+  --color-footer-foreground: var(--footer-foreground);
+  --color-footer-accent: var(--footer-accent);
+  --color-footer-border: var(--footer-border);
 }
 
 body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 a {
@@ -26,10 +38,11 @@ a {
   font-size: 1.6rem;
   font-weight: 700;
   margin: 0;
+  color: var(--foreground);
 }
 
 .page-description {
-  color: var(--muted);
+  color: var(--muted-foreground);
   margin-top: 0.4rem;
 }
 

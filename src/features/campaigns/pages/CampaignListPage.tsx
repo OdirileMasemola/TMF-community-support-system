@@ -31,10 +31,10 @@ export function CampaignListPage() {
         {!isLoading && campaigns.length === 0 && <Card>No campaigns yet.</Card>}
         {campaigns.map((campaign) => (
           <Card key={campaign.id}>
-            <p className="text-xs font-semibold uppercase text-teal-700">{campaign.status}</p>
+            <p className="text-xs font-semibold uppercase text-primary">{campaign.status}</p>
             <h2 className="mt-2 text-lg font-bold">{campaign.title}</h2>
-            <p className="mt-2 text-sm text-slate-600">{campaign.description}</p>
-            <p className="mt-4 text-sm text-slate-500">{campaign.location} - {campaign.start_date}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{campaign.description}</p>
+            <p className="mt-4 text-sm text-muted-foreground">{campaign.location} - {campaign.start_date}</p>
           </Card>
         ))}
       </div>

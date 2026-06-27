@@ -34,13 +34,13 @@ export function ReportsPage() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-bold">Available report types</h2>
-            <p className="mt-2 text-sm text-slate-600">Connect these to live Supabase queries as you build each module.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Connect these to live Supabase queries as you build each module.</p>
           </div>
           <Button onClick={exportSamplePdf}>Export sample PDF</Button>
         </div>
 
-        <ul className="mt-5 grid gap-2 text-sm text-slate-700">
-          {reportTypes.map((item) => <li key={item} className="rounded-lg bg-slate-50 p-3">{item}</li>)}
+        <ul className="mt-5 grid gap-2 text-sm text-foreground">
+          {reportTypes.map((item) => <li key={item} className="rounded-lg bg-muted p-3">{item}</li>)}
         </ul>
       </Card>
     </div>
