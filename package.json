@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "latest",
-    "@supabase/supabase-js": "latest",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.108.2",
     "@tanstack/react-query": "latest",
     "@tanstack/react-query-devtools": "latest",
     "@tanstack/react-table": "latest",
