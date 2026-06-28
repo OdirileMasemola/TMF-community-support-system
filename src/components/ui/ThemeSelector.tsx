@@ -21,13 +21,13 @@ export function ThemeSelector({ className }: ThemeSelectorProps) {
       type="button"
       onClick={() => setTheme(nextTheme)}
       className={cn(
-        "inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+        "inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
         className,
       )}
       aria-label={switchLabel}
       title={switchLabel}
     >
-      {isDark ? <Moon className="h-5 w-5" aria-hidden="true" /> : <Sun className="h-5 w-5" aria-hidden="true" />}
+      {isDark ? <Moon className="size-4" aria-hidden="true" /> : <Sun className="size-4" aria-hidden="true" />}
     </button>
   );
 }

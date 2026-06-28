@@ -40,20 +40,20 @@ export function PublicNavbar() {
     <header className="fixed left-0 right-0 top-0 z-50 px-4 pt-4 text-foreground">
       <div
         className={cn(
-          "relative mx-auto flex items-center justify-between gap-4 transition-all duration-300",
+          "relative mx-auto flex items-center gap-4 transition-all duration-300",
           isScrolled
             ? "max-w-5xl rounded-2xl border border-border bg-background/70 px-4 py-2 shadow-lg backdrop-blur-xl"
             : "max-w-7xl bg-background/80 px-2 py-3 backdrop-blur-sm lg:bg-transparent lg:backdrop-blur-none",
         )}
       >
-        <Link to="/" className="flex shrink-0 items-center gap-2.5">
-          <img src={logo} alt="TMF Support logo" className="h-10 w-auto shrink-0 object-contain" />
-          <div className="flex flex-col leading-none">
-            <span className="text-lg font-bold text-foreground">TMF Support</span>
+        <Link to="/" className="flex shrink-0 items-center gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border dark:shadow-[0_0_18px_rgba(255,255,255,0.35)]">
+            <img src={logo} alt="TMF Logo" className="h-full w-full object-contain" />
           </div>
+          <span className="text-lg font-bold text-foreground">TMF Support</span>
         </Link>
 
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex lg:-translate-x-8 xl:-translate-x-12">
           {navLinks.map((link) => (
             <NavLink key={link.to} to={link.to} end={link.end} className={({ isActive }) => navLinkClassName(isActive)}>
               {link.label}
@@ -61,7 +61,7 @@ export function PublicNavbar() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        <div className="hidden shrink-0 items-center gap-2 lg:flex">
           <ThemeSelector />
           {isScrolled ? (
             <Button to="/register">Get Started</Button>
@@ -77,7 +77,7 @@ export function PublicNavbar() {
 
         <button
           type="button"
-          className="rounded-md p-2 text-foreground hover:bg-muted lg:hidden"
+          className="ml-auto shrink-0 rounded-md p-2 text-foreground hover:bg-muted lg:hidden"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((open) => !open)}
