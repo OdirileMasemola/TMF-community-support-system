@@ -1,5 +1,7 @@
-import { themeNames, themePresets } from "@/theme/themePresets";
+import { Moon, Sun } from "lucide-react";
+import { themePresets } from "@/theme/themePresets";
 import { useTheme } from "@/theme/ThemeProvider";
+import { cn } from "@/lib/utils";
 
 type ThemeSelectorProps = {
   className?: string;
@@ -8,25 +10,24 @@ type ThemeSelectorProps = {
 export function ThemeSelector({ className }: ThemeSelectorProps) {
   const { theme, setTheme } = useTheme();
 
+  const isDark = theme === "dark";
+  const nextTheme = isDark ? "light" : "dark";
+  const switchLabel = isDark
+    ? `Switch to ${themePresets.light.label}`
+    : `Switch to ${themePresets.dark.label}`;
+
   return (
-    <div className={className}>
-      <label htmlFor="theme-selector" className="mb-2 block text-sm font-semibold">
-        Theme
-      </label>
-      <select
-        id="theme-selector"
-        value={theme}
-        onChange={(event) => setTheme(event.target.value as typeof theme)}
-        className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm text-card-foreground outline-none focus:ring-2 focus:ring-ring"
-        aria-label="Select website theme"
-      >
-        {themeNames.map((name) => (
-          <option key={name} value={name}>
-            {themePresets[name].label}
-          </option>
-        ))}
-      </select>
-      <p className="mt-2 text-xs opacity-80">{themePresets[theme].description}</p>
-    </div>
+    <button
+      type="button"
+      onClick={() => setTheme(nextTheme)}
+      className={cn(
+        "inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+        className,
+      )}
+      aria-label={switchLabel}
+      title={switchLabel}
+    >
+      {isDark ? <Moon className="h-5 w-5" aria-hidden="true" /> : <Sun className="h-5 w-5" aria-hidden="true" />}
+    </button>
   );
 }

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabaseClient";
 import type { UserRole } from "@/types/app.types";
 

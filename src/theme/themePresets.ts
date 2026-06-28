@@ -1,23 +1,19 @@
 import type { ThemeName, ThemePreset } from "@/theme/themeTypes";
 
 export const themePresets: Record<ThemeName, ThemePreset> = {
-  system: {
-    label: "TMF Default",
-    description:
-      "Official TMF colour palette using Baltic Blue, Pacific Blue, Powder Blue, Carbon Black, White, and Light Grey.",
-  },
-  blue: {
-    label: "Baltic Blue",
-    description: "A stronger blue theme based on the official Baltic Blue brand colour.",
-  },
   light: {
-    label: "Clean Light",
-    description: "A soft light theme using White, Light Grey, and Powder Blue.",
+    label: "White Theme",
+    description: "A clean white interface with dark text and visible grey borders.",
   },
   dark: {
-    label: "Carbon Dark",
-    description: "A dark theme based on Carbon Black with blue highlights.",
+    label: "Dark Theme",
+    description: "A solid black and grey interface with light text and visible light grey borders.",
   },
 };
 
-export const themeNames = Object.keys(themePresets) as ThemeName[];
+export const themeNames: ThemeName[] = ["light", "dark"];
+
+export const themeOptions = themeNames.map((name) => ({
+  name,
+  ...themePresets[name],
+}));

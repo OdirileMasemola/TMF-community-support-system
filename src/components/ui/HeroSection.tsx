@@ -30,13 +30,10 @@ export type HeroSectionProps = {
 
 const MOBILE_CLIP = "polygon(0 0, 100% 0, 100% 100%, 0 100%)";
 const DESKTOP_CLIP = "polygon(14% 0%, 100% 0%, 100% 100%, 0% 100%)";
-const DESKTOP_CLIP_LG = "polygon(18% 0%, 100% 0%, 100% 100%, 0% 100%)";
 const HIDDEN_CLIP = "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)";
 
 function getClipPathForWidth(width: number) {
-  if (width >= 1024) return DESKTOP_CLIP_LG;
-  if (width >= 768) return DESKTOP_CLIP;
-  return MOBILE_CLIP;
+  return width >= 768 ? DESKTOP_CLIP : MOBILE_CLIP;
 }
 
 const contentVariants = {
@@ -68,13 +65,13 @@ export function HeroSection({
   return (
     <section
       className={cn(
-        "relative min-h-[calc(100vh-80px)] overflow-hidden bg-background text-foreground",
+        "relative box-border w-full overflow-hidden bg-background bg-[image:var(--page-gradient)] text-foreground md:h-[100svh]",
         className,
       )}
     >
-      <div className="relative flex min-h-[calc(100vh-80px)] flex-col md:flex-row">
+      <div className="relative flex w-full flex-col md:h-full md:flex-row md:overflow-hidden">
         <motion.div
-          className="relative z-10 flex w-full flex-col justify-between px-4 py-10 sm:px-6 md:w-[56%] md:px-8 lg:w-[58%] lg:px-12 lg:py-16"
+          className="relative z-10 flex w-full flex-col justify-center px-6 pb-8 pt-28 md:h-full md:w-[58%] md:justify-between md:px-12 md:pb-8 md:pt-24 lg:w-[60%] lg:px-16"
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -109,7 +106,7 @@ export function HeroSection({
 
             <motion.h1
               variants={contentVariants}
-              className="mt-6 max-w-xl text-4xl font-bold leading-tight text-foreground sm:text-5xl lg:text-6xl"
+              className="mt-4 max-w-xl text-4xl font-bold leading-tight text-foreground sm:text-5xl lg:text-6xl"
             >
               {title}
               {highlightedTitle ? (
@@ -122,12 +119,12 @@ export function HeroSection({
 
             <motion.p
               variants={contentVariants}
-              className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg"
+              className="mt-4 max-w-xl text-base leading-normal text-muted-foreground sm:text-lg"
             >
               {subtitle}
             </motion.p>
 
-            <motion.div variants={contentVariants} className="mt-8 flex flex-wrap gap-3">
+            <motion.div variants={contentVariants} className="mt-6 flex flex-wrap gap-3">
               <Button to={primaryCta.to}>{primaryCta.text}</Button>
               {secondaryCta ? (
                 <Button to={secondaryCta.to} variant="outline">
@@ -139,35 +136,41 @@ export function HeroSection({
 
           <motion.div
             variants={contentVariants}
-            className="mt-10 grid gap-4 border-t border-border pt-6 sm:grid-cols-3 lg:mt-12"
+            className="mt-10 grid gap-3 border-t border-border pt-5 sm:grid-cols-2 lg:grid-cols-3"
           >
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+            <div className="flex items-start gap-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
                 <Globe className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Website</p>
-                <p className="mt-1 text-sm font-medium text-foreground">{contactInfo.website}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Website
+                </p>
+                <p className="mt-0.5 text-sm font-medium text-foreground">{contactInfo.website}</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+            <div className="flex items-start gap-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
                 <Phone className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Phone</p>
-                <p className="mt-1 text-sm font-medium text-foreground">{contactInfo.phone}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Phone
+                </p>
+                <p className="mt-0.5 text-sm font-medium text-foreground">{contactInfo.phone}</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
+            <div className="flex items-start gap-2.5 sm:col-span-2 lg:col-span-1">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-primary">
                 <MapPin className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Address</p>
-                <p className="mt-1 text-sm font-medium text-foreground">{contactInfo.address}</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Address
+                </p>
+                <p className="mt-0.5 text-sm font-medium text-foreground">{contactInfo.address}</p>
               </div>
             </div>
           </motion.div>
@@ -175,10 +178,9 @@ export function HeroSection({
 
         <motion.div
           className={cn(
-            "relative h-[360px] w-full shrink-0 overflow-hidden",
-            "mx-4 mb-10 rounded-2xl border border-border shadow-sm",
-            "md:absolute md:inset-y-0 md:right-0 md:mx-0 md:mb-0 md:h-auto md:min-h-full",
-            "md:w-[44%] md:rounded-none md:border-0 md:shadow-none lg:w-[42%]",
+            "relative h-[320px] w-full shrink-0 overflow-hidden",
+            "mx-4 mb-8 rounded-2xl border border-border shadow-sm",
+            "md:mx-0 md:mb-0 md:h-full md:w-[42%] md:rounded-none md:border-0 md:shadow-none lg:w-[40%]",
           )}
           initial={{ clipPath: HIDDEN_CLIP }}
           animate={{ clipPath }}

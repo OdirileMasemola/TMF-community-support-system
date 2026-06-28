@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { themeNames } from "@/theme/themePresets";
 import type { ThemeName } from "@/theme/themeTypes";
 
 const STORAGE_KEY = "tmf-theme";
@@ -12,7 +11,7 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function isThemeName(value: string | null): value is ThemeName {
-  return value !== null && themeNames.includes(value as ThemeName);
+  return value === "light" || value === "dark";
 }
 
 function applyTheme(theme: ThemeName) {
@@ -20,11 +19,13 @@ function applyTheme(theme: ThemeName) {
   localStorage.setItem(STORAGE_KEY, theme);
 }
 
+function getInitialTheme(): ThemeName {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return isThemeName(stored) ? stored : "light";
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeName>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return isThemeName(stored) ? stored : "system";
-  });
+  const [theme, setThemeState] = useState<ThemeName>(getInitialTheme);
 
   useEffect(() => {
     applyTheme(theme);
