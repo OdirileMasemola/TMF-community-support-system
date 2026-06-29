@@ -1,17 +1,16 @@
 import { HeroSection } from "@/components/ui/HeroSection";
+import { StatsSection } from "@/components/ui/StatsSection";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { StatCard } from "@/components/ui/StatCard";
 import {
   featuredCampaigns,
   howItWorksSteps,
-  impactStats,
 } from "@/data/publicHomeData";
 import type { FeaturedCampaign } from "@/types/public";
 import { cn } from "@/lib/utils";
 
-import heroImage from "../../assets/hero.JPG";
+import heroImage from "@/assets/images/logo(hero).png";
 
 function CampaignStatusBadge({ status }: { status: FeaturedCampaign["status"] }) {
   return (
@@ -46,6 +45,8 @@ export function HomePage() {
         }}
       />
 
+      <StatsSection />
+
       {/* About Preview */}
       <section className="mx-auto max-w-6xl px-4 py-16 md:px-6">
         <div className="grid items-center gap-8 md:grid-cols-2">
@@ -62,22 +63,6 @@ export function HomePage() {
                 Learn More
               </Button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Impact Stats */}
-      <section className="bg-background py-16">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <SectionHeader
-            title="Our Impact"
-            subtitle="Placeholder figures showing the foundation's reach."
-            align="center"
-          />
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {impactStats.map((stat) => (
-              <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
-            ))}
           </div>
         </div>
       </section>

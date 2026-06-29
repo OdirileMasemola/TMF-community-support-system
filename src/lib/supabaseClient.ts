@@ -1,10 +1,25 @@
-import { createClient } from "@/utils/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, getSupabaseClientOrNull } from "@/utils/supabase/client";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+export { isSupabaseConfigured } from "@/utils/supabase/env";
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase environment variables. Check your .env.local file.");
+function requireClient(): SupabaseClient {
+  const client = getSupabaseClientOrNull();
+  if (!client) {
+    throw new Error(
+      "Supabase is not configured. Copy .env.example to .env.local and add your project credentials.",
+    );
+  }
+
+  return client;
 }
 
-export const supabase = createClient();
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop, receiver) {
+    const client = requireClient();
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
+
+export { createClient, getSupabaseClientOrNull };

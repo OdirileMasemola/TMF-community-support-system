@@ -24,3 +24,15 @@ export type HowItWorksStep = {
   title: string;
   description: string;
 };
+
+export type FounderQuote = {
+  label: string;
+  quote: string;
+  cite: string;
+};
+
+export type StatsSectionContent = {
+  label: string;
+  heading: string;
+  paragraph: string;
+};

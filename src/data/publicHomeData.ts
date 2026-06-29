@@ -8,9 +8,11 @@ import {
 } from "lucide-react";
 import type {
   FeaturedCampaign,
+  FounderQuote,
   HeroSummaryItem,
   HowItWorksStep,
   ImpactStat,
+  StatsSectionContent,
 } from "@/types/public";
 
 export const heroSummaryItems: HeroSummaryItem[] = [
@@ -26,6 +28,19 @@ export const impactStats: ImpactStat[] = [
   { label: "Families Supported", value: "150+", icon: Home },
   { label: "Donations Tracked", value: "R25k+", icon: HeartHandshake },
 ];
+
+export const statsSectionContent: StatsSectionContent = {
+  label: "FOUNDATION IMPACT",
+  heading: "Building hope through organised community support.",
+  paragraph:
+    "The Themba Molefe Foundation supports vulnerable communities through outreach programmes, donations, sponsorships, volunteer participation, and beneficiary assistance. This platform helps organise that support in one central system.",
+};
+
+export const founderQuote: FounderQuote = {
+  label: "Founder's Message",
+  quote: "Tomorrow is one dream away.",
+  cite: "Themba Molefe Foundation Motto",
+};
 
 export const featuredCampaigns: FeaturedCampaign[] = [
   {

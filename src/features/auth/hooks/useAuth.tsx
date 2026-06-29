@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient, getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
 import type { UserRole } from "@/types/app.types";
 
 type Profile = {
@@ -30,8 +30,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const navigate = useNavigateSafe();
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setIsLoading(false);
+      return;
+    }
+
+    const client = createClient();
+
     async function loadSession() {
-      const { data } = await supabase.auth.getSession();
+      const { data } = await client.auth.getSession();
       setSession(data.session);
       if (data.session?.user.id) {
         await loadProfile(data.session.user.id);
@@ -41,7 +48,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     loadSession();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+    const { data: listener } = client.auth.onAuthStateChange(async (_event: string, nextSession: Session | null) => {
       setSession(nextSession);
       if (nextSession?.user.id) {
         await loadProfile(nextSession.user.id);
@@ -54,6 +61,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   async function loadProfile(userId: string) {
+    const supabase = getSupabaseClientOrNull();
+    if (!supabase) return;
+
     const { data, error } = await supabase
       .from("profiles")
       .select("id, full_name, email, phone_number, role")
@@ -69,12 +79,30 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }
 
   async function signIn(email: string, password: string) {
+    if (!isSupabaseConfigured()) {
+      throw new Error("Supabase is not configured. Add your credentials to .env.local and restart the dev server.");
+    }
+
+    const supabase = getSupabaseClientOrNull();
+    if (!supabase) {
+      throw new Error("Supabase client is unavailable.");
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     navigate("/dashboard");
   }
 
   async function signUp(values: { fullName: string; email: string; phoneNumber: string; password: string; role: UserRole }) {
+    if (!isSupabaseConfigured()) {
+      throw new Error("Supabase is not configured. Add your credentials to .env.local and restart the dev server.");
+    }
+
+    const supabase = getSupabaseClientOrNull();
+    if (!supabase) {
+      throw new Error("Supabase client is unavailable.");
+    }
+
     const { error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
@@ -92,6 +120,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }
 
   async function signOut() {
+    const supabase = getSupabaseClientOrNull();
+    if (!supabase) return;
+
     await supabase.auth.signOut();
     navigate("/login");
   }
