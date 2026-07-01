@@ -65,7 +65,7 @@ export function HeroSection({
   return (
     <section
       className={cn(
-        "relative box-border w-full overflow-hidden bg-background bg-[image:var(--page-gradient)] text-foreground md:h-[100svh]",
+        "relative box-border w-full overflow-hidden bg-transparent text-foreground md:h-[100svh]",
         className,
       )}
     >

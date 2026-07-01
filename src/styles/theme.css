@@ -24,6 +24,18 @@
   --border: #d1d5db;
   --ring: #1c5d99;
   --page-gradient: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  --animated-bg-start: #ffffff;
+  --animated-bg-end: #f5f5f5;
+  --animated-first-color: 99, 159, 171;
+  --animated-second-color: 28, 93, 153;
+  --animated-third-color: 28, 93, 153;
+  --animated-fourth-color: 187, 205, 229;
+  --animated-fifth-color: 99, 159, 171;
+  --animated-pointer-color: 28, 93, 153;
+  --animated-opacity: 0.55;
+  --animated-blob-alpha: 0.95;
+  --animated-base-opacity: 0.15;
+  --animated-blending: soft-light;
   --footer: #222222;
   --footer-foreground: #ffffff;
   --footer-accent: #bbcde5;
@@ -46,8 +58,90 @@
   --border: #404040;
   --ring: #639fab;
   --page-gradient: linear-gradient(135deg, #000000 0%, #111111 45%, #222222 100%);
+  --animated-bg-start: #000000;
+  --animated-bg-end: #222222;
+  --animated-first-color: 28, 93, 153;
+  --animated-second-color: 99, 159, 171;
+  --animated-third-color: 187, 205, 229;
+  --animated-fourth-color: 28, 93, 153;
+  --animated-fifth-color: 99, 159, 171;
+  --animated-pointer-color: 187, 205, 229;
+  --animated-opacity: 0.35;
+  --animated-blob-alpha: 0.8;
+  --animated-base-opacity: 0.4;
+  --animated-blending: screen;
   --footer: #0b0b0b;
   --footer-foreground: #ffffff;
   --footer-accent: #bbcde5;
   --footer-border: #404040;
+}
+
+.animated-blobs {
+  opacity: var(--animated-opacity);
+  mix-blend-mode: var(--animated-blending);
+}
+
+@keyframes moveVertical {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  50% {
+    transform: translateY(50%);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes moveHorizontal {
+  0% {
+    transform: translateX(-50%) translateY(-10%);
+  }
+
+  50% {
+    transform: translateX(50%) translateY(10%);
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(-10%);
+  }
+}
+
+@keyframes moveInCircle {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(180deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-first {
+  animation: moveVertical 22s ease infinite;
+}
+
+.animate-second {
+  animation: moveInCircle 16s reverse infinite;
+  transform-origin: calc(50% - 400px);
+}
+
+.animate-third {
+  animation: moveInCircle 28s linear infinite;
+  transform-origin: calc(50% + 400px);
+}
+
+.animate-fourth {
+  animation: moveHorizontal 26s ease infinite;
+}
+
+.animate-fifth {
+  animation: moveInCircle 18s ease infinite;
+  transform-origin: calc(50% - 800px) calc(50% + 800px);
 }

@@ -6,7 +6,7 @@ import {
 
 export function StatsSection() {
   return (
-    <section className="bg-background py-16 md:py-24" aria-labelledby="stats-section-heading">
+    <section className="relative bg-transparent py-16 md:py-24" aria-labelledby="stats-section-heading">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
