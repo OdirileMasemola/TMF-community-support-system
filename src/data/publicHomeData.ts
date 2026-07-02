@@ -46,20 +46,32 @@ export const featuredCampaigns: FeaturedCampaign[] = [
   {
     id: "food-support-drive",
     title: "Food Support Drive",
-    description: "Providing food parcels to families in need.",
+    description:
+      "Providing food parcels and basic support to families facing difficult living conditions.",
     status: "Active",
+    gradientFrom: "#1C5D99",
+    gradientTo: "#639FAB",
+    href: "/campaigns",
   },
   {
     id: "youth-education-support",
     title: "Youth Education Support",
-    description: "Helping learners with school resources and academic support.",
+    description:
+      "Helping young learners with school resources, mentorship, and academic support.",
     status: "Active",
+    gradientFrom: "#639FAB",
+    gradientTo: "#BBCDE5",
+    href: "/campaigns",
   },
   {
     id: "winter-relief-campaign",
     title: "Winter Relief Campaign",
-    description: "Collecting warm clothing and essentials for vulnerable families.",
+    description:
+      "Collecting warm clothing and essentials for vulnerable families during winter.",
     status: "Upcoming",
+    gradientFrom: "#222222",
+    gradientTo: "#1C5D99",
+    href: "/campaigns",
   },
 ];
 

@@ -1,31 +1,11 @@
 import { HeroSection } from "@/components/ui/HeroSection";
 import { StatsSection } from "@/components/ui/StatsSection";
+import { FeaturedCampaignsSection } from "@/components/ui/FeaturedCampaignsSection";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import {
-  featuredCampaigns,
-  howItWorksSteps,
-} from "@/data/publicHomeData";
-import type { FeaturedCampaign } from "@/types/public";
-import { cn } from "@/lib/utils";
+import { howItWorksSteps } from "@/data/publicHomeData";
 
 import heroImage from "@/assets/hero.JPG";
-
-function CampaignStatusBadge({ status }: { status: FeaturedCampaign["status"] }) {
-  return (
-    <span
-      className={cn(
-        "inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold",
-        status === "Active" && "bg-accent text-primary",
-        status === "Upcoming" && "bg-secondary/20 text-primary",
-        status === "Completed" && "bg-muted text-muted-foreground",
-      )}
-    >
-      {status}
-    </span>
-  );
-}
 
 export function HomePage() {
   return (
@@ -47,6 +27,8 @@ export function HomePage() {
 
       <StatsSection />
 
+      <FeaturedCampaignsSection />
+
       {/* About Preview */}
       <section className="relative mx-auto max-w-6xl bg-transparent px-4 py-16 md:px-6">
         <div className="grid items-center gap-8 md:grid-cols-2">
@@ -64,32 +46,6 @@ export function HomePage() {
               </Button>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Featured Campaigns */}
-      <section className="relative mx-auto max-w-6xl bg-transparent px-4 py-16 md:px-6">
-        <SectionHeader title="Featured Campaigns" />
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {featuredCampaigns.map((campaign) => (
-            <Card key={campaign.id} className="flex flex-col">
-              <div className="mb-3">
-                <CampaignStatusBadge status={campaign.status} />
-              </div>
-              <h3 className="text-lg font-semibold text-card-foreground">{campaign.title}</h3>
-              <p className="mt-2 flex-1 text-sm text-muted-foreground">{campaign.description}</p>
-              <div className="mt-6">
-                <Button to="/campaigns" variant="secondary" className="w-full">
-                  View Details
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Button to="/campaigns" variant="outline">
-            View All Campaigns
-          </Button>
         </div>
       </section>
 

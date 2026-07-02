@@ -145,3 +145,28 @@
   animation: moveInCircle 18s ease infinite;
   transform-origin: calc(50% - 800px) calc(50% + 800px);
 }
+
+@keyframes campaignBlob {
+  0%,
+  100% {
+    transform: translateY(10px);
+  }
+
+  50% {
+    transform: translateX(-10px);
+  }
+}
+
+.campaign-animate-blob {
+  animation: campaignBlob 2s ease-in-out infinite;
+}
+
+.campaign-animation-delay {
+  animation-delay: -1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .campaign-animate-blob {
+    animation: none;
+  }
+}

@@ -11,6 +11,9 @@ export type FeaturedCampaign = {
   title: string;
   description: string;
   status: "Active" | "Upcoming" | "Completed";
+  gradientFrom: string;
+  gradientTo: string;
+  href: string;
 };
 
 export type HeroSummaryItem = {
