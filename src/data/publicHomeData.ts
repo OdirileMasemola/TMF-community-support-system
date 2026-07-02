@@ -49,8 +49,9 @@ export const featuredCampaigns: FeaturedCampaign[] = [
     description:
       "Providing food parcels and basic support to families facing difficult living conditions.",
     status: "Active",
-    gradientFrom: "#1C5D99",
-    gradientTo: "#639FAB",
+    gradientFrom: "#AF3800",
+    gradientTo: "#FE621D",
+    glowColor: "#FE621D",
     href: "/campaigns",
   },
   {
@@ -59,8 +60,9 @@ export const featuredCampaigns: FeaturedCampaign[] = [
     description:
       "Helping young learners with school resources, mentorship, and academic support.",
     status: "Active",
-    gradientFrom: "#639FAB",
-    gradientTo: "#BBCDE5",
+    gradientFrom: "#4ADE80",
+    gradientTo: "#BBF7D0",
+    glowColor: "#86EFAC",
     href: "/campaigns",
   },
   {
@@ -69,8 +71,9 @@ export const featuredCampaigns: FeaturedCampaign[] = [
     description:
       "Collecting warm clothing and essentials for vulnerable families during winter.",
     status: "Upcoming",
-    gradientFrom: "#222222",
-    gradientTo: "#1C5D99",
+    gradientFrom: "#00CFC1",
+    gradientTo: "#00FFE7",
+    glowColor: "#00FFE7",
     href: "/campaigns",
   },
 ];

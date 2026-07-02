@@ -32,6 +32,7 @@ export function FeaturedCampaignsSection() {
               status={campaign.status}
               gradientFrom={campaign.gradientFrom}
               gradientTo={campaign.gradientTo}
+              glowColor={campaign.glowColor}
               href={campaign.href}
             />
           ))}

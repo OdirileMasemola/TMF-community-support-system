@@ -13,6 +13,7 @@ export type FeaturedCampaign = {
   status: "Active" | "Upcoming" | "Completed";
   gradientFrom: string;
   gradientTo: string;
+  glowColor?: string;
   href: string;
 };
 
