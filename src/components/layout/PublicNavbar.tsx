@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ThemeSelector } from "@/components/ui/ThemeSelector";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/images/logo.png";
+import logo from "@/assets/images/logo.jpeg";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -47,8 +47,8 @@ export function PublicNavbar() {
         )}
       >
         <Link to="/" className="flex shrink-0 items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border dark:shadow-[0_0_18px_rgba(255,255,255,0.35)]">
-            <img src={logo} alt="TMF Logo" className="h-full w-full object-contain" />
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-0.5 shadow-sm ring-1 ring-border dark:shadow-[0_0_18px_rgba(255,255,255,0.35)]">
+            <img src={logo} alt="TMF Logo" className="h-full w-full scale-[1.65] object-contain" />
           </div>
           <span className="text-lg font-bold text-foreground">TMF Support</span>
         </Link>
