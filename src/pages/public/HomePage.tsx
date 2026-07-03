@@ -29,26 +29,6 @@ export function HomePage() {
 
       <FeaturedCampaignsSection />
 
-      {/* About Preview */}
-      <section className="relative mx-auto max-w-6xl bg-transparent px-4 py-16 md:px-6">
-        <div className="grid items-center gap-8 md:grid-cols-2">
-          <SectionHeader title="About the Foundation" />
-          <div>
-            <p className="leading-relaxed text-muted-foreground">
-              The Themba Molefe Foundation supports vulnerable communities through outreach
-              programmes, donations, sponsorships, volunteer participation, and beneficiary
-              assistance. This system helps organise and track community support activities in one
-              central platform.
-            </p>
-            <div className="mt-6">
-              <Button to="/about" variant="outline">
-                Learn More
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* How It Works */}
       <section className="relative bg-transparent py-16 md:py-24">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
