@@ -1,9 +1,9 @@
 import { HeroSection } from "@/components/ui/HeroSection";
 import { StatsSection } from "@/components/ui/StatsSection";
 import { FeaturedCampaignsSection } from "@/components/ui/FeaturedCampaignsSection";
+import { HowItWorksSection } from "@/components/ui/HowItWorksSection";
 import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { howItWorksSteps } from "@/data/publicHomeData";
 
 import heroImage from "@/assets/hero.JPG";
 
@@ -20,7 +20,7 @@ export function HomePage() {
         backgroundImage={heroImage}
         contactInfo={{
           website: "tmfsupport.org",
-          phone: "+27 00 000 0000",
+          phone: "+27 72 076 9116",
           address: "Katlehong, Gauteng",
         }}
       />
@@ -28,6 +28,8 @@ export function HomePage() {
       <StatsSection />
 
       <FeaturedCampaignsSection />
+
+      <HowItWorksSection />
 
       {/* About Preview */}
       <section className="relative mx-auto max-w-6xl bg-transparent px-4 py-16 md:px-6">
@@ -45,27 +47,6 @@ export function HomePage() {
                 Learn More
               </Button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="relative bg-transparent py-16 md:py-24">
-        <div className="mx-auto max-w-6xl px-4 md:px-6">
-          <SectionHeader title="How The System Works" align="center" />
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {howItWorksSteps.map((step) => (
-              <div
-                key={step.step}
-                className="rounded-2xl border border-border bg-card p-6 text-card-foreground"
-              >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
-                  {step.step}
-                </div>
-                <h3 className="font-semibold text-card-foreground">{step.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

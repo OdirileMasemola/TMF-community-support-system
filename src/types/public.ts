@@ -27,6 +27,8 @@ export type HowItWorksStep = {
   step: number;
   title: string;
   description: string;
+  benefits: string[];
+  icon: LucideIcon;
 };
 
 export type FounderQuote = {
