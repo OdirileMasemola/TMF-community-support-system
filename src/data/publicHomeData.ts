@@ -5,6 +5,9 @@ import {
   ClipboardList,
   Users,
   Home,
+  UserPlus,
+  Layers,
+  ClipboardCheck,
 } from "lucide-react";
 import type {
   FeaturedCampaign,
@@ -81,22 +84,35 @@ export const featuredCampaigns: FeaturedCampaign[] = [
 export const howItWorksSteps: HowItWorksStep[] = [
   {
     step: 1,
-    title: "Register",
-    description: "Create an account based on your role.",
+    title: "Create Your Account",
+    description: "Register on the platform and choose the role that matches how you want to use the system.",
+    benefits: [
+      "Register as a volunteer, donor, sponsor, or beneficiary",
+      "Secure account access",
+      "Role-based system experience",
+    ],
+    icon: UserPlus,
   },
   {
     step: 2,
-    title: "Choose Your Role",
-    description: "Join as a volunteer, donor, sponsor, or beneficiary.",
+    title: "Access The Right Services",
+    description: "Use the services linked to your role, such as campaigns, donations, sponsorships, or assistance requests.",
+    benefits: [
+      "Volunteers can apply for campaigns",
+      "Beneficiaries can submit assistance requests",
+      "Donors and sponsors can support active campaigns",
+    ],
+    icon: Layers,
   },
   {
     step: 3,
-    title: "Access Services",
-    description: "Apply for campaigns, make donations, request assistance, or sponsor campaigns.",
-  },
-  {
-    step: 4,
     title: "Track Progress",
-    description: "Receive updates and monitor requests, applications, donations, and support activities.",
+    description: "Receive updates and monitor campaign applications, donations, sponsorships, and assistance request statuses.",
+    benefits: [
+      "Track request and application status",
+      "Receive system notifications",
+      "Support better reporting and transparency",
+    ],
+    icon: ClipboardCheck,
   },
 ];

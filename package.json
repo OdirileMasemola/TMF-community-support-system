@@ -22,7 +22,7 @@
     "framer-motion": "^12.42.0",
     "jspdf": "latest",
     "jspdf-autotable": "latest",
-    "lucide-react": "^1.21.0",
+    "lucide-react": "^1.23.0",
     "react": "latest",
     "react-dom": "latest",
     "react-hook-form": "latest",
