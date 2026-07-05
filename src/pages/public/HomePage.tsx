@@ -3,6 +3,7 @@ import { StatsSection } from "@/components/ui/StatsSection";
 import { FeaturedCampaignsSection } from "@/components/ui/FeaturedCampaignsSection";
 import { HowItWorksSection } from "@/components/ui/HowItWorksSection";
 import { CallToActionSection } from "@/components/ui/CallToActionSection";
+import { SectionReveal } from "@/components/ui/SectionReveal";
 
 import heroImage from "@/assets/hero.JPG";
 
@@ -24,15 +25,21 @@ export function HomePage() {
         }}
       />
 
-      <StatsSection />
+      <SectionReveal delay={0.05} direction="left">
+        <StatsSection />
+      </SectionReveal>
 
-      <FeaturedCampaignsSection />
+      <SectionReveal delay={0.12} direction="right">
+        <FeaturedCampaignsSection />
+      </SectionReveal>
 
+      <SectionReveal delay={0.18} direction="left">
+        <HowItWorksSection />
+      </SectionReveal>
 
-
-      <HowItWorksSection />
-
-      <CallToActionSection />
+      <SectionReveal delay={0.24} direction="up">
+        <CallToActionSection />
+      </SectionReveal>
     </>
   );
 }

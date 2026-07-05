@@ -1,27 +1,16 @@
-import { motion, useReducedMotion } from "framer-motion";
 import { HeartHandshake } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 export function CallToActionSection() {
-  const shouldReduceMotion = useReducedMotion();
-
   return (
     <section className="relative bg-transparent py-16 md:py-24" aria-labelledby="cta-heading">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
-        <motion.div
+        <div
           className="relative mx-auto flex max-w-5xl flex-col items-center justify-center overflow-hidden rounded-3xl border border-border bg-card/70 px-6 py-14 text-center text-card-foreground shadow-lg backdrop-blur-xl md:px-10 md:py-16"
           style={{
             backgroundImage:
               "linear-gradient(135deg, var(--cta-gradient-start), var(--cta-gradient-end))",
           }}
-          initial={
-            shouldReduceMotion
-              ? false
-              : { opacity: 0, y: 24, filter: "blur(6px)" }
-          }
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.35 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
         >
           <div
             aria-hidden="true"
@@ -60,7 +49,7 @@ export function CallToActionSection() {
             Whether you want to volunteer, donate, sponsor, or request support, the platform guides
             you to the right place.
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
