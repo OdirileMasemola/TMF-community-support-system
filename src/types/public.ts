@@ -17,12 +17,6 @@ export type FeaturedCampaign = {
   href: string;
 };
 
-export type HeroSummaryItem = {
-  label: string;
-  value: string;
-  icon?: LucideIcon;
-};
-
 export type HowItWorksStep = {
   step: number;
   title: string;

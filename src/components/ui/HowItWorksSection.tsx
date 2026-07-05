@@ -33,10 +33,10 @@ function StepCard({ icon, title, description, benefits }: StepCardProps) {
 export function HowItWorksSection() {
   return (
     <section className="relative bg-transparent py-16 md:py-24" aria-labelledby="how-it-works-heading">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="mx-auto max-w-6xl px-6">
         <div className="max-w-2xl text-left">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-            HOW THE SYSTEM WORKS
+            How the system works
           </p>
           <h2
             id="how-it-works-heading"

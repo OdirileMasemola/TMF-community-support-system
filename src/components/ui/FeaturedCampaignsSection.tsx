@@ -10,7 +10,9 @@ export function FeaturedCampaignsSection() {
     >
       <div className="mx-auto max-w-6xl px-6">
         <div className="max-w-2xl">
-          <p className="text-xs font-semibold tracking-[0.2em] text-primary">FEATURED CAMPAIGNS</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            Featured Campaigns
+          </p>
           <h2
             id="featured-campaigns-heading"
             className="mt-3 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl"

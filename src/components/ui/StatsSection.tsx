@@ -10,7 +10,7 @@ export function StatsSection() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
           <div>
-            <p className="text-xs font-semibold tracking-[0.2em] text-primary">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               {statsSectionContent.label}
             </p>
             <h2

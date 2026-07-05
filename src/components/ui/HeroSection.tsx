@@ -32,10 +32,6 @@ const MOBILE_CLIP = "polygon(0 0, 100% 0, 100% 100%, 0 100%)";
 const DESKTOP_CLIP = "polygon(14% 0%, 100% 0%, 100% 100%, 0% 100%)";
 const HIDDEN_CLIP = "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)";
 
-function getClipPathForWidth(width: number) {
-  return width >= 768 ? DESKTOP_CLIP : MOBILE_CLIP;
-}
-
 const contentVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
@@ -56,10 +52,11 @@ export function HeroSection({
   const [clipPath, setClipPath] = useState(MOBILE_CLIP);
 
   useEffect(() => {
-    const updateClipPath = () => setClipPath(getClipPathForWidth(window.innerWidth));
+    const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const updateClipPath = () => setClipPath(desktopQuery.matches ? DESKTOP_CLIP : MOBILE_CLIP);
     updateClipPath();
-    window.addEventListener("resize", updateClipPath);
-    return () => window.removeEventListener("resize", updateClipPath);
+    desktopQuery.addEventListener("change", updateClipPath);
+    return () => desktopQuery.removeEventListener("change", updateClipPath);
   }, []);
 
   return (
@@ -96,7 +93,7 @@ export function HeroSection({
               <motion.p
                 variants={contentVariants}
                 className={cn(
-                  "text-xs font-semibold tracking-[0.2em] text-primary sm:text-sm",
+                  "text-xs font-semibold uppercase tracking-[0.2em] text-primary sm:text-sm",
                   logoText ? "mt-2" : "",
                 )}
               >

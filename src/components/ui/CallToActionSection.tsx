@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 export function CallToActionSection() {
   return (
     <section className="relative bg-transparent py-16 md:py-24" aria-labelledby="cta-heading">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+      <div className="mx-auto max-w-6xl px-6">
         <div
           className="relative mx-auto flex max-w-5xl flex-col items-center justify-center overflow-hidden rounded-3xl border border-border bg-card/70 px-6 py-14 text-center text-card-foreground shadow-lg backdrop-blur-xl md:px-10 md:py-16"
           style={{

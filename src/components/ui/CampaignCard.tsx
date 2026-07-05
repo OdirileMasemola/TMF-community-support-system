@@ -18,9 +18,27 @@ const gradientPanelClassName = cn(
   "motion-safe:group-hover:skew-x-0 motion-safe:group-hover:left-6 motion-safe:group-hover:w-[calc(100%-56px)]",
 );
 
+function getStatusBadgeClasses(status: FeaturedCampaign["status"]) {
+  switch (status) {
+    case "Active":
+      return "border-emerald-500/40 bg-emerald-500/15 text-emerald-700 dark:border-emerald-400/50 dark:text-emerald-300";
+    case "Upcoming":
+      return "border-cyan-500/40 bg-cyan-500/15 text-cyan-700 dark:border-cyan-400/50 dark:text-cyan-300";
+    case "Completed":
+      return "border-zinc-500/40 bg-zinc-500/15 text-zinc-700 dark:border-zinc-400/50 dark:text-zinc-300";
+    default:
+      return "border-border bg-background/70 text-muted-foreground";
+  }
+}
+
 function CampaignStatusBadge({ status }: { status: FeaturedCampaign["status"] }) {
   return (
-    <span className="mb-5 inline-flex w-fit rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-primary">
+    <span
+      className={cn(
+        "mb-5 inline-flex w-fit items-center rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur",
+        getStatusBadgeClasses(status),
+      )}
+    >
       {status}
     </span>
   );
@@ -96,7 +114,7 @@ export function CampaignCard({
 
       <div
         className={cn(
-          "relative z-20 mt-8 flex h-[280px] flex-col overflow-hidden rounded-2xl border border-border bg-card/70 p-7 shadow-lg backdrop-blur-xl",
+          "relative z-20 mt-8 flex h-[280px] flex-col overflow-hidden rounded-2xl border border-border bg-card/80 p-7 shadow-lg backdrop-blur-xl",
           "text-card-foreground motion-safe:transition-all motion-safe:duration-500 motion-reduce:transition-none",
           "motion-safe:group-hover:-translate-x-4 motion-safe:group-hover:-translate-y-2 motion-reduce:transform-none",
         )}

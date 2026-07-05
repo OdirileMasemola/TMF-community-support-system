@@ -1,8 +1,6 @@
 import {
   HeartHandshake,
   Megaphone,
-  HandHeart,
-  ClipboardList,
   Users,
   Home,
   UserPlus,
@@ -12,18 +10,10 @@ import {
 import type {
   FeaturedCampaign,
   FounderQuote,
-  HeroSummaryItem,
   HowItWorksStep,
   ImpactStat,
   StatsSectionContent,
 } from "@/types/public";
-
-export const heroSummaryItems: HeroSummaryItem[] = [
-  { label: "Active Campaigns", value: "12+", icon: Megaphone },
-  { label: "Volunteers", value: "80+", icon: Users },
-  { label: "Assistance Requests", value: "150+", icon: ClipboardList },
-  { label: "Donations Tracked", value: "R25k+", icon: HandHeart },
-];
 
 export const impactStats: ImpactStat[] = [
   { label: "Active Campaigns", value: "12+", icon: Megaphone },
@@ -33,7 +23,7 @@ export const impactStats: ImpactStat[] = [
 ];
 
 export const statsSectionContent: StatsSectionContent = {
-  label: "FOUNDATION IMPACT",
+  label: "Foundation Impact",
   heading: "Building hope through organised community support.",
   paragraph:
     "The Themba Molefe Foundation supports vulnerable communities through outreach programmes, donations, sponsorships, volunteer participation, and beneficiary assistance. This platform helps organise that support in one central system.",
