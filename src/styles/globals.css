@@ -35,6 +35,18 @@ a {
   text-decoration: none;
 }
 
+a.border-primary.bg-primary {
+  color: var(--primary-foreground);
+}
+
+a.border-secondary.bg-secondary {
+  color: var(--secondary-foreground);
+}
+
+a.border-foreground.bg-foreground {
+  color: var(--background);
+}
+
 .page-title {
   font-size: 1.6rem;
   font-weight: 700;

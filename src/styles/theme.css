@@ -40,6 +40,12 @@
   --footer-foreground: #ffffff;
   --footer-accent: #bbcde5;
   --footer-border: #6b7280;
+  --outline-hover-border: #6b7280;
+  --outline-hover-bg: rgba(55, 65, 81, 0.04);
+  --outline-hover-shadow: rgba(55, 65, 81, 0.1);
+  --cta-glow: rgba(28, 93, 153, 0.18);
+  --cta-gradient-start: rgba(255, 255, 255, 0.9);
+  --cta-gradient-end: rgba(245, 245, 245, 0.75);
 }
 
 [data-theme="dark"] {
@@ -74,6 +80,12 @@
   --footer-foreground: #ffffff;
   --footer-accent: #bbcde5;
   --footer-border: #404040;
+  --outline-hover-border: #d1d5db;
+  --outline-hover-bg: rgba(229, 231, 235, 0.05);
+  --outline-hover-shadow: rgba(229, 231, 235, 0.12);
+  --cta-glow: rgba(99, 159, 171, 0.22);
+  --cta-gradient-start: rgba(17, 17, 17, 0.9);
+  --cta-gradient-end: rgba(34, 34, 34, 0.75);
 }
 
 .animated-blobs {

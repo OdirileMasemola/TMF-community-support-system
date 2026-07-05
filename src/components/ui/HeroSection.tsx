@@ -71,7 +71,7 @@ export function HeroSection({
     >
       <div className="relative flex w-full flex-col md:h-full md:flex-row md:overflow-hidden">
         <motion.div
-          className="relative z-10 flex w-full flex-col justify-center px-6 pb-8 pt-28 md:h-full md:w-[58%] md:justify-between md:px-12 md:pb-8 md:pt-24 lg:w-[60%] lg:px-16"
+          className="relative z-10 flex w-full flex-col justify-center px-6 pb-8 pt-32 md:h-full md:w-[58%] md:justify-between md:px-12 md:pb-8 md:pt-32 lg:w-[60%] lg:px-16"
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -82,7 +82,7 @@ export function HeroSection({
             },
           }}
         >
-          <div>
+          <div className="mt-8 md:mt-14">
             {logoText ? (
               <motion.p
                 variants={contentVariants}

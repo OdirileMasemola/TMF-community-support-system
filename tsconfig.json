@@ -15,12 +15,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],
+  "exclude": ["src/app", "src/utils/supabase/middleware.ts", "src/utils/supabase/server.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
