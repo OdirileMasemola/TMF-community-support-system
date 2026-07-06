@@ -44,6 +44,14 @@
   --outline-hover-bg: rgba(55, 65, 81, 0.04);
   --outline-hover-shadow: rgba(55, 65, 81, 0.1);
   --cta-glow: rgba(28, 93, 153, 0.18);
+  --hero-glow: rgba(28, 93, 153, 0.18);
+  --hero-highlight-gradient: linear-gradient(
+    120deg,
+    #1c5d99 0%,
+    #1c5d99 55%,
+    #3d7aad 78%,
+    #639fab 100%
+  );
   --cta-gradient-start: rgba(255, 255, 255, 0.9);
   --cta-gradient-end: rgba(245, 245, 245, 0.75);
 }
@@ -84,6 +92,15 @@
   --outline-hover-bg: rgba(229, 231, 235, 0.05);
   --outline-hover-shadow: rgba(229, 231, 235, 0.12);
   --cta-glow: rgba(99, 159, 171, 0.22);
+  --hero-glow: rgba(99, 159, 171, 0.22);
+  --hero-highlight-gradient: linear-gradient(
+    120deg,
+    #2878b5 0%,
+    #1c5d99 40%,
+    #1c5d99 65%,
+    #639fab 88%,
+    #8bb8c4 100%
+  );
   --cta-gradient-start: rgba(17, 17, 17, 0.9);
   --cta-gradient-end: rgba(34, 34, 34, 0.75);
 }

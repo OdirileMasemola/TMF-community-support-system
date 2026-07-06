@@ -1,61 +1,25 @@
-import { PlaceholderPage } from "@/pages/public/PlaceholderPage";
-import { CampaignCard } from "@/components/ui/CampaignCard";
-import { Button } from "@/components/ui/Button";
-import { featuredCampaigns } from "@/data/publicHomeData";
+import { CampaignHeroPreview } from "@/components/ui/CampaignHeroPreview";
+import { PageHero } from "@/components/ui/PageHero";
 
 export function CampaignsPage() {
   return (
-    <div style={{ paddingTop: "60px", paddingLeft: "40px" }}>
-      <PlaceholderPage
-        title="Campaigns"
-        description="Browse active and upcoming foundation campaigns. Campaign listings and details will appear here soon."
-      />
-
-      <section
-        className="relative bg-transparent py-16 md:py-24"
-        aria-labelledby="featured-campaigns-heading"
+    <>
+      <PageHero
+        label="CAMPAIGNS"
+        title="Support campaigns that"
+        highlightedTitle="make a difference."
+        subtitle="Explore active and upcoming foundation campaigns focused on food support, youth education, winter relief, and community assistance."
+        primaryCta={{ text: "View Campaigns", to: "#campaign-list" }}
+        secondaryCta={{ text: "Get Involved", to: "/get-involved" }}
       >
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold tracking-[0.2em] text-primary">
-              FEATURED CAMPAIGNS
-            </p>
+        <CampaignHeroPreview />
+      </PageHero>
 
-            <h2
-              id="featured-campaigns-heading"
-              className="mt-3 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl"
-            >
-              Support active community campaigns.
-            </h2>
-
-            <p className="mt-4 leading-relaxed text-muted-foreground">
-              Explore current and upcoming campaigns managed through the Themba
-              Molefe Foundation&apos;s community support platform.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-10 pt-8 pb-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredCampaigns.map((campaign) => (
-              <CampaignCard
-                key={campaign.id}
-                title={campaign.title}
-                description={campaign.description}
-                status={campaign.status}
-                gradientFrom={campaign.gradientFrom}
-                gradientTo={campaign.gradientTo}
-                glowColor={campaign.glowColor}
-                href={campaign.href}
-              />
-            ))}
-          </div>
-
-          <div className="mt-6 text-center">
-            <Button to="/campaigns" variant="outline">
-              View All Campaigns
-            </Button>
-          </div>
+      <section id="campaign-list" className="px-6 py-16">
+        <div className="mx-auto max-w-6xl">
+          {/* Campaign filters and cards will be added next. */}
         </div>
       </section>
-    </div>
+    </>
   );
 }

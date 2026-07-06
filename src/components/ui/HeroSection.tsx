@@ -109,7 +109,9 @@ export function HeroSection({
               {highlightedTitle ? (
                 <>
                   <br />
-                  <span className="text-primary">{highlightedTitle}</span>
+                  <span className="bg-[image:var(--hero-highlight-gradient)] bg-clip-text text-transparent">
+                    {highlightedTitle}
+                  </span>
                 </>
               ) : null}
             </motion.h1>
