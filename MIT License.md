@@ -1,5 +1,3 @@
-MIT License
-
 Copyright (c) 2026 Odirile Masemola & Lerato Mokoena
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
