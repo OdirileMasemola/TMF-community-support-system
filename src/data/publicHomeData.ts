@@ -15,12 +15,12 @@ import type {
   ImpactStat,
   StatsSectionContent,
 } from "@/types/public";
-import backToSchoolImage from "@/assets/images/campaigns/Back to school.jpg";
-import communityHealthImage from "@/assets/images/campaigns/Community Health Awareness.jpg";
-import familyCareImage from "@/assets/images/campaigns/Family Care Support.jpg";
-import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.jpg";
-import winterReliefImage from "@/assets/images/campaigns/Winter Relief.jpg";
-import youthEducationImage from "@/assets/images/campaigns/Youth Education Support.jpg";
+import backToSchoolImage from "@/assets/images/campaigns/Back to school.webp";
+import communityHealthImage from "@/assets/images/campaigns/Community Health Awareness.webp";
+import familyCareImage from "@/assets/images/campaigns/Family Care Support.webp";
+import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp";
+import winterReliefImage from "@/assets/images/campaigns/Winter Relief.webp";
+import youthEducationImage from "@/assets/images/campaigns/Youth Education Support.webp";
 
 export const impactStats: ImpactStat[] = [
   { label: "Active Campaigns", value: "12+", icon: Megaphone },
