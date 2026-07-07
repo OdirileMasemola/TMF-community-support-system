@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Globe, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
 
 export type HeroContactInfo = {
@@ -109,7 +110,9 @@ export function HeroSection({
               {highlightedTitle ? (
                 <>
                   <br />
-                  <span className="text-primary">{highlightedTitle}</span>
+                  <span className="bg-[image:var(--hero-highlight-gradient)] bg-clip-text text-transparent">
+                    {highlightedTitle}
+                  </span>
                 </>
               ) : null}
             </motion.h1>
@@ -183,9 +186,12 @@ export function HeroSection({
           animate={{ clipPath }}
           transition={{ duration: 1.1, ease: "easeOut", delay: 0.15 }}
         >
-          <img
+          <OptimizedImage
             src={backgroundImage}
-            alt="Community support outreach by the Themba Molefe Foundation"
+            alt="Themba Molefe Foundation community support"
+            priority
+            width={2400}
+            height={1600}
             className="h-full w-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-primary/10" aria-hidden="true" />

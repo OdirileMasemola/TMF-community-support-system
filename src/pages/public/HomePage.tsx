@@ -5,7 +5,7 @@ import { HowItWorksSection } from "@/components/ui/HowItWorksSection";
 import { CallToActionSection } from "@/components/ui/CallToActionSection";
 import { SectionReveal } from "@/components/ui/SectionReveal";
 
-import heroImage from "@/assets/hero.JPG";
+import heroImage from "@/assets/hero.webp";
 
 export function HomePage() {
   return (
