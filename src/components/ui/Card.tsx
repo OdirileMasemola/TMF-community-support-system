@@ -9,3 +9,9 @@ export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
     />
   );
 }
+
+export function CardContent({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("px-5 py-4", className)} {...props} />;
+}
+
+export default Card;
