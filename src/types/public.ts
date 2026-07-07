@@ -10,12 +10,26 @@ export type FeaturedCampaign = {
   id: string;
   title: string;
   description: string;
-  status: "Active" | "Upcoming" | "Completed";
+  status: CampaignStatus;
   gradientFrom: string;
   gradientTo: string;
   glowColor?: string;
   href: string;
 };
+
+export type CampaignStatus = "Active" | "Upcoming" | "Completed";
+
+export interface Campaign {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  status: CampaignStatus;
+  startDate: string;
+  endDate: string;
+  goal: string;
+  image: string;
+}
 
 export type HowItWorksStep = {
   step: number;

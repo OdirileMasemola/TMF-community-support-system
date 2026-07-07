@@ -50,6 +50,14 @@ function buttonClassName(variant: ButtonVariant, className?: string) {
 }
 
 export function Button({ className, variant = "primary", to, children, ...props }: ButtonProps) {
+  if (to?.startsWith("#")) {
+    return (
+      <a href={to} className={buttonClassName(variant, className)}>
+        {children}
+      </a>
+    );
+  }
+
   if (to) {
     return (
       <Link to={to} className={buttonClassName(variant, className)}>
