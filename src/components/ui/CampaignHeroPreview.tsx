@@ -22,30 +22,6 @@ export function CampaignHeroPreview() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-transparent from-35% to-transparent"
         />
-
-        <div className="relative mx-auto max-w-3xl rounded-3xl border border-border bg-card/70 p-6 text-card-foreground shadow-lg backdrop-blur-xl md:p-8">
-          <h2 className="text-lg font-semibold text-foreground md:text-xl">Campaign Overview</h2>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className={cn(
-                  "flex flex-col items-center rounded-2xl border px-4 py-4 text-center backdrop-blur",
-                  statToneClasses[stat.tone],
-                )}
-              >
-                <span className="text-2xl font-bold">{stat.value}</span>
-                <span className="mt-1 text-sm font-medium">{stat.label}</span>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
-            Public campaigns are currently shown using static placeholder data. Supabase fetching
-            will be connected later.
-          </p>
-        </div>
       </div>
     </AnimatedGroup>
   );
