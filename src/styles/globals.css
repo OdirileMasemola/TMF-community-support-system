@@ -69,3 +69,45 @@ a.border-foreground.bg-foreground {
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
+
+/* Animations and small helpers for social icons */
+@keyframes shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-5px) rotate(-5deg); }
+  40% { transform: translateX(5px) rotate(5deg); }
+  60% { transform: translateX(-5px) rotate(-5deg); }
+  80% { transform: translateX(5px) rotate(5deg); }
+}
+
+.icon-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: -1;
+}
+
+.social-icon:hover .icon-container::before {
+  opacity: 1;
+}
+
+.animate-shake {
+  animation: shake 0.5s;
+}
+
+/* Per-platform hover glows (used alongside Tailwind utilities) */
+.social-icon.instagram:hover .icon-container {
+  box-shadow: 0 0 30px rgba(225,48,108,0.25), 0 0 60px rgba(124,58,237,0.18);
+}
+.social-icon.discord:hover .icon-container {
+  box-shadow: 0 0 30px rgba(114,137,218,0.25), 0 0 60px rgba(114,137,218,0.15);
+}
+.social-icon.github:hover .icon-container {
+  box-shadow: 0 0 30px rgba(51,51,51,0.25), 0 0 60px rgba(51,51,51,0.12);
+}
+.social-icon.linkedin:hover .icon-container {
+  box-shadow: 0 0 30px rgba(0,119,181,0.25), 0 0 60px rgba(0,119,181,0.12);
+}

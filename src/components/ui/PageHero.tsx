@@ -16,6 +16,10 @@ export type PageHeroProps = {
     text: string;
     to: string;
   };
+  tertiaryCta?: {
+    text: string;
+    to: string;
+  };
   children?: ReactNode;
 };
 
@@ -26,6 +30,7 @@ export function PageHero({
   subtitle,
   primaryCta,
   secondaryCta,
+  tertiaryCta,
   children,
 }: PageHeroProps) {
   return (
@@ -55,7 +60,7 @@ export function PageHero({
             {subtitle}
           </p>
 
-          {(primaryCta || secondaryCta) && (
+          {(primaryCta || secondaryCta || tertiaryCta) && (
             <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">
               {primaryCta && (
                 <div className="rounded-xl border border-border bg-foreground/5 p-0.5">
@@ -71,6 +76,15 @@ export function PageHero({
                   className={cn("rounded-lg px-3.5 py-1.5 text-sm")}
                 >
                   {secondaryCta.text}
+                </Button>
+              )}
+              {tertiaryCta && (
+                <Button
+                  to={tertiaryCta.to}
+                  variant="secondary"
+                  className={cn("rounded-lg px-3.5 py-1.5 text-sm")}
+                >
+                  {tertiaryCta.text}
                 </Button>
               )}
             </div>
