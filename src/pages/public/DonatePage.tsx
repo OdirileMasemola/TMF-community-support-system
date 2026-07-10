@@ -12,7 +12,7 @@ export function DonatePage() {
         label="DONATE"
         title={
           <>
-            Help TMF turn support
+            Help us turn support
             <br />
             <span className="bg-[image:var(--hero-highlight-gradient)] bg-clip-text text-transparent">
               into real opportunity.
