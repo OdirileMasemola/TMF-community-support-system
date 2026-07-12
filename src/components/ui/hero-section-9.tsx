@@ -169,43 +169,49 @@ const HeroSection = ({ label, title, subtitle, actions, stats, images, className
           />
 
           <motion.div
-            className="absolute left-[42%] top-28 h-52 w-52 -translate-x-1/2 overflow-hidden rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-72 sm:w-72 md:top-44"
+            className="absolute left-[42%] top-28 h-52 w-52 -translate-x-1/2 rounded-3xl border border-border bg-transparent p-2 shadow-2xl backdrop-blur-sm sm:h-72 sm:w-72 md:top-44"
             style={{ transformOrigin: "bottom center" }}
             variants={imageVariants}
           >
-            <OptimizedImage
-              src={images[0]}
-              alt="Community learners studying together"
-              width={900}
-              height={900}
-              className="h-full w-full scale-110 rounded-xl object-cover"
-            />
+            <div className="h-full w-full overflow-hidden rounded-xl">
+              <OptimizedImage
+                src={images[0]}
+                alt="Community learners studying together"
+                width={900}
+                height={900}
+                className="h-full w-full scale-110 object-cover"
+              />
+            </div>
           </motion.div>
           <motion.div
-            className="absolute right-10 top-[46%] h-44 w-44 overflow-hidden rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-60 sm:w-60 md:right-14 md:top-[40%]"
+            className="absolute right-10 top-[46%] h-44 w-44 rounded-3xl border border-border bg-transparent p-2 shadow-2xl backdrop-blur-sm sm:h-60 sm:w-60 md:right-14 md:top-[40%]"
             style={{ transformOrigin: "left center" }}
             variants={imageVariants}
           >
-            <OptimizedImage
-              src={images[1]}
-              alt="Mentor supporting a student"
-              width={900}
-              height={900}
-              className="h-full w-full scale-110 rounded-xl object-cover"
-            />
+            <div className="h-full w-full overflow-hidden rounded-xl">
+              <OptimizedImage
+                src={images[1]}
+                alt="Mentor supporting a student"
+                width={900}
+                height={900}
+                className="h-full w-full scale-110 object-cover"
+              />
+            </div>
           </motion.div>
           <motion.div
-            className="absolute left-6 top-[62%] h-36 w-36 overflow-hidden rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-52 sm:w-52 md:left-10 md:top-[58%]"
+            className="absolute left-6 top-[62%] h-36 w-36 rounded-3xl border border-border bg-transparent p-2 shadow-2xl backdrop-blur-sm sm:h-52 sm:w-52 md:left-10 md:top-[58%]"
             style={{ transformOrigin: "top right" }}
             variants={imageVariants}
           >
-            <OptimizedImage
-              src={images[2]}
-              alt="Young people collaborating"
-              width={900}
-              height={900}
-              className="h-full w-full scale-110 rounded-xl object-cover"
-            />
+            <div className="h-full w-full overflow-hidden rounded-xl">
+              <OptimizedImage
+                src={images[2]}
+                alt="Young people collaborating"
+                width={900}
+                height={900}
+                className="h-full w-full scale-110 object-cover"
+              />
+            </div>
           </motion.div>
         </motion.div>
       </div>

@@ -22,7 +22,7 @@ export function DonatePage() {
             </span>
           </>
         }
-        subtitle="Your donation helps The Masemola Foundation provide learning support, mentorship, resources, and community programmes for young people who need a stronger bridge to their future."
+        subtitle="Your donation helps The Themba Molefe Foundation provide learning support, mentorship, resources, and community programmes for young people who need a stronger bridge to their future."
         actions={[
           {
             text: "Donate now",
