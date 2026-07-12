@@ -1,5 +1,8 @@
 import HeroSection from "@/components/ui/hero-section-9";
 import { BookOpen, GraduationCap, HandHeart, ShieldCheck } from "lucide-react";
+import donationImageOne from "@/assets/images/donation/donation-1.webp";
+import donationImageTwo from "@/assets/images/donation/donation-2.webp";
+import donationImageThree from "@/assets/images/donation/donation-3.webp";
 
 export function DonatePage() {
   const scrollToDonationOptions = () => {
@@ -52,9 +55,9 @@ export function DonatePage() {
           },
         ]}
         images={[
-          "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1543269865-cbf427effbad?q=80&w=1200&auto=format&fit=crop",
-          "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1200&auto=format&fit=crop",
+          donationImageOne,
+          donationImageTwo,
+          donationImageThree,
         ]}
       />
 

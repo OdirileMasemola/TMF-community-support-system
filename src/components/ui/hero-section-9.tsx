@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, type Variants } from "framer-motion";
 import { Button, type ButtonProps } from "@/components/ui/Button";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
 
 interface StatProps {
@@ -90,7 +91,7 @@ const HeroSection = ({ label, title, subtitle, actions, stats, images, className
           initial="hidden"
           animate="visible"
         >
-          <div className="mt-8 md:mt-14">
+          <div className="mt-8 md:ml-4 md:mt-14 lg:ml-6">
             {label ? (
               <motion.p
                 className="text-xs font-semibold uppercase tracking-[0.2em] text-primary sm:text-sm"
@@ -150,12 +151,12 @@ const HeroSection = ({ label, title, subtitle, actions, stats, images, className
           animate="visible"
         >
           <motion.div
-            className="absolute left-1/4 top-10 h-16 w-16 rounded-full bg-blue-200/50 dark:bg-blue-800/30"
+            className="absolute left-[18%] top-24 h-16 w-16 rounded-full bg-blue-200/50 dark:bg-blue-800/30 md:top-36"
             variants={floatingVariants}
             animate="animate"
           />
           <motion.div
-            className="absolute bottom-0 right-1/4 h-12 w-12 rounded-lg bg-purple-200/50 dark:bg-purple-800/30"
+            className="absolute bottom-0 right-1/3 h-12 w-12 rounded-lg bg-purple-200/50 dark:bg-purple-800/30"
             variants={floatingVariants}
             animate="animate"
             style={{ transitionDelay: "0.5s" }}
@@ -168,25 +169,43 @@ const HeroSection = ({ label, title, subtitle, actions, stats, images, className
           />
 
           <motion.div
-            className="absolute left-1/2 top-12 h-48 w-48 -translate-x-1/2 rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-64 sm:w-64 md:top-24"
+            className="absolute left-[42%] top-28 h-52 w-52 -translate-x-1/2 overflow-hidden rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-72 sm:w-72 md:top-44"
             style={{ transformOrigin: "bottom center" }}
             variants={imageVariants}
           >
-            <img src={images[0]} alt="Community learners studying together" className="h-full w-full rounded-xl object-cover" />
+            <OptimizedImage
+              src={images[0]}
+              alt="Community learners studying together"
+              width={900}
+              height={900}
+              className="h-full w-full scale-110 rounded-xl object-cover"
+            />
           </motion.div>
           <motion.div
-            className="absolute right-0 top-1/3 h-40 w-40 rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-56 sm:w-56 md:right-8"
+            className="absolute right-10 top-[46%] h-44 w-44 overflow-hidden rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-60 sm:w-60 md:right-14 md:top-[40%]"
             style={{ transformOrigin: "left center" }}
             variants={imageVariants}
           >
-            <img src={images[1]} alt="Mentor supporting a student" className="h-full w-full rounded-xl object-cover" />
+            <OptimizedImage
+              src={images[1]}
+              alt="Mentor supporting a student"
+              width={900}
+              height={900}
+              className="h-full w-full scale-110 rounded-xl object-cover"
+            />
           </motion.div>
           <motion.div
-            className="absolute bottom-8 left-0 h-32 w-32 rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-48 sm:w-48 md:left-8"
+            className="absolute left-6 top-[62%] h-36 w-36 overflow-hidden rounded-3xl border border-border bg-card/70 p-2 shadow-2xl backdrop-blur-xl sm:h-52 sm:w-52 md:left-10 md:top-[58%]"
             style={{ transformOrigin: "top right" }}
             variants={imageVariants}
           >
-            <img src={images[2]} alt="Young people collaborating" className="h-full w-full rounded-xl object-cover" />
+            <OptimizedImage
+              src={images[2]}
+              alt="Young people collaborating"
+              width={900}
+              height={900}
+              className="h-full w-full scale-110 rounded-xl object-cover"
+            />
           </motion.div>
         </motion.div>
       </div>
