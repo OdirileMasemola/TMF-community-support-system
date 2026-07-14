@@ -1,8 +1,38 @@
 import HeroSection from "@/components/ui/hero-section-9";
-import { BookOpen, GraduationCap, HandHeart, ShieldCheck } from "lucide-react";
+import {
+  Accessibility,
+  Banknote,
+  BookOpen,
+  GraduationCap,
+  HandHeart,
+  Shirt,
+} from "lucide-react";
 import donationImageOne from "@/assets/images/donation/donation-1.webp";
 import donationImageTwo from "@/assets/images/donation/donation-2.webp";
 import donationImageThree from "@/assets/images/donation/donation-3.webp";
+
+const donationOptions = [
+  {
+    title: "Clothes",
+    description: "Donate gently used or new clothing to support families and learners in need.",
+    icon: Shirt,
+  },
+  {
+    title: "Wheelchairs",
+    description: "Help provide mobility support for beneficiaries who need wheelchair assistance.",
+    icon: Accessibility,
+  },
+  {
+    title: "School uniform",
+    description: "Contribute school uniforms so learners can attend school with dignity and confidence.",
+    icon: GraduationCap,
+  },
+  {
+    title: "Money",
+    description: "Make a financial gift to fund programmes, resources, and urgent community needs.",
+    icon: Banknote,
+  },
+] as const;
 
 export function DonatePage() {
   const scrollToDonationOptions = () => {
@@ -67,23 +97,17 @@ export function DonatePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Ways to give</p>
             <h2 className="mt-3 text-3xl font-bold text-card-foreground">Choose how you want to support the mission.</h2>
             <p className="mt-4 text-muted-foreground">
-              Secure payment options are coming soon. For now, reach out to the team and we will help you complete your
-              donation or partnership pledge.
+              Choose one of the donation types below. Secure payment options are coming soon — for now, reach out to
+              the team and we will help you complete your donation.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {[
-              "Sponsor a learner support programme",
-              "Contribute learning materials",
-              "Fund mentorship and community outreach",
-            ].map((option) => (
-              <div key={option} className="rounded-2xl border border-border bg-background/70 p-5 backdrop-blur-xl">
-                <ShieldCheck className="h-6 w-6 text-primary" />
-                <h3 className="mt-4 font-semibold text-foreground">{option}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  We will connect your contribution to high-impact needs in the TMF community.
-                </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {donationOptions.map(({ title, description, icon: Icon }) => (
+              <div key={title} className="rounded-2xl border border-border bg-background/70 p-5 backdrop-blur-xl">
+                <Icon className="h-6 w-6 text-primary" />
+                <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
               </div>
             ))}
           </div>
