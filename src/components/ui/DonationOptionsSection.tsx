@@ -244,33 +244,35 @@ function MoneyDonationForm({ onCancel }: { onCancel: () => void }) {
 
       <label className="grid gap-2 text-sm font-medium text-foreground">
         Proof of payment
-        <div className="rounded-lg border border-dashed border-border bg-card px-4 py-5">
-          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+        <div className="rounded-lg border border-dashed border-border bg-card px-6 py-6">
+          <div className="flex flex-col items-center gap-4 text-center">
             <Upload className="h-5 w-5 text-primary" aria-hidden="true" />
-            <div className="flex-1">
+            <div>
               <p className="text-sm text-foreground">Upload your bank confirmation, receipt, or screenshot.</p>
-              <p className="mt-1 text-xs text-muted-foreground">Accepted formats: PDF, JPG, PNG.</p>
+              <p className="mt-2 text-xs text-muted-foreground">Accepted formats: PDF, JPG, PNG.</p>
             </div>
           </div>
-          <input
-            className="mt-4 block w-full text-sm text-muted-foreground file:mr-4 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground"
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png,image/*,application/pdf"
-            onChange={(event) =>
-              setForm((current) => ({
-                ...current,
-                proofOfPayment: event.target.files?.[0] ?? null,
-              }))
-            }
-            required
-          />
+          <div className="mt-6 flex justify-center px-2">
+            <input
+              className="w-auto max-w-full cursor-pointer text-sm text-muted-foreground file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:bg-primary file:px-5 file:py-2.5 file:text-sm file:font-medium file:text-primary-foreground"
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,image/*,application/pdf"
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  proofOfPayment: event.target.files?.[0] ?? null,
+                }))
+              }
+              required
+            />
+          </div>
           {form.proofOfPayment && (
-            <p className="mt-2 text-xs text-muted-foreground">Selected file: {form.proofOfPayment.name}</p>
+            <p className="mt-4 text-center text-xs text-muted-foreground">Selected file: {form.proofOfPayment.name}</p>
           )}
         </div>
       </label>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
         <Button type="submit">Submit proof of payment</Button>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
