@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Info, Upload } from "lucide-react";
 import { toast } from "sonner";
+import fnbIcon from "@/assets/images/icons/fnbicon.png";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -44,11 +45,29 @@ const initialMoneyForm: MoneyFormState = {
   proofOfPayment: null,
 };
 
-function Notice({ children }: { children: React.ReactNode }) {
+function Notice({
+  children,
+  variant = "default",
+}: {
+  children: React.ReactNode;
+  variant?: "default" | "warning";
+}) {
   return (
-    <div className="flex gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-muted-foreground">
-      <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-      <p>{children}</p>
+    <div
+      className={cn(
+        "flex gap-3 rounded-xl border p-4 text-sm",
+        variant === "warning"
+          ? "donation-warning-notice border-amber-300/80 bg-amber-50 [html[data-theme=dark]_&]:border-amber-500/30 [html[data-theme=dark]_&]:bg-amber-500/10"
+          : "border-primary/20 bg-primary/5 text-muted-foreground",
+      )}
+    >
+      <Info
+        className={cn("mt-0.5 h-4 w-4 shrink-0", variant === "warning" ? undefined : "text-primary")}
+        aria-hidden="true"
+      />
+      <p className={variant === "warning" ? "font-normal" : undefined}>
+        {children}
+      </p>
     </div>
   );
 }
@@ -67,7 +86,14 @@ function BankingDetailsCard() {
 
   return (
     <div className="rounded-2xl border border-border bg-background/70 p-5 backdrop-blur-xl">
-      <h3 className="text-lg font-semibold text-foreground">FNB banking details</h3>
+      <div className="flex items-center gap-3">
+        <img
+          src={fnbIcon}
+          alt="FNB logo"
+          className="h-10 w-10 shrink-0 rounded-lg object-contain"
+        />
+        <h3 className="text-lg font-semibold text-foreground">FNB banking details</h3>
+      </div>
       <p className="mt-2 text-sm text-muted-foreground">
         Use these details when making an EFT payment to The Themba Molefe Foundation.
       </p>
@@ -103,7 +129,7 @@ function InKindDonationForm({
 
   return (
     <form className="form-grid" onSubmit={handleSubmit}>
-      <Notice>{inKindDeliveryNotice}</Notice>
+      <Notice variant="warning">{inKindDeliveryNotice}</Notice>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
@@ -260,10 +286,10 @@ export function DonationOptionsSection() {
 
   return (
     <section id="donation-options" className="scroll-mt-28 px-6 pb-16 pt-6 md:pt-10">
-      <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card/70 p-6 shadow-sm backdrop-blur-xl md:p-8">
+      <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Ways to give</p>
-          <h2 className="mt-3 text-3xl font-bold text-card-foreground">Choose how you want to support the mission.</h2>
+          <h2 className="mt-3 text-3xl font-bold text-foreground">Choose how you want to support the mission.</h2>
           <p className="mt-4 text-muted-foreground">
             Select a donation type below to submit your request. In-kind donations are reviewed by an administrator
             before delivery details are shared, and money donations require proof of payment after your EFT.
