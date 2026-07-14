@@ -1,38 +1,9 @@
 import HeroSection from "@/components/ui/hero-section-9";
-import {
-  Accessibility,
-  Banknote,
-  BookOpen,
-  GraduationCap,
-  HandHeart,
-  Shirt,
-} from "lucide-react";
+import { DonationOptionsSection } from "@/components/ui/DonationOptionsSection";
+import { BookOpen, GraduationCap, HandHeart } from "lucide-react";
 import donationImageOne from "@/assets/images/donation/donation-1.webp";
 import donationImageTwo from "@/assets/images/donation/donation-2.webp";
 import donationImageThree from "@/assets/images/donation/donation-3.webp";
-
-const donationOptions = [
-  {
-    title: "Clothes",
-    description: "Donate gently used or new clothing to support families and learners in need.",
-    icon: Shirt,
-  },
-  {
-    title: "Wheelchairs",
-    description: "Help provide mobility support for beneficiaries who need wheelchair assistance.",
-    icon: Accessibility,
-  },
-  {
-    title: "School uniform",
-    description: "Contribute school uniforms so learners can attend school with dignity and confidence.",
-    icon: GraduationCap,
-  },
-  {
-    title: "Money",
-    description: "Make a financial gift to fund programmes, resources, and urgent community needs.",
-    icon: Banknote,
-  },
-] as const;
 
 export function DonatePage() {
   const scrollToDonationOptions = () => {
@@ -84,35 +55,10 @@ export function DonatePage() {
             icon: <HandHeart className="h-5 w-5 text-muted-foreground" />,
           },
         ]}
-        images={[
-          donationImageOne,
-          donationImageTwo,
-          donationImageThree,
-        ]}
+        images={[donationImageOne, donationImageTwo, donationImageThree]}
       />
 
-      <section id="donation-options" className="px-6 pb-16 pt-10 md:pt-16">
-        <div className="mx-auto max-w-6xl rounded-3xl border border-border bg-card/70 p-6 shadow-sm backdrop-blur-xl md:p-8">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Ways to give</p>
-            <h2 className="mt-3 text-3xl font-bold text-card-foreground">Choose how you want to support the mission.</h2>
-            <p className="mt-4 text-muted-foreground">
-              Choose one of the donation types below. Secure payment options are coming soon — for now, reach out to
-              the team and we will help you complete your donation.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {donationOptions.map(({ title, description, icon: Icon }) => (
-              <div key={title} className="rounded-2xl border border-border bg-background/70 p-5 backdrop-blur-xl">
-                <Icon className="h-6 w-6 text-primary" />
-                <h3 className="mt-4 font-semibold text-foreground">{title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DonationOptionsSection />
     </>
   );
 }
