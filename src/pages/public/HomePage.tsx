@@ -22,13 +22,13 @@ export function HomePage() {
           website: "tmfsupport.org",
           phone: "+27 72 076 9116",
           address: "Katlehong, Gauteng",
-        }}
+        }} 
       />
-
+   // this is sectional that reveals the stats section with a certain delay offset and directions of animations 
       <SectionReveal delay={0.05} direction="left">
-        <StatsSection />
+        <StatsSection /> 
       </SectionReveal>
-
+ 
       <SectionReveal delay={0.12} direction="right">
         <FeaturedCampaignsSection />
       </SectionReveal>
