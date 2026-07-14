@@ -24,7 +24,7 @@ export function HomePage() {
           address: "Katlehong, Gauteng",
         }} 
       />
-   // this is sectional that reveals the stats section with a certain delay offset and directions of animations 
+      /* this is the stats section that is used to display the stats of the foundation and the way that we do that is by using the StatsSection component from the StatsSection component file */
       <SectionReveal delay={0.05} direction="left">
         <StatsSection /> 
       </SectionReveal>

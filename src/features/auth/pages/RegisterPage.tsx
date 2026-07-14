@@ -17,6 +17,7 @@ const roles: { value: UserRole; label: string }[] = [
   { value: "sponsor", label: "Sponsor" },
 ];
 
+// this is the register page and it is used to register a new user with email and password
 export function RegisterPage() {
   const { signUp, signInWithGoogle } = useAuth();
   const [fullName, setFullName] = useState("");
@@ -40,7 +41,7 @@ export function RegisterPage() {
       setIsSubmitting(false);
     }
   }
-
+// this is the asyncronous function that is used to handle the google sign-up and the way that we do this is by using the signInWithGoogle function from the useAuth hook that we have setup.
   async function handleGoogleSignUp() {
     setIsGoogleLoading(true);
 
@@ -77,7 +78,7 @@ export function RegisterPage() {
       />
 
       <AuthDivider text="Or register with email" />
-
+       
       <form className="grid gap-4" onSubmit={handleSubmit}>
         <Input
           label="Full name"

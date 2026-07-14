@@ -41,7 +41,7 @@ export function LoginPage() {
   }
 
   const isBusy = isSubmitting || isGoogleLoading;
-
+// this is the return statement for the login page and it is used to display the login page and the way that we do that is by using the AuthPageShell component from the AuthPageShell component file and the GoogleSignInButton component from the GoogleSignInButton component file and the Input component from the Input component file and the Button component from the Button component file 
   return (
     <AuthPageShell
       label="Themba Molefe Foundation"

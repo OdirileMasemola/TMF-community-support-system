@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabaseClient";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-
+// this is the auth callback page and its used to handle the callback from the auth provider and exchange the code for the session
 export function AuthCallbackPage() {
   const navigate = useNavigate();
   const { profile, isLoading } = useAuth();
