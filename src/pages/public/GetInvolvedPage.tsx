@@ -1,13 +1,22 @@
-import { PlaceholderPage } from "@/pages/public/PlaceholderPage";
+import { PageHero } from "@/components/ui/PageHero";
+import ConnectWithUs from "@/components/ui/connect-with-us";
 
 export function GetInvolvedPage() {
   return (
-    <div style={{ paddingTop: "60px",
-     paddingLeft: "40px" }}>
-    <PlaceholderPage
-      title="Get Involved"
-      description="Discover ways to volunteer, donate, or sponsor foundation initiatives. Registration and involvement options will be available here soon."
-    />
-      </div>
+    <main className="min-h-screen">
+      <PageHero
+        label="Get Involved"
+        title="Make an Impact with Us"
+        highlightedTitle="Join the Community"
+        subtitle="Volunteer, donate, or connect — your involvement helps us reach more people and create lasting change."
+        primaryCta={{ text: "Volunteer", to: "#volunteer" }}
+        secondaryCta={{ text: "Donate", to: "#donate" }}
+        tertiaryCta={{ text: "Sponsor", to: "#sponsor" }}
+      />
+
+      <section className="max-w-4xl mx-auto px-4 py-12">
+        <ConnectWithUs />
+      </section>
+    </main>
   );
 }
