@@ -64,6 +64,21 @@ a.border-foreground.bg-foreground {
   gap: 1rem;
 }
 
+.donation-warning-notice,
+.donation-warning-notice p,
+.donation-warning-notice svg {
+  color: #6b7280;
+}
+
+[data-theme="dark"] .donation-warning-notice,
+[data-theme="dark"] .donation-warning-notice p {
+  color: #fef3c7;
+}
+
+[data-theme="dark"] .donation-warning-notice svg {
+  color: #fbbf24;
+}
+
 .card-grid {
   display: grid;
   gap: 1rem;
