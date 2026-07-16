@@ -1,7 +1,9 @@
 import { Route, Routes } from "react-router-dom";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { RegisterPage } from "@/pages/auth/RegisterPage";
+import { AdminDashboardPage } from "@/pages/admin/AdminDashboardPage";
 import { AboutPage } from "@/pages/public/AboutPage";
 import { CampaignsPage } from "@/pages/public/CampaignsPage";
 import { ContactPage } from "@/pages/public/ContactPage";
@@ -21,6 +23,10 @@ export default function App() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+      </Route>
+
+      <Route element={<AppLayout />}>
+        <Route path="admin/dashboard" element={<AdminDashboardPage />} />
       </Route>
     </Routes>
   );
