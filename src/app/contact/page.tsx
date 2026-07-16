@@ -1,7 +1,7 @@
 import { ContactHero } from "@/components/blocks/contact-hero";
 import { ContactSection } from "@/components/blocks/contact-form";
 
-export function ContactPage() {
+export default function ContactPage() {
   return (
     <div className="min-h-screen bg-transparent">
       <ContactHero />
