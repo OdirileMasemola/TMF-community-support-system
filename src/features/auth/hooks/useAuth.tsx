@@ -90,7 +90,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    navigate("/dashboard");
+    navigate("/admin/dashboard");
   }
 
   async function signUp(values: { fullName: string; email: string; phoneNumber: string; password: string; role: UserRole }) {

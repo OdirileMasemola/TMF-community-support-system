@@ -1,18 +1,18 @@
 "use client";
 
-import { Bell, PanelLeft, Send } from "lucide-react";
+import { Bell, Send } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/separator";
-import { ThemeSelector } from "@/components/ui/ThemeSelector";import { AppBreadcrumbs } from "@/components/app-shell/app-breadcrumbs";
-import { navLinks } from "@/components/app-shell/app-shared";
+import { ThemeSelector } from "@/components/ui/ThemeSelector";
+import { AppBreadcrumbs } from "@/components/app-shell/app-breadcrumbs";
+import { getActiveNavItem } from "@/components/app-shell/app-shared";
 import { NavUser } from "@/components/app-shell/nav-user";
-import { useSidebar } from "@/components/app-shell/sidebar-context";
 import { cn } from "@/lib/utils";
 
-const activeItem = navLinks.find((item) => item.isActive);
-
 export function AppHeader() {
-  const { toggle } = useSidebar();
+  const { pathname } = useLocation();
+  const activeItem = getActiveNavItem(pathname);
 
   return (
     <header
@@ -22,10 +22,6 @@ export function AppHeader() {
       )}
     >
       <div className="flex min-w-0 items-center gap-2">
-        <Button type="button" variant="ghost" size="icon" onClick={toggle} aria-label="Toggle sidebar">
-          <PanelLeft className="size-4" aria-hidden="true" />
-        </Button>
-        <Separator className="mr-2 hidden h-4 md:block" orientation="vertical" />
         <AppBreadcrumbs page={activeItem ? { title: activeItem.title, icon: activeItem.icon } : null} />
       </div>
 
@@ -37,7 +33,8 @@ export function AppHeader() {
           <Bell className="size-4" aria-hidden="true" />
         </Button>
         <ThemeSelector className="size-10 rounded-md border-0 bg-transparent hover:bg-accent" />
-        <Separator className="hidden h-4 md:block" orientation="vertical" />        <NavUser />
+        <Separator className="hidden h-4 md:block" orientation="vertical" />
+        <NavUser />
       </div>
     </header>
   );

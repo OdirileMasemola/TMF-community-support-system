@@ -14,9 +14,8 @@ import {
 
 export type SidebarNavItem = {
   title: string;
-  path?: string;
+  path: string;
   icon?: ReactNode;
-  isActive?: boolean;
 };
 
 export type SidebarNavGroup = {
@@ -32,11 +31,10 @@ export const navGroups: SidebarNavGroup[] = [
         title: "Dashboard",
         path: "/admin/dashboard",
         icon: <LayoutGrid className="size-4" aria-hidden="true" />,
-        isActive: true,
       },
       {
         title: "Reports",
-        path: "/reports",
+        path: "/admin/reports",
         icon: <BarChart3 className="size-4" aria-hidden="true" />,
       },
     ],
@@ -46,22 +44,22 @@ export const navGroups: SidebarNavGroup[] = [
     items: [
       {
         title: "Campaigns",
-        path: "/campaigns",
+        path: "/admin/campaigns",
         icon: <Megaphone className="size-4" aria-hidden="true" />,
       },
       {
         title: "Donations",
-        path: "/donations",
+        path: "/admin/donations",
         icon: <HeartHandshake className="size-4" aria-hidden="true" />,
       },
       {
         title: "Volunteers",
-        path: "/applications",
+        path: "/admin/volunteers",
         icon: <HandCoins className="size-4" aria-hidden="true" />,
       },
       {
         title: "Sponsors",
-        path: "/sponsorships",
+        path: "/admin/sponsors",
         icon: <UserRoundCheck className="size-4" aria-hidden="true" />,
       },
     ],
@@ -71,22 +69,22 @@ export const navGroups: SidebarNavGroup[] = [
     items: [
       {
         title: "Users",
-        path: "/users",
+        path: "/admin/users",
         icon: <Users className="size-4" aria-hidden="true" />,
       },
       {
         title: "Events",
-        path: "/events",
+        path: "/admin/events",
         icon: <CalendarDays className="size-4" aria-hidden="true" />,
       },
       {
         title: "Notifications",
-        path: "/notifications",
+        path: "/admin/notifications",
         icon: <Bell className="size-4" aria-hidden="true" />,
       },
       {
         title: "Settings",
-        path: "/settings",
+        path: "/admin/settings",
         icon: <Settings className="size-4" aria-hidden="true" />,
       },
     ],
@@ -94,3 +92,7 @@ export const navGroups: SidebarNavGroup[] = [
 ];
 
 export const navLinks: SidebarNavItem[] = navGroups.flatMap((group) => group.items);
+
+export function getActiveNavItem(pathname: string) {
+  return navLinks.find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
+}
