@@ -1,5 +1,4 @@
 import { Route, Routes } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { RegisterPage } from "@/pages/auth/RegisterPage";
@@ -25,9 +24,7 @@ export default function App() {
         <Route path="register" element={<RegisterPage />} />
       </Route>
 
-      <Route element={<AppLayout />}>
-        <Route path="admin/dashboard" element={<AdminDashboardPage />} />
-      </Route>
+      <Route path="admin/dashboard" element={<AdminDashboardPage />} />
     </Routes>
   );
 }
