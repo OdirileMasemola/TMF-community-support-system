@@ -13,7 +13,3 @@ Use clear file names like:
 - `education-support.jpg`
 - `winter-relief.jpg`
 - `tmf-logo.png`
-
-## Hero image
-
-Add your hero image as `hero-community-support.jpg` in this folder. The Home page imports it for the split hero layout.
