@@ -1,16 +1,17 @@
-import { PlaceholderPage } from "@/pages/public/PlaceholderPage";
+import { ContactHero } from "@/components/blocks/contact-hero";
+import { ContactSection } from "@/components/blocks/contact-form";
 
 export function ContactPage() {
   return (
-
-    <div style={{
-       paddingTop: "60px",
-        paddingLeft: "40px" }}>
-
-    <PlaceholderPage
-      title="Contact Us"
-      description="Get in touch with the Themba Molefe Foundation team. A contact form and office details will be available here soon."
-    />
-     </div>
+    <div className="min-h-screen bg-transparent">
+      <ContactHero />
+      <ContactSection
+        title="Contact the Themba Molefe Foundation"
+        description="Replace these placeholder details with your foundation's real contact information whenever you're ready."
+        phone="(placeholder) +27 00 000 0000"
+        email="(placeholder) hello@themba-molefe-foundation.org"
+        website={{ label: "(placeholder) themba-molefe-foundation.org", url: "https://example.com" }}
+      />
+    </div>
   );
 }

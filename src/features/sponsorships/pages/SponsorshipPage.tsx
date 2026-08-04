@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/Input";
 export function SponsorshipPage() {
   return (
     <div>
-      <h1 className="page-title">Sponsorships</h1>
-      <p className="page-description">Sponsors can support campaigns and view sponsored activities.</p>
+      <h1 className="page-title">Sponsors</h1>
+      <p className="page-description">Manage sponsor registrations, partnerships, and sponsored campaign activity.</p>
 
       <Card className="mt-6 max-w-xl">
         <form className="form-grid">

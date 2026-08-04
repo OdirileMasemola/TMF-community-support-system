@@ -6,7 +6,7 @@ export function DonationPage() {
   return (
     <div>
       <h1 className="page-title">Donations</h1>
-      <p className="page-description">Donors can make donations and view donation history.</p>
+      <p className="page-description">Review donation records, verify proofs of payment, and track contribution history.</p>
 
       <Card className="mt-6 max-w-xl">
         <form className="form-grid">

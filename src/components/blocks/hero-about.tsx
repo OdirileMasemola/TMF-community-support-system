@@ -38,7 +38,7 @@ export function AboutHero(): ReactElement {
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-6 px-6 pb-24 md:grid-cols-3">
             <img
-              src="https://source.unsplash.com/900x600/?team,community"
+              src="DSC_0632.jpeg"
               alt="Team working together"
               className="h-56 w-full rounded-lg object-cover"
               loading="lazy"
