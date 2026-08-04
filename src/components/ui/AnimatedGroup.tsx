@@ -11,7 +11,7 @@ type AnimatedGroupProps = {
     item?: Variants;
   };
 };
-
+// the animation here is for the list of components that are going to be displayed
 const defaultContainerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -22,7 +22,7 @@ const defaultContainerVariants: Variants = {
     },
   },
 };
-
+ // the animation here is for the list of components that are going to be displayed 
 const defaultItemVariants: Variants = {
   hidden: {
     opacity: 0,
@@ -40,7 +40,7 @@ const defaultItemVariants: Variants = {
     },
   },
 };
-
+// this function is used to animate a group of components, it takes in children, className and variants as props. It uses the useReducedMotion hook to check if the user has requested reduced motion. If so, it simply renders the children without any animation. Otherwise, it uses the motion.div component from framer-motion to animate the children based on the provided or default variants.
 export function AnimatedGroup({ children, className, variants }: AnimatedGroupProps) {
   const shouldReduceMotion = useReducedMotion();
   const containerVariants = variants?.container ?? defaultContainerVariants;

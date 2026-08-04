@@ -40,6 +40,10 @@
   --footer-foreground: #ffffff;
   --footer-accent: #bbcde5;
   --footer-border: #6b7280;
+  --chart-1: #639fab;
+  --chart-2: #1c5d99;
+  --chart-3: #bbcde5;
+  --chart-4: #4b5563;
   --outline-hover-border: #6b7280;
   --outline-hover-bg: rgba(55, 65, 81, 0.04);
   --outline-hover-shadow: rgba(55, 65, 81, 0.1);
@@ -97,6 +101,10 @@
   --footer-foreground: #ffffff;
   --footer-accent: #bbcde5;
   --footer-border: #404040;
+  --chart-1: #639fab;
+  --chart-2: #2878b5;
+  --chart-3: #bbcde5;
+  --chart-4: #d1d5db;
   --outline-hover-border: #d1d5db;
   --outline-hover-bg: rgba(229, 231, 235, 0.05);
   --outline-hover-shadow: rgba(229, 231, 235, 0.12);
