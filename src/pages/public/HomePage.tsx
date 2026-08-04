@@ -22,13 +22,13 @@ export function HomePage() {
           website: "tmfsupport.org",
           phone: "+27 72 076 9116",
           address: "Katlehong, Gauteng",
-        }}
+        }} 
       />
-
+      /* this is the stats section that is used to display the stats of the foundation and the way that we do that is by using the StatsSection component from the StatsSection component file */
       <SectionReveal delay={0.05} direction="left">
-        <StatsSection />
+        <StatsSection /> 
       </SectionReveal>
-
+ 
       <SectionReveal delay={0.12} direction="right">
         <FeaturedCampaignsSection />
       </SectionReveal>
