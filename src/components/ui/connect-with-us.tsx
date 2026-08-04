@@ -2,7 +2,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-export function ConnectWithUs(): JSX.Element {
+export function ConnectWithUs() {
   return (
     <section className="w-full bg-white rounded-2xl p-8 shadow-sm">
       <div className="max-w-4xl mx-auto text-center">

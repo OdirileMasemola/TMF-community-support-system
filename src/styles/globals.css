@@ -20,6 +20,10 @@
   --color-footer-foreground: var(--footer-foreground);
   --color-footer-accent: var(--footer-accent);
   --color-footer-border: var(--footer-border);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
 }
 
 body {

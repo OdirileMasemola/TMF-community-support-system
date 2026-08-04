@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/Card";
 export function VolunteerApplicationsPage() {
   return (
     <div>
-      <h1 className="page-title">Volunteer Applications</h1>
-      <p className="page-description">Volunteers can apply for campaigns. Administrators can approve or reject applications.</p>
+      <h1 className="page-title">Volunteers</h1>
+      <p className="page-description">Review volunteer applications, approve assignments, and track participation.</p>
 
       <Card className="mt-6">
         <h2 className="text-lg font-bold">Module skeleton</h2>
