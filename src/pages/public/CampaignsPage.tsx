@@ -11,6 +11,7 @@ type CampaignFilter = "All" | CampaignStatus;
 
 const filters: CampaignFilter[] = ["All", "Active", "Upcoming", "Completed"];
 
+// so this page is public and allows users to view campaigns without authentication
 export function CampaignsPage() {
   const [activeFilter, setActiveFilter] = useState<CampaignFilter>("All");
   const [searchQuery, setSearchQuery] = useState("");
