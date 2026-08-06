@@ -96,7 +96,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 // this is the error that is used to sign in with email and password
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    navigate("/admin/dashboard");
+    navigate("/dashboard");
   }
 // this is the function that is used to sign up with email and password and how we do that is by using the supabase auth.signUp method
   async function signUp(values: { fullName: string; email: string; phoneNumber: string; password: string; role: UserRole }) {

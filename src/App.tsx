@@ -31,6 +31,7 @@ export default function App() {
     <Routes>
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
+      {/* Signed-in users land on /dashboard (not /admin/*). */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="register/complete-profile" element={<CompleteProfilePage />} />
       </Route>
 
+      {/* Admin shell lives only under /admin/* — do not reclaim /dashboard here. */}
       <Route path="admin" element={<AdminLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
@@ -63,7 +65,7 @@ export default function App() {
         <Route path="settings" element={<AdminSettingsPage />} />
       </Route>
 
-      <Route path="dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+      {/* Legacy root paths from before the /admin/* move. */}
       <Route path="reports" element={<Navigate to="/admin/reports" replace />} />
       <Route path="donations" element={<Navigate to="/admin/donations" replace />} />
       <Route path="applications" element={<Navigate to="/admin/volunteers" replace />} />
