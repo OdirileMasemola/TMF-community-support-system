@@ -10,6 +10,7 @@ import {
   History,
   Package,
   Receipt,
+  UserRound,
   Users,
 } from "lucide-react";
 import familyCareImage from "@/assets/images/campaigns/Family Care Support.webp";
@@ -42,6 +43,7 @@ export type ProofRecord = {
   fileName: string;
   submittedAt: string;
   amount: string;
+  reference: string;
   status: DonationStatus;
   comment: string;
 };
@@ -78,6 +80,16 @@ export type DonorActivity = {
   icon: LucideIcon;
 };
 
+export type DonorNotification = {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  priority: "Update" | "Action needed" | "Campaign";
+  unread: boolean;
+  icon: LucideIcon;
+};
+
 export const donorProfile = {
   name: "Odirile Masemola",
   initials: "OM",
@@ -101,12 +113,16 @@ export const donationHistory: DonationRecord[] = [
   { id: "donation-2", type: "General Donation", campaign: "Themba Molefe Foundation", amount: "R1,000", reference: "TMF-GD-1957", date: "03 Jul 2026", status: "Verified" },
   { id: "donation-3", type: "Campaign Donation", campaign: "Food Support Drive", amount: "R3,500", reference: "TMF-FS-1842", date: "14 Jun 2026", status: "Verified" },
   { id: "donation-4", type: "Campaign Donation", campaign: "Youth Education Support", amount: "R1,850", reference: "TMF-YES-1730", date: "29 May 2026", status: "Verified" },
+  { id: "donation-5", type: "General Donation", campaign: "Themba Molefe Foundation", amount: "R750", reference: "TMF-GD-1654", date: "08 Apr 2026", status: "Verified" },
+  { id: "donation-6", type: "Campaign Donation", campaign: "Family Care Programme", amount: "R1,250", reference: "TMF-FCP-1518", date: "21 Mar 2026", status: "Verified" },
+  { id: "donation-7", type: "Campaign Donation", campaign: "Food Support Drive", amount: "R1,000", reference: "TMF-FS-1427", date: "17 Feb 2026", status: "Verified" },
+  { id: "donation-8", type: "General Donation", campaign: "Themba Molefe Foundation", amount: "R1,000", reference: "TMF-GD-1305", date: "29 Jan 2026", status: "Rejected" },
 ];
 
 export const proofHistory: ProofRecord[] = [
-  { id: "proof-1", fileName: "winter-relief-eft.pdf", submittedAt: "18 Jul 2026", amount: "R2,500", status: "Pending", comment: "Your proof is being reviewed by our team." },
-  { id: "proof-2", fileName: "general-donation-july.pdf", submittedAt: "03 Jul 2026", amount: "R1,000", status: "Verified", comment: "Verified — thank you for your contribution." },
-  { id: "proof-3", fileName: "food-support-drive.pdf", submittedAt: "14 Jun 2026", amount: "R3,500", status: "Verified", comment: "Verified and allocated to the campaign." },
+  { id: "proof-1", fileName: "winter-relief-eft.pdf", submittedAt: "18 Jul 2026", amount: "R2,500", reference: "TMF-WR-2084", status: "Pending", comment: "Your proof is being reviewed by our team." },
+  { id: "proof-2", fileName: "general-donation-july.pdf", submittedAt: "03 Jul 2026", amount: "R1,000", reference: "TMF-GD-1957", status: "Verified", comment: "Verified — thank you for your contribution." },
+  { id: "proof-3", fileName: "food-support-drive.pdf", submittedAt: "14 Jun 2026", amount: "R3,500", reference: "TMF-FS-1842", status: "Verified", comment: "Verified and allocated to the campaign." },
 ];
 
 export const donorImpact: DonorImpact[] = [
@@ -136,11 +152,19 @@ export const donorActivities: DonorActivity[] = [
   { id: "activity-4", title: "Updated donor profile", timestamp: "12 May 2026 · 16:30", icon: History },
 ];
 
+export const donorNotifications: DonorNotification[] = [
+  { id: "notice-1", title: "Your donation has been verified", message: "Your R3,500 contribution to Food Support Drive has been confirmed.", timestamp: "15 Jun 2026 · 14:20", priority: "Update", unread: true, icon: BadgeCheck },
+  { id: "notice-2", title: "Proof of payment under review", message: "We are reviewing your Winter Relief Campaign proof of payment.", timestamp: "18 Jul 2026 · 09:42", priority: "Action needed", unread: true, icon: Receipt },
+  { id: "notice-3", title: "Winter Relief Campaign has started", message: "This campaign is now accepting support from the TMF community.", timestamp: "17 Jul 2026 · 08:00", priority: "Campaign", unread: false, icon: Bell },
+  { id: "notice-4", title: "Your support is making a difference", message: "Your contributions helped provide food parcels to 35 families this month.", timestamp: "01 Jul 2026 · 10:15", priority: "Update", unread: false, icon: HeartHandshake },
+];
+
 export const donorQuickActions = [
-  { id: "donate", title: "Make a donation", description: "Choose a campaign or make a general contribution.", icon: HandCoins, route: "/donate" },
-  { id: "campaigns", title: "Browse campaigns", description: "Discover causes currently accepting support.", icon: HeartHandshake, route: "/campaigns" },
-  { id: "history", title: "Donation history", description: "Review your contributions and their status.", icon: History, route: "#donation-history" },
-  { id: "proof", title: "Proof of payment", description: "View submitted payment proof records.", icon: Receipt, route: "#proof-history" },
+  { id: "donate", title: "Make a donation", description: "Choose a campaign or make a general contribution.", icon: HandCoins, route: "/donor/dashboard/donate" },
+  { id: "campaigns", title: "Browse campaigns", description: "Discover causes currently accepting support.", icon: HeartHandshake, route: "/donor/dashboard/campaigns" },
+  { id: "history", title: "Donation history", description: "Review your contributions and their status.", icon: History, route: "/donor/dashboard/donations" },
+  { id: "proof", title: "Proof of payment", description: "View submitted payment proof records.", icon: Receipt, route: "/donor/dashboard/proof-of-payment" },
+  { id: "profile", title: "Profile", description: "Review your donor details and preferences.", icon: UserRound, route: "/donor/dashboard/profile" },
 ];
 
 export const updateIcon = Bell;
