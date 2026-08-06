@@ -70,7 +70,7 @@ export function AppSidebar({ navGroups = adminNavGroups }: AppSidebarProps) {
                 const [itemPath, itemHash] = item.path.split("#");
                 const isActive = itemHash
                   ? pathname === itemPath && hash === `#${itemHash}`
-                  : pathname === item.path || pathname.startsWith(`${item.path}/`);
+                  : pathname === item.path;
 
                 return (
                   <Link
