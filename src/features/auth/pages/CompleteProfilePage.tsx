@@ -27,7 +27,7 @@ export function CompleteProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="grid min-h-[50vh] place-items-center px-6">
+      <div className="grid min-h-[100dvh] place-items-center bg-background px-6">
         <p className="text-sm text-muted-foreground">Loading your account...</p>
       </div>
     );
@@ -63,8 +63,9 @@ export function CompleteProfilePage() {
       highlightedTitle="profile"
       subtitle="Tell us a bit more about yourself so we can tailor your experience on the platform."
       maxWidth="lg"
+      scrollable
     >
-      <form className="grid gap-4" onSubmit={handleSubmit}>
+      <form className="grid gap-3" onSubmit={handleSubmit}>
         <Input
           label="Full name"
           autoComplete="name"
@@ -98,7 +99,7 @@ export function CompleteProfilePage() {
           </select>
         </label>
 
-        <Button type="submit" disabled={isSubmitting} className="mt-1 w-full">
+        <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? "Saving..." : "Continue to dashboard"}
         </Button>
       </form>

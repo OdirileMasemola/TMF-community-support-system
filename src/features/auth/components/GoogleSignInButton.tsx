@@ -44,7 +44,7 @@ export function GoogleSignInButton({
       variant="outline"
       disabled={disabled}
       onClick={onClick}
-      className={cn("w-full gap-3", className)}
+      className={cn("h-9 w-full gap-3", className)}
     >
       <GoogleIcon />
       {label}
