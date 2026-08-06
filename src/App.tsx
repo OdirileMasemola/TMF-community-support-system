@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import { AdminLayout } from "@/components/app-shell/admin-layout";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
