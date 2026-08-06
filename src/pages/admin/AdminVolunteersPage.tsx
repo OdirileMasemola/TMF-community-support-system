@@ -38,7 +38,7 @@ export function AdminVolunteersPage() {
           <CardContent>
             <p className="text-3xl font-semibold">24</p>
           </CardContent>
-        </DashboardCard>
+        </DashboardCard>  
         <DashboardCard>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">This week</CardTitle>
