@@ -18,6 +18,7 @@ import { AdminSettingsPage } from "@/pages/admin/AdminSettingsPage";
 import { AdminSponsorsPage } from "@/pages/admin/AdminSponsorsPage";
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
 import { AdminVolunteersPage } from "@/pages/admin/AdminVolunteersPage";
+import { DonorDashboardPage } from "@/pages/donor/DonorDashboardPage";
 import { AboutPage } from "@/pages/public/AboutPage";
 import { CampaignsPage } from "@/pages/public/CampaignsPage";
 import { ContactPage } from "@/pages/public/ContactPage";
@@ -36,6 +37,11 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
+      </Route>
+
+      {/* Temporary public preview using the same shell as the admin workspace. */}
+      <Route path="/donor" element={<AdminLayout />}>
+        <Route path="dashboard" element={<DonorDashboardPage />} />
       </Route>
 
       <Route element={<PublicLayout />}>
