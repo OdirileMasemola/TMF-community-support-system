@@ -10,10 +10,11 @@ import {
   UserRound,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
+import { AnimatedGlowingSearchBar } from "@/components/ui/AnimatedGlowingSearchBar";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -59,41 +60,80 @@ const profileDetails: { label: string; value: string; icon: LucideIcon }[] = [
 ];
 
 export function VolunteerOpportunitiesPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredOpportunities = useMemo(() => {
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+
+    return volunteerOpportunities.filter((opportunity) => {
+      const searchableContent = [
+        opportunity.title,
+        opportunity.description,
+        opportunity.category,
+        opportunity.location,
+        opportunity.roles.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return searchableContent.includes(normalizedSearchQuery);
+    });
+  }, [searchQuery]);
+
   return (
     <AdminPageShell
       label="Volunteering"
       title="Browse opportunities"
       description="Explore open volunteer roles across Themba Molefe Foundation campaigns."
     >
-      <div className="grid gap-px bg-border md:grid-cols-2">
-        {volunteerOpportunities.map((opportunity) => (
-          <DashboardCard key={opportunity.id} className="overflow-hidden">
-            <img src={opportunity.image} alt="" className="h-44 w-full object-cover" />
-            <CardHeader>
-              <p className="text-xs font-semibold uppercase tracking-wide text-primary">{opportunity.category}</p>
-              <CardTitle>{opportunity.title}</CardTitle>
-              <CardDescription>{opportunity.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>
-                  Location: <span className="text-foreground">{opportunity.location}</span>
-                </p>
-                <p>
-                  Date: <span className="text-foreground">{opportunity.date}</span>
-                </p>
-                <p>
-                  Roles: <span className="text-foreground">{opportunity.roles.join(", ")}</span>
-                </p>
-              </div>
-              <Button to="/volunteer/applications" className="mt-5 w-full">
-                <Search className="mr-2 size-4" />
-                Apply Now
-              </Button>
-            </CardContent>
-          </DashboardCard>
-        ))}
+      <div className="mb-6 flex justify-center">
+        <AnimatedGlowingSearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search opportunities..."
+        />
       </div>
+
+      {filteredOpportunities.length > 0 ? (
+        <div className="grid gap-px bg-border md:grid-cols-2">
+          {filteredOpportunities.map((opportunity) => (
+            <DashboardCard key={opportunity.id} className="overflow-hidden">
+              <img src={opportunity.image} alt="" className="h-44 w-full object-cover" />
+              <CardHeader>
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">{opportunity.category}</p>
+                <CardTitle>{opportunity.title}</CardTitle>
+                <CardDescription>{opportunity.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>
+                    Location: <span className="text-foreground">{opportunity.location}</span>
+                  </p>
+                  <p>
+                    Date: <span className="text-foreground">{opportunity.date}</span>
+                  </p>
+                  <p>
+                    Roles: <span className="text-foreground">{opportunity.roles.join(", ")}</span>
+                  </p>
+                </div>
+                <Button to="/volunteer/applications" className="mt-5 w-full">
+                  <Search className="mr-2 size-4" />
+                  Apply Now
+                </Button>
+              </CardContent>
+            </DashboardCard>
+          ))}
+        </div>
+      ) : (
+        <DashboardCard>
+          <CardContent className="py-10 text-center">
+            <h2 className="text-xl font-semibold text-foreground">No opportunities found</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              Try a different search term to find volunteer opportunities.
+            </p>
+          </CardContent>
+        </DashboardCard>
+      )}
     </AdminPageShell>
   );
 }
