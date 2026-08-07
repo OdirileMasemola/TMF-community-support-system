@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { LayoutDashboard, UsersRound } from "lucide-react";
+import { HandHeart, LayoutDashboard, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -86,7 +86,7 @@ export function LoginPage() {
 
       <div className="mt-4 border-t border-border pt-3">
         <p className="text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Preview dashboards</p>
-        <div className="mt-2 grid grid-cols-2 gap-2">
+        <div className="mt-2 grid grid-cols-3 gap-2">
           <Button to="/admin/dashboard" variant="outline" size="sm" className="h-8 px-2 text-xs">
             <LayoutDashboard className="mr-1.5 size-3.5" />
             Admin
@@ -94,6 +94,10 @@ export function LoginPage() {
           <Button to="/donor/dashboard" variant="outline" size="sm" className="h-8 px-2 text-xs">
             <UsersRound className="mr-1.5 size-3.5" />
             Donor
+          </Button>
+          <Button to="/volunteer/dashboard" variant="outline" size="sm" className="h-8 px-2 text-xs">
+            <HandHeart className="mr-1.5 size-3.5" />
+            Volunteer
           </Button>
         </div>
       </div>

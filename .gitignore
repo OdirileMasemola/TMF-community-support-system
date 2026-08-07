@@ -6,4 +6,4 @@ dist
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
-donor.md
+issue.md
