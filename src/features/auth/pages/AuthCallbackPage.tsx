@@ -53,7 +53,7 @@ export function AuthCallbackPage() {
   }, [hasExchanged, isLoading, profile, navigate]);
 
   return (
-    <div className="grid min-h-screen place-items-center bg-background px-6">
+    <div className="grid min-h-[100dvh] place-items-center bg-background px-6">
       <div className="text-center">
         <div className="mx-auto size-10 animate-spin rounded-full border-4 border-border border-t-primary" />
         <p className="mt-4 text-sm font-medium text-foreground">Signing you in...</p>

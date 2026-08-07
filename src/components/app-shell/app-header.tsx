@@ -6,13 +6,17 @@ import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/separator";
 import { ThemeSelector } from "@/components/ui/ThemeSelector";
 import { AppBreadcrumbs } from "@/components/app-shell/app-breadcrumbs";
-import { getActiveNavItem } from "@/components/app-shell/app-shared";
+import { navLinks as adminNavLinks, type SidebarNavItem } from "@/components/app-shell/app-shared";
 import { NavUser } from "@/components/app-shell/nav-user";
 import { cn } from "@/lib/utils";
 
-export function AppHeader() {
+type AppHeaderProps = {
+  navLinks?: SidebarNavItem[];
+};
+
+export function AppHeader({ navLinks = adminNavLinks }: AppHeaderProps) {
   const { pathname } = useLocation();
-  const activeItem = getActiveNavItem(pathname);
+  const activeItem = navLinks.find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
 
   return (
     <header

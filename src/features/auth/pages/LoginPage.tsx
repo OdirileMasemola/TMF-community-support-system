@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { LayoutDashboard, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -47,7 +48,7 @@ export function LoginPage() {
       label="Themba Molefe Foundation"
       title="Welcome"
       highlightedTitle="back"
-      subtitle="Sign in to access your dashboard, manage campaigns, and stay connected with the community."
+      subtitle="Sign in to access your dashboard and stay connected with the community."
       footer={
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
@@ -61,7 +62,7 @@ export function LoginPage() {
 
       <AuthDivider text="Or sign in with email" />
 
-      <form className="grid gap-4" onSubmit={handleSubmit}>
+      <form className="grid gap-3" onSubmit={handleSubmit}>
         <Input
           label="Email address"
           type="email"
@@ -78,10 +79,24 @@ export function LoginPage() {
           onChange={(event) => setPassword(event.target.value)}
           required
         />
-        <Button type="submit" disabled={isBusy} className="mt-1 w-full">
+        <Button type="submit" disabled={isBusy} className="w-full">
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
       </form>
+
+      <div className="mt-4 border-t border-border pt-3">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Preview dashboards</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <Button to="/admin/dashboard" variant="outline" size="sm" className="h-8 px-2 text-xs">
+            <LayoutDashboard className="mr-1.5 size-3.5" />
+            Admin
+          </Button>
+          <Button to="/donor/dashboard" variant="outline" size="sm" className="h-8 px-2 text-xs">
+            <UsersRound className="mr-1.5 size-3.5" />
+            Donor
+          </Button>
+        </div>
+      </div>
     </AuthPageShell>
   );
 }

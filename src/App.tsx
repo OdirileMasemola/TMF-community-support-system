@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminLayout } from "@/components/app-shell/admin-layout";
+import { DonorLayout } from "@/components/app-shell/donor-layout";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
@@ -18,6 +19,16 @@ import { AdminSettingsPage } from "@/pages/admin/AdminSettingsPage";
 import { AdminSponsorsPage } from "@/pages/admin/AdminSponsorsPage";
 import { AdminUsersPage } from "@/pages/admin/AdminUsersPage";
 import { AdminVolunteersPage } from "@/pages/admin/AdminVolunteersPage";
+import { DonorDashboardPage } from "./pages/donor/DonorDashboardPage";
+import {
+  DonorCampaignsPage,
+  DonorDonatePage,
+  DonorDonationsPage,
+  DonorNotificationsPage,
+  DonorProfilePage,
+  DonorProofOfPaymentPage,
+  DonorSettingsPage,
+} from "@/pages/donor/DonorPortalPages";
 import { AboutPage } from "@/pages/public/AboutPage";
 import { CampaignsPage } from "@/pages/public/CampaignsPage";
 import { ContactPage } from "@/pages/public/ContactPage";
@@ -36,6 +47,18 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
+      </Route>
+
+      {/* Temporary public preview while the donor experience is being built. */}
+      <Route path="/donor" element={<DonorLayout />}>
+        <Route path="dashboard" element={<DonorDashboardPage />} />
+        <Route path="dashboard/donate" element={<DonorDonatePage />} />
+        <Route path="dashboard/campaigns" element={<DonorCampaignsPage />} />
+        <Route path="dashboard/donations" element={<DonorDonationsPage />} />
+        <Route path="dashboard/proof-of-payment" element={<DonorProofOfPaymentPage />} />
+        <Route path="dashboard/notifications" element={<DonorNotificationsPage />} />
+        <Route path="dashboard/profile" element={<DonorProfilePage />} />
+        <Route path="dashboard/settings" element={<DonorSettingsPage />} />
       </Route>
 
       <Route element={<PublicLayout />}>

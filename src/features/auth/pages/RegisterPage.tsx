@@ -62,6 +62,7 @@ export function RegisterPage() {
       highlightedTitle="community"
       subtitle="Create your account to support campaigns, volunteer, or request assistance through the foundation."
       maxWidth="lg"
+      scrollable
       footer={
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
@@ -79,7 +80,7 @@ export function RegisterPage() {
 
       <AuthDivider text="Or register with email" />
        
-      <form className="grid gap-4" onSubmit={handleSubmit}>
+      <form className="grid gap-3" onSubmit={handleSubmit}>
         <Input
           label="Full name"
           autoComplete="name"
@@ -131,7 +132,7 @@ export function RegisterPage() {
           minLength={8}
         />
 
-        <Button type="submit" disabled={isBusy} className="mt-1 w-full">
+        <Button type="submit" disabled={isBusy} className="w-full">
           {isSubmitting ? "Creating account..." : "Create account"}
         </Button>
       </form>

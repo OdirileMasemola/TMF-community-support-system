@@ -15,7 +15,7 @@ export function QuickActionCard({ title, description, icon: Icon, route }: Quick
     <Link
       to={route}
       className={cn(
-        "group flex h-full flex-col rounded-2xl border border-border bg-card/70 p-5 text-card-foreground backdrop-blur-xl",
+        "group flex h-full flex-col rounded-lg border border-border bg-card/70 p-5 text-card-foreground backdrop-blur-xl",
         "transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5",
       )}
     >

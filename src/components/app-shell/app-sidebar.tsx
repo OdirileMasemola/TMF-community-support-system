@@ -1,15 +1,20 @@
 "use client";
 
-import { NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { PanelLeft, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { navGroups } from "@/components/app-shell/app-shared";
+import { navGroups as adminNavGroups, type SidebarNavGroup } from "@/components/app-shell/app-shared";
 import { useSidebar } from "@/components/app-shell/sidebar-context";
 import { cn } from "@/lib/utils";
 import logoImage from "@/assets/images/logo.jpeg";
 
-export function AppSidebar() {
+type AppSidebarProps = {
+  navGroups?: SidebarNavGroup[];
+};
+
+export function AppSidebar({ navGroups = adminNavGroups }: AppSidebarProps) {
   const { collapsed, toggle } = useSidebar();
+  const { pathname, hash } = useLocation();
 
   return (
     <aside
@@ -61,23 +66,28 @@ export function AppSidebar() {
               <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{group.label}</p>
             ) : null}
             <nav className="grid gap-1">
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.title}
-                  to={item.path}
-                  title={collapsed ? item.title : undefined}
-                  className={({ isActive }) =>
-                    cn(
+              {group.items.map((item) => {
+                const [itemPath, itemHash] = item.path.split("#");
+                const isActive = itemHash
+                  ? pathname === itemPath && hash === `#${itemHash}`
+                  : pathname === item.path;
+
+                return (
+                  <Link
+                    key={item.title}
+                    to={item.path}
+                    title={collapsed ? item.title : undefined}
+                    className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
                       collapsed && "justify-center px-2",
                       isActive && "bg-accent text-primary",
-                    )
-                  }
-                >
-                  {item.icon}
-                  {!collapsed ? <span>{item.title}</span> : null}
-                </NavLink>
-              ))}
+                    )}
+                  >
+                    {item.icon}
+                    {!collapsed ? <span>{item.title}</span> : null}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
         ))}
