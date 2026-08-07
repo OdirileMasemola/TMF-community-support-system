@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminLayout } from "@/components/app-shell/admin-layout";
 import { DonorLayout } from "@/components/app-shell/donor-layout";
+import { VolunteerLayout } from "@/components/app-shell/volunteer-layout";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
@@ -29,6 +30,16 @@ import {
   DonorProofOfPaymentPage,
   DonorSettingsPage,
 } from "@/pages/donor/DonorPortalPages";
+import { VolunteerDashboardPage } from "@/pages/volunteer/VolunteerDashboardPage";
+import {
+  VolunteerApplicationsPage,
+  VolunteerAssignmentsPage,
+  VolunteerHoursPage,
+  VolunteerNotificationsPage,
+  VolunteerOpportunitiesPage,
+  VolunteerProfilePage,
+  VolunteerSettingsPage,
+} from "@/pages/volunteer/VolunteerPortalPages";
 import { AboutPage } from "@/pages/public/AboutPage";
 import { CampaignsPage } from "@/pages/public/CampaignsPage";
 import { ContactPage } from "@/pages/public/ContactPage";
@@ -59,6 +70,19 @@ export default function App() {
         <Route path="dashboard/notifications" element={<DonorNotificationsPage />} />
         <Route path="dashboard/profile" element={<DonorProfilePage />} />
         <Route path="dashboard/settings" element={<DonorSettingsPage />} />
+      </Route>
+
+      {/* Temporary public preview while the volunteer experience is being built. */}
+      <Route path="/volunteer" element={<VolunteerLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<VolunteerDashboardPage />} />
+        <Route path="opportunities" element={<VolunteerOpportunitiesPage />} />
+        <Route path="applications" element={<VolunteerApplicationsPage />} />
+        <Route path="assignments" element={<VolunteerAssignmentsPage />} />
+        <Route path="hours" element={<VolunteerHoursPage />} />
+        <Route path="notifications" element={<VolunteerNotificationsPage />} />
+        <Route path="profile" element={<VolunteerProfilePage />} />
+        <Route path="settings" element={<VolunteerSettingsPage />} />
       </Route>
 
       <Route element={<PublicLayout />}>
