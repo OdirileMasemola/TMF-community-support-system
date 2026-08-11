@@ -1,4 +1,5 @@
 import { History } from "lucide-react";
+import { toast } from "sonner";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { Button } from "@/components/ui/Button";
 import type { SponsorshipHistoryItem } from "@/data/sponsorDashboardData";
@@ -33,7 +34,17 @@ export function SponsorshipHistoryCard({ item }: SponsorshipHistoryCardProps) {
       <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{item.impactSummary}</p>
 
       <div className="mt-auto pt-5">
-        <Button to="/sponsor/dashboard" variant="outline" size="sm" className="w-full">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="w-full"
+          onClick={() =>
+            toast.message("Summary coming soon", {
+              description: `A detailed summary for ${item.campaign} will be available in a later update.`,
+            })
+          }
+        >
           View Summary
         </Button>
       </div>

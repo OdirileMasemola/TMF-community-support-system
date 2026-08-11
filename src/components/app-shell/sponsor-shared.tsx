@@ -27,22 +27,22 @@ export const sponsorNavGroups: SidebarNavGroup[] = [
     items: [
       {
         title: "Sponsored campaigns",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/dashboard#sponsored-campaigns",
         icon: <HeartHandshake className="size-4" aria-hidden="true" />,
       },
       {
         title: "Sponsorship requests",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/dashboard#sponsorship-requests",
         icon: <ClipboardList className="size-4" aria-hidden="true" />,
       },
       {
         title: "Sponsorship history",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/dashboard#sponsorship-history",
         icon: <History className="size-4" aria-hidden="true" />,
       },
       {
         title: "Sponsor a campaign",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/dashboard#sponsorship-requests",
         icon: <HandCoins className="size-4" aria-hidden="true" />,
       },
     ],

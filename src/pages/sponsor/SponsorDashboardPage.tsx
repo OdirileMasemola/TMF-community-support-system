@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { HandCoins, HeartHandshake } from "lucide-react";
 import { SponsoredCampaignCard } from "@/components/dashboard/SponsoredCampaignCard";
 import { SponsorshipHistoryCard } from "@/components/dashboard/SponsorshipHistoryCard";
@@ -22,6 +24,16 @@ function timeOfDayGreeting() {
 }
 
 export function SponsorDashboardPage() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (!hash) return;
+    const target = document.querySelector(hash);
+    if (target instanceof HTMLElement) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [hash]);
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -53,11 +65,11 @@ export function SponsorDashboardPage() {
           </div>
         </div>
         <div className="flex shrink-0 flex-wrap gap-3">
-          <Button to="/sponsor/dashboard">
+          <Button to="#sponsored-campaigns">
             <HeartHandshake className="mr-2 size-4" />
             View Sponsored Campaigns
           </Button>
-          <Button to="/sponsor/dashboard" variant="outline">
+          <Button to="#sponsorship-requests" variant="outline">
             <HandCoins className="mr-2 size-4" />
             Sponsor New Campaign
           </Button>
@@ -86,7 +98,7 @@ export function SponsorDashboardPage() {
         })}
       </div>
 
-      <section className="space-y-4">
+      <section id="sponsored-campaigns" className="scroll-mt-24 space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Sponsored campaigns</h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -100,7 +112,7 @@ export function SponsorDashboardPage() {
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section id="sponsorship-requests" className="scroll-mt-24 space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Sponsorship requests</h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -114,7 +126,7 @@ export function SponsorDashboardPage() {
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section id="sponsorship-history" className="scroll-mt-24 space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Sponsorship history</h2>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -128,7 +140,7 @@ export function SponsorDashboardPage() {
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section id="community-impact" className="scroll-mt-24 space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Community impact</h2>
           <p className="mt-1 text-sm text-muted-foreground">
