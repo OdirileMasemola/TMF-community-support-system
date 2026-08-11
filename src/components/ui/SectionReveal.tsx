@@ -15,9 +15,11 @@ const directionOffsets: Record<
   SectionRevealDirection,
   { x: number; y: number; rotate: number; scale: number }
 > = {
-  up: { x: 0, y: 52, rotate: 0, scale: 0.94 },
-  left: { x: -88, y: 32, rotate: -3, scale: 0.96 },
-  right: { x: 88, y: 32, rotate: 3, scale: 0.96 },
+  // Keep horizontal offsets modest so animated sections do not widen the page
+  // and clip sticky sidebars in app shells.
+  up: { x: 0, y: 36, rotate: 0, scale: 0.98 },
+  left: { x: -28, y: 20, rotate: -1, scale: 0.98 },
+  right: { x: 28, y: 20, rotate: 1, scale: 0.98 },
 };
 
 export function SectionReveal({
@@ -34,34 +36,35 @@ export function SectionReveal({
   }
 
   return (
-    <motion.div
-      className={cn(className)}
-      initial={{
-        opacity: 0,
-        x: offset.x,
-        y: offset.y,
-        rotate: offset.rotate,
-        scale: offset.scale,
-        filter: "blur(10px)",
-      }}
-      whileInView={{
-        opacity: 1,
-        x: 0,
-        y: 0,
-        rotate: 0,
-        scale: 1,
-        filter: "blur(0px)",
-      }}
-      viewport={{ once: true, amount: 0.18 }}
-      transition={{
-        type: "spring",
-        stiffness: 130,
-        damping: 22,
-        mass: 0.85,
-        delay,
-      }}
-    >
-      {children}
-    </motion.div>
+    <div className={cn("overflow-x-clip", className)}>
+      <motion.div
+        initial={{
+          opacity: 0,
+          x: offset.x,
+          y: offset.y,
+          rotate: offset.rotate,
+          scale: offset.scale,
+          filter: "blur(6px)",
+        }}
+        whileInView={{
+          opacity: 1,
+          x: 0,
+          y: 0,
+          rotate: 0,
+          scale: 1,
+          filter: "blur(0px)",
+        }}
+        viewport={{ once: true, amount: 0.18 }}
+        transition={{
+          type: "spring",
+          stiffness: 130,
+          damping: 22,
+          mass: 0.85,
+          delay,
+        }}
+      >
+        {children}
+      </motion.div>
+    </div>
   );
 }

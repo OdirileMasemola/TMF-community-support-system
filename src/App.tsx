@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminLayout } from "@/components/app-shell/admin-layout";
 import { BeneficiaryLayout } from "@/components/app-shell/beneficiary-layout";
 import { DonorLayout } from "@/components/app-shell/donor-layout";
+import { SponsorLayout } from "@/components/app-shell/sponsor-layout";
 import { VolunteerLayout } from "@/components/app-shell/volunteer-layout";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PublicLayout } from "@/components/layout/PublicLayout";
@@ -51,6 +52,7 @@ import {
   VolunteerProfilePage,
   VolunteerSettingsPage,
 } from "@/pages/volunteer/VolunteerPortalPages";
+import { SponsorDashboardPage } from "@/pages/sponsor/SponsorDashboardPage";
 import { AboutPage } from "@/pages/public/AboutPage";
 import { CampaignsPage } from "@/pages/public/CampaignsPage";
 import { ContactPage } from "@/pages/public/ContactPage";
@@ -107,6 +109,12 @@ export default function App() {
         <Route path="notifications" element={<BeneficiaryNotificationsPage />} />
         <Route path="profile" element={<BeneficiaryProfilePage />} />
         <Route path="settings" element={<BeneficiarySettingsPage />} />
+      </Route>
+
+      {/* Temporary public preview while the sponsor experience is being built. */}
+      <Route path="/sponsor" element={<SponsorLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<SponsorDashboardPage />} />
       </Route>
 
       <Route element={<PublicLayout />}>
