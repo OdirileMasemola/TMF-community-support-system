@@ -14,9 +14,10 @@ export function AppShell({ children, navGroups = adminNavGroups }: AppShellProps
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen overflow-x-hidden bg-muted/40">
+      {/* Do not put overflow-x-hidden here — it breaks sticky sidebar scrolling. */}
+      <div className="flex min-h-screen bg-muted/40">
         <AppSidebar navGroups={navGroups} />
-        <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden">
+        <div className="flex min-w-0 flex-1 flex-col overflow-x-clip">
           <AppHeader navLinks={navLinks} />
           <main className={cn("mx-auto flex w-full min-w-0 max-w-[1400px] flex-1 flex-col p-4 md:p-6")}>
             {children}
