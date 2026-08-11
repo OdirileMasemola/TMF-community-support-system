@@ -1,8 +1,15 @@
 import { HandCoins, HeartHandshake } from "lucide-react";
+import { SponsoredCampaignCard } from "@/components/dashboard/SponsoredCampaignCard";
+import { SponsorshipRequestCard } from "@/components/dashboard/SponsorshipRequestCard";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { sponsorProfile, sponsorStatistics } from "@/data/sponsorDashboardData";
+import {
+  sponsoredCampaigns,
+  sponsorProfile,
+  sponsorshipRequests,
+  sponsorStatistics,
+} from "@/data/sponsorDashboardData";
 
 function timeOfDayGreeting() {
   const hour = new Date().getHours();
@@ -75,6 +82,34 @@ export function SponsorDashboardPage() {
           );
         })}
       </div>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Sponsored campaigns</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Campaigns your organisation currently supports.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {sponsoredCampaigns.map((campaign) => (
+            <SponsoredCampaignCard key={campaign.id} campaign={campaign} />
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Sponsorship requests</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Opportunities from the foundation looking for organisational partners.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {sponsorshipRequests.map((request) => (
+            <SponsorshipRequestCard key={request.id} request={request} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
