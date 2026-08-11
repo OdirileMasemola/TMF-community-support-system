@@ -1,25 +1,18 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { HandCoins, HeartHandshake } from "lucide-react";
-import { toast } from "sonner";
+import { ArrowRight, HandCoins, HeartHandshake } from "lucide-react";
 import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { SponsoredCampaignCard } from "@/components/dashboard/SponsoredCampaignCard";
-import { SponsorCampaignCard } from "@/components/dashboard/SponsorCampaignCard";
-import { SponsorshipHistoryCard } from "@/components/dashboard/SponsorshipHistoryCard";
 import { SponsorshipRequestCard } from "@/components/dashboard/SponsorshipRequestCard";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { SectionReveal } from "@/components/ui/SectionReveal";
 import {
-  campaignsToSponsor,
   communityImpactMetrics,
   foundationUpdates,
   sponsoredCampaigns,
   sponsorActivities,
   sponsorProfile,
-  sponsorshipHistory,
   sponsorshipRequests,
   sponsorQuickActions,
   sponsorStatistics,
@@ -46,15 +39,10 @@ function PriorityBadge({ priority }: { priority: UpdatePriority }) {
 }
 
 export function SponsorDashboardPage() {
-  const { hash } = useLocation();
-
-  useEffect(() => {
-    if (!hash) return;
-    const target = document.querySelector(hash);
-    if (target instanceof HTMLElement) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [hash]);
+  const featuredCampaigns = sponsoredCampaigns.slice(0, 4);
+  const featuredRequests = sponsorshipRequests.slice(0, 2);
+  const recentActivities = sponsorActivities.slice(0, 5);
+  const recentUpdates = foundationUpdates.slice(0, 3);
 
   return (
     <div className="space-y-6">
@@ -88,11 +76,11 @@ export function SponsorDashboardPage() {
             </div>
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
-            <Button to="#sponsored-campaigns">
+            <Button to="/sponsor/campaigns">
               <HeartHandshake className="mr-2 size-4" />
               View Sponsored Campaigns
             </Button>
-            <Button to="#sponsor-campaign" variant="outline">
+            <Button to="/sponsor/sponsorships" variant="outline">
               <HandCoins className="mr-2 size-4" />
               Sponsor New Campaign
             </Button>
@@ -125,15 +113,21 @@ export function SponsorDashboardPage() {
       </SectionReveal>
 
       <SectionReveal delay={0.08}>
-        <section id="sponsored-campaigns" className="scroll-mt-24 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Sponsored campaigns</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Campaigns your organisation currently supports.
-            </p>
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Sponsored campaigns</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                A snapshot of campaigns your organisation currently supports.
+              </p>
+            </div>
+            <Button to="/sponsor/campaigns" variant="ghost" size="sm">
+              View All Campaigns
+              <ArrowRight className="ml-1.5 size-3.5" />
+            </Button>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {sponsoredCampaigns.map((campaign) => (
+            {featuredCampaigns.map((campaign) => (
               <SponsoredCampaignCard key={campaign.id} campaign={campaign} />
             ))}
           </div>
@@ -141,15 +135,21 @@ export function SponsorDashboardPage() {
       </SectionReveal>
 
       <SectionReveal delay={0.1}>
-        <section id="sponsorship-requests" className="scroll-mt-24 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Sponsorship requests</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Opportunities from the foundation looking for organisational partners.
-            </p>
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Sponsorship requests</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Current opportunities looking for organisational partners.
+              </p>
+            </div>
+            <Button to="/sponsor/requests" variant="ghost" size="sm">
+              View All Requests
+              <ArrowRight className="ml-1.5 size-3.5" />
+            </Button>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {sponsorshipRequests.map((request) => (
+            {featuredRequests.map((request) => (
               <SponsorshipRequestCard key={request.id} request={request} />
             ))}
           </div>
@@ -157,44 +157,18 @@ export function SponsorDashboardPage() {
       </SectionReveal>
 
       <SectionReveal delay={0.12}>
-        <section id="sponsor-campaign" className="scroll-mt-24 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Sponsor a campaign</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Choose an open TMF campaign to support with funding or resources.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {campaignsToSponsor.map((campaign) => (
-              <SponsorCampaignCard key={campaign.id} campaign={campaign} />
-            ))}
-          </div>
-        </section>
-      </SectionReveal>
-
-      <SectionReveal delay={0.14}>
-        <section id="sponsorship-history" className="scroll-mt-24 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Sponsorship history</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Previous sponsorships and the outcomes they helped deliver.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {sponsorshipHistory.map((item) => (
-              <SponsorshipHistoryCard key={item.id} item={item} />
-            ))}
-          </div>
-        </section>
-      </SectionReveal>
-
-      <SectionReveal delay={0.16}>
-        <section id="community-impact" className="scroll-mt-24 space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Community impact</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              The difference your sponsorship contributions have made.
-            </p>
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Community impact</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                The difference your sponsorship contributions have made.
+              </p>
+            </div>
+            <Button to="/sponsor/impact" variant="ghost" size="sm">
+              View Impact
+              <ArrowRight className="ml-1.5 size-3.5" />
+            </Button>
           </div>
           <div className="grid grid-cols-2 gap-px bg-border lg:grid-cols-4">
             {communityImpactMetrics.map((metric) => {
@@ -221,15 +195,21 @@ export function SponsorDashboardPage() {
         </section>
       </SectionReveal>
 
-      <SectionReveal delay={0.18}>
+      <SectionReveal delay={0.14}>
         <div className="grid gap-px bg-border lg:grid-cols-2">
-          <DashboardCard id="recent-activity" className="scroll-mt-24">
-            <CardHeader>
-              <CardTitle>Recent activity</CardTitle>
-              <CardDescription>Your latest sponsorship actions and updates.</CardDescription>
+          <DashboardCard>
+            <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+              <div>
+                <CardTitle>Recent activity</CardTitle>
+                <CardDescription>Your latest sponsorship actions and updates.</CardDescription>
+              </div>
+              <Button to="/sponsor/history" variant="ghost" size="sm" className="shrink-0">
+                View Activity
+                <ArrowRight className="ml-1.5 size-3.5" />
+              </Button>
             </CardHeader>
             <CardContent>
-              {sponsorActivities.map((activity) => (
+              {recentActivities.map((activity) => (
                 <RecentActivityCard
                   key={activity.id}
                   title={activity.title}
@@ -241,55 +221,19 @@ export function SponsorDashboardPage() {
             </CardContent>
           </DashboardCard>
 
-          <DashboardCard id="organisation-profile" className="scroll-mt-24">
-            <CardHeader>
-              <CardTitle>Organisation profile</CardTitle>
-              <CardDescription>Your sponsor organisation details on file with TMF.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {[
-                  ["Organisation Name", sponsorProfile.organisationName],
-                  ["Representative", sponsorProfile.representative],
-                  ["Email Address", sponsorProfile.email],
-                  ["Phone Number", sponsorProfile.phone],
-                  ["Sponsor Level", `${sponsorProfile.sponsorLevel} Sponsor`],
-                  ["Member Since", sponsorProfile.memberSince],
-                  ["Business Address", sponsorProfile.businessAddress],
-                ].map(([label, value]) => (
-                  <div key={label} className={label === "Business Address" ? "sm:col-span-2" : undefined}>
-                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-                    <p className="mt-1 font-medium text-foreground">{value}</p>
-                  </div>
-                ))}
+          <DashboardCard>
+            <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+              <div>
+                <CardTitle>Foundation updates</CardTitle>
+                <CardDescription>Important updates for TMF organisational partners.</CardDescription>
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="mt-5"
-                onClick={() =>
-                  toast.message("Profile editing coming soon", {
-                    description: "Organisation profile updates will be available in a later update.",
-                  })
-                }
-              >
-                Edit Profile
+              <Button to="/sponsor/notifications" variant="ghost" size="sm" className="shrink-0">
+                View All
+                <ArrowRight className="ml-1.5 size-3.5" />
               </Button>
-            </CardContent>
-          </DashboardCard>
-        </div>
-      </SectionReveal>
-
-      <SectionReveal delay={0.2}>
-        <div className="grid gap-px bg-border lg:grid-cols-2">
-          <DashboardCard id="foundation-updates" className="scroll-mt-24">
-            <CardHeader>
-              <CardTitle>Foundation updates</CardTitle>
-              <CardDescription>Important updates for TMF organisational partners.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {foundationUpdates.map((update) => {
+              {recentUpdates.map((update) => {
                 const Icon = update.icon;
                 return (
                   <article
@@ -312,41 +256,41 @@ export function SponsorDashboardPage() {
               })}
             </CardContent>
           </DashboardCard>
-
-          <DashboardCard id="appreciation" className="scroll-mt-24">
-            <CardHeader>
-              <CardTitle>Your partnership creates lasting impact.</CardTitle>
-              <CardDescription>
-                Thank you for standing with the Themba Molefe Foundation. Your organisation&apos;s support helps
-                families, learners, and communities across Gauteng.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <HeartHandshake className="size-5" aria-hidden="true" />
-              </span>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Button to="#sponsor-campaign" size="sm">
-                  <HandCoins className="mr-2 size-4" />
-                  Sponsor Another Campaign
-                </Button>
-                <Button to="#sponsored-campaigns" variant="outline" size="sm">
-                  <HeartHandshake className="mr-2 size-4" />
-                  Review Your Campaigns
-                </Button>
-              </div>
-            </CardContent>
-          </DashboardCard>
         </div>
       </SectionReveal>
 
-      <SectionReveal delay={0.22}>
-        <section id="quick-actions" className="scroll-mt-24 space-y-4">
+      <SectionReveal delay={0.16}>
+        <DashboardCard>
+          <CardHeader>
+            <CardTitle>Your partnership creates lasting impact.</CardTitle>
+            <CardDescription>
+              Thank you for standing with the Themba Molefe Foundation. Your organisation&apos;s support helps
+              families, learners, and communities across Gauteng.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <span className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <HeartHandshake className="size-5" aria-hidden="true" />
+            </span>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Button to="/sponsor/sponsorships" size="sm">
+                <HandCoins className="mr-2 size-4" />
+                Sponsor Another Campaign
+              </Button>
+              <Button to="/sponsor/campaigns" variant="outline" size="sm">
+                <HeartHandshake className="mr-2 size-4" />
+                Review Your Campaigns
+              </Button>
+            </div>
+          </CardContent>
+        </DashboardCard>
+      </SectionReveal>
+
+      <SectionReveal delay={0.18}>
+        <section className="space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Quick actions</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Jump into common sponsorship workflows.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Jump into common sponsorship workflows.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sponsorQuickActions.map((action) => (

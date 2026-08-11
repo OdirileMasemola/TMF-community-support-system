@@ -53,6 +53,16 @@ import {
   VolunteerSettingsPage,
 } from "@/pages/volunteer/VolunteerPortalPages";
 import { SponsorDashboardPage } from "@/pages/sponsor/SponsorDashboardPage";
+import {
+  SponsorCampaignsPage,
+  SponsorHistoryPage,
+  SponsorImpactPage,
+  SponsorNotificationsPage,
+  SponsorProfilePage,
+  SponsorRequestsPage,
+  SponsorSettingsPage,
+  SponsorSponsorshipsPage,
+} from "@/pages/sponsor/SponsorPortalPages";
 import { AboutPage } from "@/pages/public/AboutPage";
 import { CampaignsPage } from "@/pages/public/CampaignsPage";
 import { ContactPage } from "@/pages/public/ContactPage";
@@ -115,6 +125,14 @@ export default function App() {
       <Route path="/sponsor" element={<SponsorLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<SponsorDashboardPage />} />
+        <Route path="campaigns" element={<SponsorCampaignsPage />} />
+        <Route path="sponsorships" element={<SponsorSponsorshipsPage />} />
+        <Route path="requests" element={<SponsorRequestsPage />} />
+        <Route path="history" element={<SponsorHistoryPage />} />
+        <Route path="impact" element={<SponsorImpactPage />} />
+        <Route path="notifications" element={<SponsorNotificationsPage />} />
+        <Route path="profile" element={<SponsorProfilePage />} />
+        <Route path="settings" element={<SponsorSettingsPage />} />
       </Route>
 
       <Route element={<PublicLayout />}>

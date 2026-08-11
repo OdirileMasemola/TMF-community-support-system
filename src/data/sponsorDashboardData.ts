@@ -107,6 +107,16 @@ export type SponsorQuickAction = {
   route: string;
 };
 
+export type SponsorNotification = {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  priority: UpdatePriority;
+  unread: boolean;
+  icon: LucideIcon;
+};
+
 export const sponsorProfile = {
   organisationName: "ABC Holdings",
   initials: "AH",
@@ -402,27 +412,66 @@ export const foundationUpdates: FoundationUpdate[] = [
   },
 ];
 
+export const sponsorNotifications: SponsorNotification[] = [
+  {
+    id: "notice-1",
+    title: "New campaign available for sponsorship",
+    message: "School Stationery Drive is open for organisational partners this term.",
+    timestamp: "Today · 09:30",
+    priority: "High",
+    unread: true,
+    icon: Bell,
+  },
+  {
+    id: "notice-2",
+    title: "Winter Relief campaign reached 80% funding",
+    message: "Your continued support is helping households prepare for colder months.",
+    timestamp: "2 days ago · 11:15",
+    priority: "Medium",
+    unread: true,
+    icon: TrendingUp,
+  },
+  {
+    id: "notice-3",
+    title: "Impact summary ready",
+    message: "Family Care Programme closed with an impact summary available to review.",
+    timestamp: "30 Apr 2026 · 16:05",
+    priority: "Normal",
+    unread: false,
+    icon: HeartHandshake,
+  },
+  {
+    id: "notice-4",
+    title: "Volunteer registrations are now open",
+    message: "Community members can join upcoming outreach programmes across Gauteng.",
+    timestamp: "5 days ago · 10:00",
+    priority: "Normal",
+    unread: false,
+    icon: Users,
+  },
+];
+
 export const sponsorQuickActions: SponsorQuickAction[] = [
   {
     id: "sponsor-campaign",
     title: "Sponsor Campaign",
     description: "Explore open campaigns looking for organisational partners.",
     icon: HandCoins,
-    route: "/sponsor/dashboard#sponsor-campaign",
+    route: "/sponsor/sponsorships",
   },
   {
     id: "view-campaigns",
     title: "View Campaigns",
     description: "Review the campaigns your organisation currently supports.",
     icon: HeartHandshake,
-    route: "/sponsor/dashboard#sponsored-campaigns",
+    route: "/sponsor/campaigns",
   },
   {
     id: "view-history",
     title: "View Sponsorship History",
     description: "Look back at past contributions and impact summaries.",
     icon: History,
-    route: "/sponsor/dashboard#sponsorship-history",
+    route: "/sponsor/history",
   },
   {
     id: "contact-foundation",
@@ -436,6 +485,6 @@ export const sponsorQuickActions: SponsorQuickAction[] = [
     title: "Organisation Profile",
     description: "Update your organisation details and representative contacts.",
     icon: Building2,
-    route: "/sponsor/dashboard#organisation-profile",
+    route: "/sponsor/profile",
   },
 ];
