@@ -62,7 +62,7 @@ export const sponsorNavGroups: SidebarNavGroup[] = [
       },
       {
         title: "Notifications",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/dashboard#foundation-updates",
         icon: <Bell className="size-4" aria-hidden="true" />,
       },
       {
