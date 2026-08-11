@@ -124,7 +124,7 @@ export function SponsorDashboardPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal delay={0.08} direction="left">
+      <SectionReveal delay={0.08}>
         <section id="sponsored-campaigns" className="scroll-mt-24 space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Sponsored campaigns</h2>
@@ -140,7 +140,7 @@ export function SponsorDashboardPage() {
         </section>
       </SectionReveal>
 
-      <SectionReveal delay={0.1} direction="right">
+      <SectionReveal delay={0.1}>
         <section id="sponsorship-requests" className="scroll-mt-24 space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Sponsorship requests</h2>
@@ -156,7 +156,7 @@ export function SponsorDashboardPage() {
         </section>
       </SectionReveal>
 
-      <SectionReveal delay={0.12} direction="left">
+      <SectionReveal delay={0.12}>
         <section id="sponsor-campaign" className="scroll-mt-24 space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Sponsor a campaign</h2>
@@ -172,7 +172,7 @@ export function SponsorDashboardPage() {
         </section>
       </SectionReveal>
 
-      <SectionReveal delay={0.14} direction="right">
+      <SectionReveal delay={0.14}>
         <section id="sponsorship-history" className="scroll-mt-24 space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Sponsorship history</h2>
@@ -281,7 +281,7 @@ export function SponsorDashboardPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal delay={0.2} direction="left">
+      <SectionReveal delay={0.2}>
         <div className="grid gap-px bg-border lg:grid-cols-2">
           <DashboardCard id="foundation-updates" className="scroll-mt-24">
             <CardHeader>
@@ -340,7 +340,7 @@ export function SponsorDashboardPage() {
         </div>
       </SectionReveal>
 
-      <SectionReveal delay={0.22} direction="right">
+      <SectionReveal delay={0.22}>
         <section id="quick-actions" className="scroll-mt-24 space-y-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Quick actions</h2>
