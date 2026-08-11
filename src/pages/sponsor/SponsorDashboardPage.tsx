@@ -1,22 +1,27 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { HandCoins, HeartHandshake } from "lucide-react";
+import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
+import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { SponsoredCampaignCard } from "@/components/dashboard/SponsoredCampaignCard";
 import { SponsorCampaignCard } from "@/components/dashboard/SponsorCampaignCard";
 import { SponsorshipHistoryCard } from "@/components/dashboard/SponsorshipHistoryCard";
 import { SponsorshipRequestCard } from "@/components/dashboard/SponsorshipRequestCard";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { Button } from "@/components/ui/Button";
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import {
   campaignsToSponsor,
   communityImpactMetrics,
   sponsoredCampaigns,
+  sponsorActivities,
   sponsorProfile,
   sponsorshipHistory,
   sponsorshipRequests,
+  sponsorQuickActions,
   sponsorStatistics,
 } from "@/data/sponsorDashboardData";
+import { toast } from "sonner";
 
 function timeOfDayGreeting() {
   const hour = new Date().getHours();
@@ -127,7 +132,6 @@ export function SponsorDashboardPage() {
           ))}
         </div>
       </section>
-
       <section id="sponsor-campaign" className="scroll-mt-24 space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Sponsor a campaign</h2>
@@ -141,7 +145,6 @@ export function SponsorDashboardPage() {
           ))}
         </div>
       </section>
-
       <section id="sponsorship-history" className="scroll-mt-24 space-y-4">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Sponsorship history</h2>
@@ -184,6 +187,84 @@ export function SponsorDashboardPage() {
               </DashboardCard>
             );
           })}
+        </div>
+      </section>
+
+      <div className="grid gap-px bg-border lg:grid-cols-2">
+        <DashboardCard id="recent-activity" className="scroll-mt-24">
+          <CardHeader>
+            <CardTitle>Recent activity</CardTitle>
+            <CardDescription>Your latest sponsorship actions and updates.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {sponsorActivities.map((activity) => (
+              <RecentActivityCard
+                key={activity.id}
+                title={activity.title}
+                description={activity.description}
+                timestamp={activity.timestamp}
+                icon={activity.icon}
+              />
+            ))}
+          </CardContent>
+        </DashboardCard>
+
+        <DashboardCard id="organisation-profile" className="scroll-mt-24">
+          <CardHeader>
+            <CardTitle>Organisation profile</CardTitle>
+            <CardDescription>Your sponsor organisation details on file with TMF.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[
+                ["Organisation Name", sponsorProfile.organisationName],
+                ["Representative", sponsorProfile.representative],
+                ["Email Address", sponsorProfile.email],
+                ["Phone Number", sponsorProfile.phone],
+                ["Sponsor Level", `${sponsorProfile.sponsorLevel} Sponsor`],
+                ["Member Since", sponsorProfile.memberSince],
+                ["Business Address", sponsorProfile.businessAddress],
+              ].map(([label, value]) => (
+                <div key={label} className={label === "Business Address" ? "sm:col-span-2" : undefined}>
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+                  <p className="mt-1 font-medium text-foreground">{value}</p>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-5"
+              onClick={() =>
+                toast.message("Profile editing coming soon", {
+                  description: "Organisation profile updates will be available in a later update.",
+                })
+              }
+            >
+              Edit Profile
+            </Button>
+          </CardContent>
+        </DashboardCard>
+      </div>
+
+      <section id="quick-actions" className="scroll-mt-24 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Quick actions</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Jump into common sponsorship workflows.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {sponsorQuickActions.map((action) => (
+            <QuickActionCard
+              key={action.id}
+              title={action.title}
+              description={action.description}
+              icon={action.icon}
+              route={action.route}
+            />
+          ))}
         </div>
       </section>
     </div>

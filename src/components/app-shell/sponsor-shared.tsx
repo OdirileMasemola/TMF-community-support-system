@@ -52,7 +52,7 @@ export const sponsorNavGroups: SidebarNavGroup[] = [
     items: [
       {
         title: "Organisation profile",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/dashboard#organisation-profile",
         icon: <Building2 className="size-4" aria-hidden="true" />,
       },
       {

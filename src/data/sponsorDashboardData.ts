@@ -436,6 +436,6 @@ export const sponsorQuickActions: SponsorQuickAction[] = [
     title: "Organisation Profile",
     description: "Update your organisation details and representative contacts.",
     icon: Building2,
-    route: "/sponsor/dashboard",
+    route: "/sponsor/dashboard#organisation-profile",
   },
 ];
