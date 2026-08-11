@@ -1,12 +1,15 @@
 import { HandCoins, HeartHandshake } from "lucide-react";
 import { SponsoredCampaignCard } from "@/components/dashboard/SponsoredCampaignCard";
+import { SponsorshipHistoryCard } from "@/components/dashboard/SponsorshipHistoryCard";
 import { SponsorshipRequestCard } from "@/components/dashboard/SponsorshipRequestCard";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import {
+  communityImpactMetrics,
   sponsoredCampaigns,
   sponsorProfile,
+  sponsorshipHistory,
   sponsorshipRequests,
   sponsorStatistics,
 } from "@/data/sponsorDashboardData";
@@ -108,6 +111,51 @@ export function SponsorDashboardPage() {
           {sponsorshipRequests.map((request) => (
             <SponsorshipRequestCard key={request.id} request={request} />
           ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Sponsorship history</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Previous sponsorships and the outcomes they helped deliver.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {sponsorshipHistory.map((item) => (
+            <SponsorshipHistoryCard key={item.id} item={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Community impact</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            The difference your sponsorship contributions have made.
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-px bg-border lg:grid-cols-4">
+          {communityImpactMetrics.map((metric) => {
+            const Icon = metric.icon;
+            return (
+              <DashboardCard key={metric.id}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">{metric.label}</CardTitle>
+                    <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="size-4" aria-hidden="true" />
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+                    {metric.value}
+                  </p>
+                </CardContent>
+              </DashboardCard>
+            );
+          })}
         </div>
       </section>
     </div>
