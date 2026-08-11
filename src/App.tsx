@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminLayout } from "@/components/app-shell/admin-layout";
+import { BeneficiaryLayout } from "@/components/app-shell/beneficiary-layout";
 import { DonorLayout } from "@/components/app-shell/donor-layout";
 import { VolunteerLayout } from "@/components/app-shell/volunteer-layout";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -30,6 +31,16 @@ import {
   DonorProofOfPaymentPage,
   DonorSettingsPage,
 } from "@/pages/donor/DonorPortalPages";
+import { BeneficiaryDashboardPage } from "@/pages/beneficiary/BeneficiaryDashboardPage";
+import {
+  BeneficiaryHelpPage,
+  BeneficiaryNotificationsPage,
+  BeneficiaryProfilePage,
+  BeneficiaryProgrammesPage,
+  BeneficiaryRequestPage,
+  BeneficiaryRequestsPage,
+  BeneficiarySettingsPage,
+} from "@/pages/beneficiary/BeneficiaryPortalPages";
 import { VolunteerDashboardPage } from "@/pages/volunteer/VolunteerDashboardPage";
 import {
   VolunteerApplicationsPage,
@@ -83,6 +94,19 @@ export default function App() {
         <Route path="notifications" element={<VolunteerNotificationsPage />} />
         <Route path="profile" element={<VolunteerProfilePage />} />
         <Route path="settings" element={<VolunteerSettingsPage />} />
+      </Route>
+
+      {/* Temporary public preview while the beneficiary experience is being built. */}
+      <Route path="/beneficiary" element={<BeneficiaryLayout />}>
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<BeneficiaryDashboardPage />} />
+        <Route path="request" element={<BeneficiaryRequestPage />} />
+        <Route path="requests" element={<BeneficiaryRequestsPage />} />
+        <Route path="programmes" element={<BeneficiaryProgrammesPage />} />
+        <Route path="help" element={<BeneficiaryHelpPage />} />
+        <Route path="notifications" element={<BeneficiaryNotificationsPage />} />
+        <Route path="profile" element={<BeneficiaryProfilePage />} />
+        <Route path="settings" element={<BeneficiarySettingsPage />} />
       </Route>
 
       <Route element={<PublicLayout />}>
