@@ -42,7 +42,7 @@ export const sponsorNavGroups: SidebarNavGroup[] = [
       },
       {
         title: "Sponsor a campaign",
-        path: "/sponsor/dashboard#sponsorship-requests",
+        path: "/sponsor/dashboard#sponsor-campaign",
         icon: <HandCoins className="size-4" aria-hidden="true" />,
       },
     ],

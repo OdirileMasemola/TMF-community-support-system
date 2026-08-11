@@ -17,6 +17,8 @@ import familyCareImage from "@/assets/images/campaigns/Family Care Support.webp"
 import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp";
 import winterReliefImage from "@/assets/images/campaigns/Winter Relief.webp";
 import youthEducationImage from "@/assets/images/campaigns/Youth Education Support.webp";
+import communityHealthImage from "@/assets/images/campaigns/Community Health Awareness.webp";
+import backToSchoolImage from "@/assets/images/campaigns/Back to school.webp";
 
 export type CampaignStatus = "Active" | "Upcoming" | "Completed";
 export type RequestPriority = "High" | "Medium" | "Normal";
@@ -41,6 +43,15 @@ export type SponsoredCampaign = {
   progress: number;
   startDate: string;
   endDate: string;
+  image: string;
+};
+
+export type CampaignToSponsor = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  fundingGoal: string;
   image: string;
 };
 
@@ -183,6 +194,33 @@ export const sponsoredCampaigns: SponsoredCampaign[] = [
     startDate: "01 Feb 2026",
     endDate: "30 Apr 2026",
     image: familyCareImage,
+  },
+];
+
+export const campaignsToSponsor: CampaignToSponsor[] = [
+  {
+    id: "open-1",
+    title: "Back to School Drive",
+    category: "Education",
+    description: "Help equip learners with stationery, uniforms, and school bags for the new term.",
+    fundingGoal: "R45,000",
+    image: backToSchoolImage,
+  },
+  {
+    id: "open-2",
+    title: "Community Health Awareness",
+    category: "Health",
+    description: "Sponsor wellness packs and screening support for an upcoming community health day.",
+    fundingGoal: "R30,000",
+    image: communityHealthImage,
+  },
+  {
+    id: "open-3",
+    title: "Winter Relief Campaign",
+    category: "Relief",
+    description: "Provide blankets and warm clothing for households ahead of the colder months.",
+    fundingGoal: "R55,000",
+    image: winterReliefImage,
   },
 ];
 
@@ -370,21 +408,21 @@ export const sponsorQuickActions: SponsorQuickAction[] = [
     title: "Sponsor Campaign",
     description: "Explore open campaigns looking for organisational partners.",
     icon: HandCoins,
-    route: "/sponsor/dashboard",
+    route: "/sponsor/dashboard#sponsor-campaign",
   },
   {
     id: "view-campaigns",
     title: "View Campaigns",
     description: "Review the campaigns your organisation currently supports.",
     icon: HeartHandshake,
-    route: "/sponsor/dashboard",
+    route: "/sponsor/dashboard#sponsored-campaigns",
   },
   {
     id: "view-history",
     title: "View Sponsorship History",
     description: "Look back at past contributions and impact summaries.",
     icon: History,
-    route: "/sponsor/dashboard",
+    route: "/sponsor/dashboard#sponsorship-history",
   },
   {
     id: "contact-foundation",

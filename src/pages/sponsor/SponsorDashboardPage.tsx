@@ -2,12 +2,14 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { HandCoins, HeartHandshake } from "lucide-react";
 import { SponsoredCampaignCard } from "@/components/dashboard/SponsoredCampaignCard";
+import { SponsorCampaignCard } from "@/components/dashboard/SponsorCampaignCard";
 import { SponsorshipHistoryCard } from "@/components/dashboard/SponsorshipHistoryCard";
 import { SponsorshipRequestCard } from "@/components/dashboard/SponsorshipRequestCard";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import {
+  campaignsToSponsor,
   communityImpactMetrics,
   sponsoredCampaigns,
   sponsorProfile,
@@ -69,7 +71,7 @@ export function SponsorDashboardPage() {
             <HeartHandshake className="mr-2 size-4" />
             View Sponsored Campaigns
           </Button>
-          <Button to="#sponsorship-requests" variant="outline">
+          <Button to="#sponsor-campaign" variant="outline">
             <HandCoins className="mr-2 size-4" />
             Sponsor New Campaign
           </Button>
@@ -122,6 +124,20 @@ export function SponsorDashboardPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           {sponsorshipRequests.map((request) => (
             <SponsorshipRequestCard key={request.id} request={request} />
+          ))}
+        </div>
+      </section>
+
+      <section id="sponsor-campaign" className="scroll-mt-24 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Sponsor a campaign</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Choose an open TMF campaign to support with funding or resources.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {campaignsToSponsor.map((campaign) => (
+            <SponsorCampaignCard key={campaign.id} campaign={campaign} />
           ))}
         </div>
       </section>
