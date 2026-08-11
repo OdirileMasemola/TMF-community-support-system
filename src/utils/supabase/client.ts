@@ -1,10 +1,13 @@
-import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
+import type { Database } from "@/types/database.types";
 import { getSupabaseEnv, isSupabaseConfigured } from "@/utils/supabase/env";
 
-let client: SupabaseClient | null = null;
+export type TypedSupabaseClient = SupabaseClient<Database>;
 
-export function createClient(): SupabaseClient {
+let client: TypedSupabaseClient | null = null;
+
+export function createClient(): TypedSupabaseClient {
   if (!isSupabaseConfigured()) {
     throw new Error(
       "Supabase is not configured. Copy .env.example to .env.local and add your project credentials.",
@@ -13,13 +16,13 @@ export function createClient(): SupabaseClient {
 
   if (!client) {
     const { url, key } = getSupabaseEnv();
-    client = createBrowserClient(url!, key!);
+    client = createBrowserClient<Database>(url!, key!);
   }
 
   return client;
 }
 
-export function getSupabaseClientOrNull(): SupabaseClient | null {
+export function getSupabaseClientOrNull(): TypedSupabaseClient | null {
   if (!isSupabaseConfigured()) {
     return null;
   }

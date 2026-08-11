@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { PendingActionCard } from "@/components/dashboard/PendingActionCard";
 import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { DashboardActivity } from "@/components/efferd/dashboard-activity";
@@ -7,10 +8,46 @@ import { OperationalHealth } from "@/components/efferd/operational-health";
 import { ProgrammeActivityChart } from "@/components/efferd/programme-activity-chart";
 import { RecentDonationsTable } from "@/components/efferd/recent-donations-table";
 import { DashboardStats as DashboardStatsSection } from "@/components/efferd/stats";
+import { DataState } from "@/components/shared/DataState";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
-import { pendingActions, quickActions } from "@/data/adminDashboardData";
+import { quickActions, type PendingAction } from "@/data/adminDashboardData";
+import { isSupabaseConfigured } from "@/lib/supabaseClient";
+import { fetchAdminDashboardStats } from "@/services/admin";
 
 export function Dashboard() {
+  const { data: stats, isLoading, isError, error } = useQuery({
+    queryKey: ["admin-dashboard-stats"],
+    enabled: isSupabaseConfigured(),
+    queryFn: fetchAdminDashboardStats,
+  });
+
+  const pendingActions: PendingAction[] = [
+    {
+      id: "pending-volunteers",
+      title: "Pending Volunteer Applications",
+      count: stats?.pendingVolunteerApplications ?? 0,
+      priority: "High",
+    },
+    {
+      id: "pending-donations",
+      title: "Pending Donation Verifications",
+      count: stats?.pendingDonationProofs ?? 0,
+      priority: "High",
+    },
+    {
+      id: "pending-sponsors",
+      title: "Pending Sponsor Requests",
+      count: stats?.openSponsorshipRequests ?? 0,
+      priority: "Medium",
+    },
+    {
+      id: "pending-assistance",
+      title: "Pending Assistance Requests",
+      count: stats?.pendingAssistanceRequests ?? 0,
+      priority: "High",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -38,9 +75,15 @@ export function Dashboard() {
             <CardDescription>Pending reviews and operational follow-ups.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-2">
-            {pendingActions.slice(0, 4).map((action) => (
-              <PendingActionCard key={action.id} title={action.title} count={action.count} priority={action.priority} />
-            ))}
+            <DataState
+              isLoading={isLoading}
+              isError={isError}
+              loadingMessage="Loading pending items..."
+            >
+              {pendingActions.map((action) => (
+                <PendingActionCard key={action.id} title={action.title} count={action.count} priority={action.priority} />
+              ))}
+            </DataState>
           </CardContent>
         </DashboardCard>
 

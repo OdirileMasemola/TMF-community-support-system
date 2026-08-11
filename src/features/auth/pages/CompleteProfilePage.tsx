@@ -20,6 +20,7 @@ export function CompleteProfilePage() {
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [role, setRole] = useState<UserRole>("beneficiary");
+  const [organisationName, setOrganisationName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const googleName =
@@ -47,7 +48,12 @@ export function CompleteProfilePage() {
     setIsSubmitting(true);
 
     try {
-      await completeProfile({ fullName: fullName || googleName, phoneNumber, role });
+      await completeProfile({
+        fullName: fullName || googleName,
+        phoneNumber,
+        role,
+        organisationName: role === "sponsor" ? organisationName : undefined,
+      });
       toast.success("Profile completed. Welcome!");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not save your profile");
@@ -98,6 +104,15 @@ export function CompleteProfilePage() {
             ))}
           </select>
         </label>
+
+        {role === "sponsor" ? (
+          <Input
+            label="Organisation name"
+            value={organisationName}
+            onChange={(event) => setOrganisationName(event.target.value)}
+            required
+          />
+        ) : null}
 
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? "Saving..." : "Continue to dashboard"}

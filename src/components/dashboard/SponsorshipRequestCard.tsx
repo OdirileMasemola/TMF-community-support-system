@@ -15,9 +15,17 @@ function PriorityBadge({ priority }: { priority: SponsorshipRequest["priority"] 
 
 type SponsorshipRequestCardProps = {
   request: SponsorshipRequest;
+  onRespond?: (request: SponsorshipRequest) => void;
+  isResponding?: boolean;
+  hasResponded?: boolean;
 };
 
-export function SponsorshipRequestCard({ request }: SponsorshipRequestCardProps) {
+export function SponsorshipRequestCard({
+  request,
+  onRespond,
+  isResponding,
+  hasResponded,
+}: SponsorshipRequestCardProps) {
   const Icon = request.icon;
 
   return (
@@ -48,8 +56,15 @@ export function SponsorshipRequestCard({ request }: SponsorshipRequestCardProps)
       </dl>
 
       <div className="mt-auto pt-5">
-        <Button to="/sponsor/dashboard" variant="outline" size="sm" className="w-full">
-          View Request
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="w-full"
+          disabled={isResponding || hasResponded || !onRespond}
+          onClick={() => onRespond?.(request)}
+        >
+          {hasResponded ? "Response submitted" : isResponding ? "Submitting..." : "Express interest"}
         </Button>
       </div>
     </article>

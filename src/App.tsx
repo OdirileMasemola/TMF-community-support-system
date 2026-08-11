@@ -7,6 +7,7 @@ import { VolunteerLayout } from "@/components/app-shell/volunteer-layout";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedRoute } from "@/components/shared/ProtectedRoute";
+import { RoleProtectedRoute } from "@/components/shared/RoleProtectedRoute";
 import { AuthCallbackPage } from "@/features/auth/pages/AuthCallbackPage";
 import { CompleteProfilePage } from "@/features/auth/pages/CompleteProfilePage";
 import { DashboardPage } from "@/features/dashboard/pages/DashboardPage";
@@ -70,69 +71,71 @@ import { DonatePage } from "@/pages/public/DonatePage";
 import { GetInvolvedPage } from "@/pages/public/GetInvolvedPage";
 import { HomePage } from "@/pages/public/HomePage";
 
-// this is the main app component 
 export default function App() {
   return (
     <Routes>
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
-      {/* Signed-in users land on /dashboard (not /admin/*). */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
       </Route>
 
-      {/* Temporary public preview while the donor experience is being built. */}
-      <Route path="/donor" element={<DonorLayout />}>
-        <Route path="dashboard" element={<DonorDashboardPage />} />
-        <Route path="dashboard/donate" element={<DonorDonatePage />} />
-        <Route path="dashboard/campaigns" element={<DonorCampaignsPage />} />
-        <Route path="dashboard/donations" element={<DonorDonationsPage />} />
-        <Route path="dashboard/proof-of-payment" element={<DonorProofOfPaymentPage />} />
-        <Route path="dashboard/notifications" element={<DonorNotificationsPage />} />
-        <Route path="dashboard/profile" element={<DonorProfilePage />} />
-        <Route path="dashboard/settings" element={<DonorSettingsPage />} />
+      <Route element={<RoleProtectedRoute allowedRoles={["donor"]} />}>
+        <Route path="/donor" element={<DonorLayout />}>
+          <Route path="dashboard" element={<DonorDashboardPage />} />
+          <Route path="dashboard/donate" element={<DonorDonatePage />} />
+          <Route path="dashboard/campaigns" element={<DonorCampaignsPage />} />
+          <Route path="dashboard/donations" element={<DonorDonationsPage />} />
+          <Route path="dashboard/proof-of-payment" element={<DonorProofOfPaymentPage />} />
+          <Route path="dashboard/notifications" element={<DonorNotificationsPage />} />
+          <Route path="dashboard/profile" element={<DonorProfilePage />} />
+          <Route path="dashboard/settings" element={<DonorSettingsPage />} />
+        </Route>
       </Route>
 
-      {/* Temporary public preview while the volunteer experience is being built. */}
-      <Route path="/volunteer" element={<VolunteerLayout />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<VolunteerDashboardPage />} />
-        <Route path="opportunities" element={<VolunteerOpportunitiesPage />} />
-        <Route path="applications" element={<VolunteerApplicationsPage />} />
-        <Route path="assignments" element={<VolunteerAssignmentsPage />} />
-        <Route path="hours" element={<VolunteerHoursPage />} />
-        <Route path="notifications" element={<VolunteerNotificationsPage />} />
-        <Route path="profile" element={<VolunteerProfilePage />} />
-        <Route path="settings" element={<VolunteerSettingsPage />} />
+      <Route element={<RoleProtectedRoute allowedRoles={["volunteer"]} />}>
+        <Route path="/volunteer" element={<VolunteerLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<VolunteerDashboardPage />} />
+          <Route path="opportunities" element={<VolunteerOpportunitiesPage />} />
+          <Route path="applications" element={<VolunteerApplicationsPage />} />
+          <Route path="assignments" element={<VolunteerAssignmentsPage />} />
+          <Route path="hours" element={<VolunteerHoursPage />} />
+          <Route path="notifications" element={<VolunteerNotificationsPage />} />
+          <Route path="profile" element={<VolunteerProfilePage />} />
+          <Route path="settings" element={<VolunteerSettingsPage />} />
+        </Route>
       </Route>
 
-      {/* Temporary public preview while the beneficiary experience is being built. */}
-      <Route path="/beneficiary" element={<BeneficiaryLayout />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<BeneficiaryDashboardPage />} />
-        <Route path="request" element={<BeneficiaryRequestPage />} />
-        <Route path="requests" element={<BeneficiaryRequestsPage />} />
-        <Route path="programmes" element={<BeneficiaryProgrammesPage />} />
-        <Route path="help" element={<BeneficiaryHelpPage />} />
-        <Route path="notifications" element={<BeneficiaryNotificationsPage />} />
-        <Route path="profile" element={<BeneficiaryProfilePage />} />
-        <Route path="settings" element={<BeneficiarySettingsPage />} />
+      <Route element={<RoleProtectedRoute allowedRoles={["beneficiary"]} />}>
+        <Route path="/beneficiary" element={<BeneficiaryLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<BeneficiaryDashboardPage />} />
+          <Route path="request" element={<BeneficiaryRequestPage />} />
+          <Route path="requests" element={<BeneficiaryRequestsPage />} />
+          <Route path="programmes" element={<BeneficiaryProgrammesPage />} />
+          <Route path="help" element={<BeneficiaryHelpPage />} />
+          <Route path="notifications" element={<BeneficiaryNotificationsPage />} />
+          <Route path="profile" element={<BeneficiaryProfilePage />} />
+          <Route path="settings" element={<BeneficiarySettingsPage />} />
+        </Route>
       </Route>
 
-      {/* Temporary public preview while the sponsor experience is being built. */}
-      <Route path="/sponsor" element={<SponsorLayout />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<SponsorDashboardPage />} />
-        <Route path="campaigns" element={<SponsorCampaignsPage />} />
-        <Route path="sponsorships" element={<SponsorSponsorshipsPage />} />
-        <Route path="requests" element={<SponsorRequestsPage />} />
-        <Route path="history" element={<SponsorHistoryPage />} />
-        <Route path="impact" element={<SponsorImpactPage />} />
-        <Route path="notifications" element={<SponsorNotificationsPage />} />
-        <Route path="profile" element={<SponsorProfilePage />} />
-        <Route path="settings" element={<SponsorSettingsPage />} />
+      <Route element={<RoleProtectedRoute allowedRoles={["sponsor"]} />}>
+        <Route path="/sponsor" element={<SponsorLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<SponsorDashboardPage />} />
+          <Route path="campaigns" element={<SponsorCampaignsPage />} />
+          <Route path="sponsorships" element={<SponsorSponsorshipsPage />} />
+          <Route path="requests" element={<SponsorRequestsPage />} />
+          <Route path="history" element={<SponsorHistoryPage />} />
+          <Route path="impact" element={<SponsorImpactPage />} />
+          <Route path="notifications" element={<SponsorNotificationsPage />} />
+          <Route path="profile" element={<SponsorProfilePage />} />
+          <Route path="settings" element={<SponsorSettingsPage />} />
+        </Route>
       </Route>
 
       <Route element={<PublicLayout />}>
@@ -147,22 +150,22 @@ export default function App() {
         <Route path="register/complete-profile" element={<CompleteProfilePage />} />
       </Route>
 
-      {/* Admin shell lives only under /admin/* — do not reclaim /dashboard here. */}
-      <Route path="admin" element={<AdminLayout />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<AdminDashboardPage />} />
-        <Route path="reports" element={<AdminReportsPage />} />
-        <Route path="campaigns" element={<AdminCampaignsPage />} />
-        <Route path="donations" element={<AdminDonationsPage />} />
-        <Route path="volunteers" element={<AdminVolunteersPage />} />
-        <Route path="sponsors" element={<AdminSponsorsPage />} />
-        <Route path="users" element={<AdminUsersPage />} />
-        <Route path="events" element={<AdminEventsPage />} />
-        <Route path="notifications" element={<AdminNotificationsPage />} />
-        <Route path="settings" element={<AdminSettingsPage />} />
+      <Route element={<RoleProtectedRoute allowedRoles={["administrator"]} />}>
+        <Route path="admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboardPage />} />
+          <Route path="reports" element={<AdminReportsPage />} />
+          <Route path="campaigns" element={<AdminCampaignsPage />} />
+          <Route path="donations" element={<AdminDonationsPage />} />
+          <Route path="volunteers" element={<AdminVolunteersPage />} />
+          <Route path="sponsors" element={<AdminSponsorsPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="events" element={<AdminEventsPage />} />
+          <Route path="notifications" element={<AdminNotificationsPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
+        </Route>
       </Route>
 
-      {/* Legacy root paths from before the /admin/* move. */}
       <Route path="reports" element={<Navigate to="/admin/reports" replace />} />
       <Route path="donations" element={<Navigate to="/admin/donations" replace />} />
       <Route path="applications" element={<Navigate to="/admin/volunteers" replace />} />

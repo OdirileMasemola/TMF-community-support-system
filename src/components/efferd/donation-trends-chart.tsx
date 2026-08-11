@@ -1,25 +1,15 @@
 "use client";
 
 import type * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Bar, BarChart, XAxis } from "recharts";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Delta, DeltaIcon, DeltaValue } from "@/components/efferd/delta";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
-
-const donationDaily = [
-  { day: "Mon", donations: 8200 },
-  { day: "Tue", donations: 7600 },
-  { day: "Wed", donations: 9100 },
-  { day: "Thu", donations: 9800 },
-  { day: "Fri", donations: 11200 },
-  { day: "Sat", donations: 10400 },
-  { day: "Sun", donations: 12400 },
-] as const;
-
-const firstDay = donationDaily[0].donations;
-const lastDay = donationDaily.at(-1)?.donations ?? firstDay;
-const growthPct = (((lastDay - firstDay) / firstDay) * 100);
+import { DataState } from "@/components/shared/DataState";
+import { isSupabaseConfigured } from "@/lib/supabaseClient";
+import { fetchAllDonations } from "@/services/donations";
 
 const chartConfig = {
   donations: {
@@ -45,14 +35,52 @@ function GradientBar(props: React.SVGProps<SVGRectElement> & { index?: number; d
   );
 }
 
+function buildMonthlyTotals(donations: Awaited<ReturnType<typeof fetchAllDonations>>) {
+  const now = new Date();
+  const months: { key: string; day: string; donations: number }[] = [];
+
+  for (let offset = 5; offset >= 0; offset -= 1) {
+    const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const day = new Intl.DateTimeFormat("en-ZA", { month: "short" }).format(date);
+    months.push({ key, day, donations: 0 });
+  }
+
+  for (const donation of donations) {
+    if (donation.status !== "successful") continue;
+    const donatedAt = new Date(donation.donation_date);
+    if (Number.isNaN(donatedAt.getTime())) continue;
+    const key = `${donatedAt.getFullYear()}-${String(donatedAt.getMonth() + 1).padStart(2, "0")}`;
+    const bucket = months.find((month) => month.key === key);
+    if (bucket) {
+      bucket.donations += Number(donation.amount ?? 0);
+    }
+  }
+
+  return months.map(({ day, donations: total }) => ({ day, donations: total }));
+}
+
 export function DonationTrendsChart({ className }: { className?: string }) {
+  const { data: chartData = [], isLoading, isError, error } = useQuery({
+    queryKey: ["admin-donation-trends"],
+    enabled: isSupabaseConfigured(),
+    queryFn: async () => {
+      const donations = await fetchAllDonations(500);
+      return buildMonthlyTotals(donations);
+    },
+  });
+
+  const firstMonth = chartData[0]?.donations ?? 0;
+  const lastMonth = chartData.at(-1)?.donations ?? firstMonth;
+  const growthPct = firstMonth > 0 ? ((lastMonth - firstMonth) / firstMonth) * 100 : 0;
+
   return (
     <DashboardCard className={className}>
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <div>
             <CardTitle>Donation trends</CardTitle>
-            <CardDescription>Daily verified donations, last 7 days.</CardDescription>
+            <CardDescription>Monthly verified donations, last 6 months.</CardDescription>
           </div>
           <Delta value={growthPct} variant="badge">
             <DeltaIcon variant="trend" />
@@ -61,13 +89,19 @@ export function DonationTrendsChart({ className }: { className?: string }) {
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer className="aspect-auto h-60 w-full md:h-72" config={chartConfig}>
-          <BarChart data={donationDaily.map((row) => ({ ...row }))} margin={{ left: 12, right: 12, top: 8 }}>
-            <XAxis axisLine={false} dataKey="day" tickLine={false} tickMargin={10} />
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} cursor={false} />
-            <Bar dataKey="donations" fill="var(--color-donations)" shape={<GradientBar />} />
-          </BarChart>
-        </ChartContainer>
+        <DataState
+          isLoading={isLoading}
+          isError={isError}
+          loadingMessage="Loading donation trends..."
+        >
+          <ChartContainer className="aspect-auto h-60 w-full md:h-72" config={chartConfig}>
+            <BarChart data={chartData} margin={{ left: 12, right: 12, top: 8 }}>
+              <XAxis axisLine={false} dataKey="day" tickLine={false} tickMargin={10} />
+              <ChartTooltip content={<ChartTooltipContent hideLabel />} cursor={false} />
+              <Bar dataKey="donations" fill="var(--color-donations)" shape={<GradientBar />} />
+            </BarChart>
+          </ChartContainer>
+        </DataState>
       </CardContent>
     </DashboardCard>
   );

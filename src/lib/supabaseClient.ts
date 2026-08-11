@@ -1,9 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database.types";
 import { createClient, getSupabaseClientOrNull } from "@/utils/supabase/client";
 
 export { isSupabaseConfigured } from "@/utils/supabase/env";
 
-function requireClient(): SupabaseClient {
+export type TypedSupabaseClient = SupabaseClient<Database>;
+
+function requireClient(): TypedSupabaseClient {
   const client = getSupabaseClientOrNull();
   if (!client) {
     throw new Error(
@@ -14,7 +17,7 @@ function requireClient(): SupabaseClient {
   return client;
 }
 
-export const supabase = new Proxy({} as SupabaseClient, {
+export const supabase = new Proxy({} as TypedSupabaseClient, {
   get(_target, prop, receiver) {
     const client = requireClient();
     const value = Reflect.get(client, prop, receiver);

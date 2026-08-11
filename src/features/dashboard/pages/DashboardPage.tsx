@@ -1,34 +1,18 @@
-import { Card } from "@/components/ui/Card";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { roleHomePath } from "@/lib/display";
 
-const stats = [
-  { label: "Active campaigns", value: "0" },
-  { label: "Assistance requests", value: "0" },
-  { label: "Donations", value: "R0" },
-  { label: "Sponsorships", value: "R0" },
-];
-
+/** Redirect signed-in users to their role-specific dashboard portal. */
 export function DashboardPage() {
-  const { profile } = useAuth();
+  const { profile, isLoading } = useAuth();
 
-  return (
-    <div>
-      <h1 className="page-title">Dashboard</h1>
-      <p className="page-description">Welcome back, {profile?.full_name}. This page will show role-based summaries.</p>
+  if (isLoading) {
+    return <div className="p-8 text-sm text-muted-foreground">Loading dashboard...</div>;
+  }
 
-      <div className="card-grid mt-6">
-        {stats.map((stat) => (
-          <Card key={stat.label}>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
-            <p className="mt-2 text-3xl font-bold text-foreground">{stat.value}</p>
-          </Card>
-        ))}
-      </div>
+  if (!profile) {
+    return <Navigate to="/register/complete-profile" replace />;
+  }
 
-      <Card className="mt-6">
-        <h2 className="text-lg font-bold">Next build step</h2>
-        <p className="mt-2 text-muted-foreground">Connect this dashboard to Supabase counts for users, campaigns, donations, sponsorships, and assistance requests.</p>
-      </Card>
-    </div>
-  );
+  return <Navigate to={roleHomePath(profile.role)} replace />;
 }

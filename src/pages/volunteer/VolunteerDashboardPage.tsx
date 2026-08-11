@@ -1,38 +1,121 @@
-import { ArrowRight, Briefcase, ClipboardList, HeartHandshake, Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, Bell, Briefcase, ClipboardList, Clock3, HeartHandshake, Search } from "lucide-react";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { QuickActionCard } from "@/components/dashboard/QuickActionCard";
 import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
+import { DataState } from "@/components/shared/DataState";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
+import { volunteerQuickActions } from "@/data/volunteerDashboardData";
+import { useRoleProfile } from "@/hooks/useRoleProfile";
+import { useNotifications } from "@/hooks/useNotifications";
 import {
-  foundationUpdates,
-  volunteerActivities,
-  volunteerApplications,
-  volunteerAssignments,
-  volunteerHoursSummary,
-  volunteerOpportunities,
-  volunteerProfile,
-  volunteerQuickActions,
-  volunteerStatistics,
-} from "@/data/volunteerDashboardData";
-import { cn } from "@/lib/utils";
-
-function PriorityBadge({ priority }: { priority: string }) {
-  const tone =
-    priority === "High"
-      ? "bg-destructive/10 text-destructive"
-      : priority === "Medium"
-        ? "bg-secondary text-secondary-foreground"
-        : "bg-primary/10 text-primary";
-
-  return <span className={cn("inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium", tone)}>{priority}</span>;
-}
+  applicationStatusLabel,
+  assignmentStatusLabel,
+  formatMonthYear,
+  formatRelativeTime,
+  formatShortDate,
+  formatStatusLabel,
+  getInitials,
+} from "@/lib/display";
+import { fetchCampaigns } from "@/services/campaigns";
+import type { VolunteerProfile } from "@/services/profiles";
+import {
+  fetchVolunteerApplications,
+  fetchVolunteerAssignments,
+  fetchVolunteerHours,
+} from "@/services/volunteers";
+import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp";
 
 export function VolunteerDashboardPage() {
-  const recentApplications = volunteerApplications.slice(0, 3);
-  const activeAssignments = volunteerAssignments.filter((assignment) => assignment.status !== "Completed");
-  const featuredOpportunities = volunteerOpportunities.slice(0, 3);
+  const { profile, roleProfile, roleProfileId, isLoading: profileLoading } = useRoleProfile();
+  const volunteerRole = roleProfile as VolunteerProfile | null;
+  const { notifications, isLoading: notificationsLoading, isError: notificationsError } = useNotifications(5);
+
+  const enabled = Boolean(roleProfileId);
+
+  const applicationsQuery = useQuery({
+    queryKey: ["volunteer-applications", roleProfileId],
+    enabled,
+    queryFn: () => fetchVolunteerApplications(roleProfileId!),
+  });
+  const assignmentsQuery = useQuery({
+    queryKey: ["volunteer-assignments", roleProfileId],
+    enabled,
+    queryFn: () => fetchVolunteerAssignments(roleProfileId!),
+  });
+  const hoursQuery = useQuery({
+    queryKey: ["volunteer-hours", roleProfileId],
+    enabled,
+    queryFn: () => fetchVolunteerHours(roleProfileId!),
+  });
+  const campaignsQuery = useQuery({
+    queryKey: ["campaigns", "public-active"],
+    queryFn: () => fetchCampaigns({ publicOnly: true }),
+  });
+
+  const applications = applicationsQuery.data ?? [];
+  const assignments = assignmentsQuery.data ?? [];
+  const hours = hoursQuery.data ?? [];
+  const campaigns = campaignsQuery.data ?? [];
+
+  const name = profile?.full_name ?? "Volunteer";
+  const initials = getInitials(name);
+  const totalHours = hours.reduce((sum, row) => sum + Number(row.hours ?? 0), 0);
+  const now = new Date();
+  const thisMonthHours = hours
+    .filter((row) => {
+      const date = new Date(row.work_date);
+      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    })
+    .reduce((sum, row) => sum + Number(row.hours ?? 0), 0);
+  const completedAssignments = assignments.filter((item) => item.status === "completed").length;
+  const activeAssignments = assignments.filter((item) => item.status !== "completed");
+  const campaignsSupported = new Set(assignments.map((item) => item.campaign_id)).size;
+  const averageHours =
+    completedAssignments > 0 ? Math.round((totalHours / completedAssignments) * 10) / 10 : totalHours > 0 ? totalHours : 0;
+  const monthlyProgress = Math.min(100, Math.round((thisMonthHours / 20) * 100));
+
+  const statistics = [
+    {
+      id: "applications",
+      title: "Applications",
+      value: String(applications.length),
+      detail: "Submitted to date",
+      icon: ClipboardList,
+    },
+    {
+      id: "assignments",
+      title: "Active Assignments",
+      value: String(activeAssignments.length),
+      detail: "Currently participating",
+      icon: Briefcase,
+    },
+    {
+      id: "hours",
+      title: "Hours Contributed",
+      value: String(totalHours),
+      detail: "Total volunteer time",
+      icon: Clock3,
+    },
+    {
+      id: "campaigns",
+      title: "Campaigns Supported",
+      value: String(campaignsSupported),
+      detail: "Helping local communities",
+      icon: HeartHandshake,
+    },
+  ];
+
+  const recentApplications = applications.slice(0, 3);
+  const featuredOpportunities = campaigns.slice(0, 3);
+  const pageLoading =
+    profileLoading ||
+    (enabled && (applicationsQuery.isLoading || assignmentsQuery.isLoading || hoursQuery.isLoading)) ||
+    campaignsQuery.isLoading;
+  const pageError =
+    applicationsQuery.isError || assignmentsQuery.isError || hoursQuery.isError || campaignsQuery.isError;
 
   return (
     <div className="space-y-6">
@@ -41,10 +124,10 @@ export function VolunteerDashboardPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Volunteer workspace</p>
           <div className="mt-2 flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-              {volunteerProfile.initials}
+              {initials}
             </span>
             <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              Welcome back, {volunteerProfile.name.split(" ")[0]}
+              Welcome back, {name.split(" ")[0]}
             </h1>
           </div>
           <p className="mt-3 text-sm text-muted-foreground md:text-base">
@@ -53,15 +136,17 @@ export function VolunteerDashboardPage() {
           <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
             <p>
               <span className="text-muted-foreground">Volunteer Status:</span>{" "}
-              <span className="font-medium text-foreground">{volunteerProfile.status}</span>
+              <span className="font-medium text-foreground">
+                {volunteerRole?.status ? formatStatusLabel(volunteerRole.status) : "—"}
+              </span>
             </p>
             <p>
               <span className="text-muted-foreground">Member Since:</span>{" "}
-              <span className="font-medium text-foreground">{volunteerProfile.memberSince}</span>
+              <span className="font-medium text-foreground">{formatMonthYear(volunteerRole?.member_since)}</span>
             </p>
             <p>
               <span className="text-muted-foreground">Volunteer Hours:</span>{" "}
-              <span className="font-medium text-foreground">{volunteerProfile.totalHours} hours</span>
+              <span className="font-medium text-foreground">{totalHours} hours</span>
             </p>
           </div>
         </div>
@@ -78,7 +163,7 @@ export function VolunteerDashboardPage() {
       </header>
 
       <div className="grid grid-cols-2 gap-px bg-border lg:grid-cols-4">
-        {volunteerStatistics.map((stat) => {
+        {statistics.map((stat) => {
           const Icon = stat.icon;
           return (
             <DashboardCard key={stat.id}>
@@ -104,31 +189,38 @@ export function VolunteerDashboardPage() {
             <CardDescription>Your latest campaign and opportunity applications.</CardDescription>
           </CardHeader>
           <CardContent className="overflow-x-auto">
-            <table className="w-full min-w-[560px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="pb-3 font-semibold">Campaign</th>
-                  <th className="pb-3 font-semibold">Role</th>
-                  <th className="pb-3 font-semibold">Applied</th>
-                  <th className="pb-3 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentApplications.map((application) => (
-                  <tr key={application.id} className="border-b border-border last:border-0">
-                    <td className="py-4">
-                      <p className="font-medium text-foreground">{application.campaign}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{application.category}</p>
-                    </td>
-                    <td className="py-4 text-muted-foreground">{application.preferredRole}</td>
-                    <td className="py-4 text-muted-foreground">{application.appliedDate}</td>
-                    <td className="py-4">
-                      <AdminStatusBadge status={application.status} />
-                    </td>
+            <DataState
+              isLoading={pageLoading}
+              isError={pageError}
+              isEmpty={recentApplications.length === 0}
+              emptyMessage="No applications yet. Browse opportunities to get started."
+            >
+              <table className="w-full min-w-[560px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="pb-3 font-semibold">Campaign</th>
+                    <th className="pb-3 font-semibold">Role</th>
+                    <th className="pb-3 font-semibold">Applied</th>
+                    <th className="pb-3 font-semibold">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recentApplications.map((application) => (
+                    <tr key={application.id} className="border-b border-border last:border-0">
+                      <td className="py-4">
+                        <p className="font-medium text-foreground">{application.campaigns?.title ?? "Campaign"}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{application.campaigns?.category ?? "—"}</p>
+                      </td>
+                      <td className="py-4 text-muted-foreground">{application.participation_role ?? "—"}</td>
+                      <td className="py-4 text-muted-foreground">{formatShortDate(application.application_date)}</td>
+                      <td className="py-4">
+                        <AdminStatusBadge status={applicationStatusLabel(application.status)} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </DataState>
             <Button to="/volunteer/applications" variant="ghost" size="sm" className="mt-4">
               View all applications
               <ArrowRight className="ml-1.5 size-3.5" />
@@ -142,29 +234,29 @@ export function VolunteerDashboardPage() {
             <CardDescription>Your contribution so far this year.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold tracking-tight text-foreground">{volunteerHoursSummary.totalHours}</p>
+            <p className="text-3xl font-semibold tracking-tight text-foreground">{totalHours}</p>
             <p className="mt-1 text-sm text-muted-foreground">Total volunteer hours</p>
             <div className="mt-5 space-y-3 text-sm">
               <div className="flex justify-between gap-3">
                 <span className="text-muted-foreground">This month</span>
-                <span className="font-medium text-foreground">{volunteerHoursSummary.thisMonth} hours</span>
+                <span className="font-medium text-foreground">{thisMonthHours} hours</span>
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-muted-foreground">Completed assignments</span>
-                <span className="font-medium text-foreground">{volunteerHoursSummary.completedAssignments}</span>
+                <span className="font-medium text-foreground">{completedAssignments}</span>
               </div>
               <div className="flex justify-between gap-3">
                 <span className="text-muted-foreground">Avg per assignment</span>
-                <span className="font-medium text-foreground">{volunteerHoursSummary.averageHoursPerAssignment} hours</span>
+                <span className="font-medium text-foreground">{averageHours} hours</span>
               </div>
             </div>
             <div className="mt-5">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Monthly progress</span>
-                <span>{volunteerHoursSummary.monthlyProgress}%</span>
+                <span>{monthlyProgress}%</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                <div className="h-full bg-primary" style={{ width: `${volunteerHoursSummary.monthlyProgress}%` }} />
+                <div className="h-full bg-primary" style={{ width: `${monthlyProgress}%` }} />
               </div>
             </div>
             <Button to="/volunteer/hours" variant="outline" size="sm" className="mt-5 w-full">
@@ -179,27 +271,42 @@ export function VolunteerDashboardPage() {
             <CardDescription>Campaigns you are currently participating in.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {activeAssignments.map((assignment) => (
-              <article key={assignment.id} className="border-b border-border pb-4 last:border-0 last:pb-0">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium text-foreground">{assignment.campaign}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{assignment.role}</p>
+            <DataState
+              isLoading={assignmentsQuery.isLoading}
+              isError={assignmentsQuery.isError}
+              isEmpty={activeAssignments.length === 0}
+              emptyMessage="No active assignments yet."
+            >
+              {activeAssignments.slice(0, 3).map((assignment) => (
+                <article key={assignment.id} className="border-b border-border pb-4 last:border-0 last:pb-0">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-foreground">{assignment.campaigns?.title ?? "Campaign"}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{assignment.role}</p>
+                    </div>
+                    <AdminStatusBadge status={assignmentStatusLabel(assignment.status)} />
                   </div>
-                  <AdminStatusBadge status={assignment.status} />
-                </div>
-                <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-                  <p>Location: <span className="text-foreground">{assignment.location}</span></p>
-                  <p>Schedule: <span className="text-foreground">{assignment.schedule}</span></p>
-                  <p>Start: <span className="text-foreground">{assignment.startDate}</span></p>
-                  <p>End: <span className="text-foreground">{assignment.endDate}</span></p>
-                </div>
-                <Button to="/volunteer/assignments" variant="ghost" size="sm" className="mt-3 px-0">
-                  View assignment
-                  <ArrowRight className="ml-1.5 size-3.5" />
-                </Button>
-              </article>
-            ))}
+                  <div className="mt-3 grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+                    <p>
+                      Location: <span className="text-foreground">{assignment.location ?? "—"}</span>
+                    </p>
+                    <p>
+                      Schedule: <span className="text-foreground">{assignment.schedule ?? "—"}</span>
+                    </p>
+                    <p>
+                      Start: <span className="text-foreground">{formatShortDate(assignment.start_date)}</span>
+                    </p>
+                    <p>
+                      End: <span className="text-foreground">{formatShortDate(assignment.end_date)}</span>
+                    </p>
+                  </div>
+                  <Button to="/volunteer/assignments" variant="ghost" size="sm" className="mt-3 px-0">
+                    View assignment
+                    <ArrowRight className="ml-1.5 size-3.5" />
+                  </Button>
+                </article>
+              ))}
+            </DataState>
           </CardContent>
         </DashboardCard>
 
@@ -209,25 +316,35 @@ export function VolunteerDashboardPage() {
             <CardDescription>Open roles you can apply for next.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {featuredOpportunities.map((opportunity) => (
-              <article key={opportunity.id} className="flex gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
-                <img
-                  src={opportunity.image}
-                  alt=""
-                  className="hidden h-20 w-28 shrink-0 rounded-lg object-cover sm:block"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">{opportunity.category}</p>
-                  <p className="mt-1 font-medium text-foreground">{opportunity.title}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{opportunity.location} · {opportunity.date}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">Roles: {opportunity.roles.join(", ")}</p>
-                  <Button to="/volunteer/opportunities" variant="ghost" size="sm" className="mt-2 px-0">
-                    Apply now
-                    <ArrowRight className="ml-1.5 size-3.5" />
-                  </Button>
-                </div>
-              </article>
-            ))}
+            <DataState
+              isLoading={campaignsQuery.isLoading}
+              isError={campaignsQuery.isError}
+              isEmpty={featuredOpportunities.length === 0}
+              emptyMessage="No open opportunities right now."
+            >
+              {featuredOpportunities.map((opportunity) => (
+                <article key={opportunity.id} className="flex gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
+                  <img
+                    src={opportunity.image_url || foodSupportImage}
+                    alt=""
+                    className="hidden h-20 w-28 shrink-0 rounded-lg object-cover sm:block"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                      {opportunity.category ?? "Campaign"}
+                    </p>
+                    <p className="mt-1 font-medium text-foreground">{opportunity.title}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {opportunity.location} · {formatShortDate(opportunity.start_date)}
+                    </p>
+                    <Button to="/volunteer/opportunities" variant="ghost" size="sm" className="mt-2 px-0">
+                      Apply now
+                      <ArrowRight className="ml-1.5 size-3.5" />
+                    </Button>
+                  </div>
+                </article>
+              ))}
+            </DataState>
           </CardContent>
         </DashboardCard>
 
@@ -237,15 +354,22 @@ export function VolunteerDashboardPage() {
             <CardDescription>Your latest volunteer updates.</CardDescription>
           </CardHeader>
           <CardContent>
-            {volunteerActivities.slice(0, 3).map((activity) => (
-              <RecentActivityCard
-                key={activity.id}
-                title={activity.title}
-                description={activity.description}
-                timestamp={activity.timestamp}
-                icon={activity.icon}
-              />
-            ))}
+            <DataState
+              isLoading={notificationsLoading}
+              isError={notificationsError}
+              isEmpty={notifications.length === 0}
+              emptyMessage="No recent notifications yet."
+            >
+              {notifications.slice(0, 3).map((activity) => (
+                <RecentActivityCard
+                  key={activity.id}
+                  title={activity.title ?? "Notification"}
+                  description={activity.message}
+                  timestamp={formatRelativeTime(activity.notification_date)}
+                  icon={Bell}
+                />
+              ))}
+            </DataState>
           </CardContent>
         </DashboardCard>
 
@@ -255,24 +379,25 @@ export function VolunteerDashboardPage() {
             <CardDescription>Important updates for TMF volunteers.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {foundationUpdates.slice(0, 3).map((update) => {
-              const Icon = update.icon;
-              return (
+            <DataState
+              isLoading={notificationsLoading}
+              isError={notificationsError}
+              isEmpty={notifications.length === 0}
+              emptyMessage="No foundation updates yet."
+            >
+              {notifications.slice(0, 3).map((update) => (
                 <article key={update.id} className="flex items-start gap-4 border-b border-border pb-4 last:border-0 last:pb-0">
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
-                    <Icon className="size-5" />
+                    <Bell className="size-5" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-medium text-foreground">{update.title}</p>
-                      <PriorityBadge priority={update.priority} />
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">{update.description}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">{update.date}</p>
+                    <p className="font-medium text-foreground">{update.title ?? "Update"}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{update.message}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">{formatRelativeTime(update.notification_date)}</p>
                   </div>
                 </article>
-              );
-            })}
+              ))}
+            </DataState>
           </CardContent>
         </DashboardCard>
 
@@ -284,14 +409,14 @@ export function VolunteerDashboardPage() {
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2">
               {[
-                ["Full Name", volunteerProfile.name],
-                ["Volunteer ID", volunteerProfile.volunteerId],
-                ["Email Address", volunteerProfile.email],
-                ["Phone Number", volunteerProfile.phone],
-                ["Member Since", volunteerProfile.memberSince],
-                ["Volunteer Status", volunteerProfile.status],
-                ["Preferred Area", volunteerProfile.preferredArea],
-                ["Total Hours", `${volunteerProfile.totalHours}`],
+                ["Full Name", name],
+                ["Volunteer ID", volunteerRole?.id ? `VOL-${volunteerRole.id.slice(0, 8).toUpperCase()}` : "—"],
+                ["Email Address", profile?.email ?? "—"],
+                ["Phone Number", profile?.phone_number ?? "—"],
+                ["Member Since", formatMonthYear(volunteerRole?.member_since)],
+                ["Volunteer Status", volunteerRole?.status ? formatStatusLabel(volunteerRole.status) : "—"],
+                ["Preferred Area", volunteerRole?.preferred_area ?? "—"],
+                ["Total Hours", `${totalHours}`],
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>

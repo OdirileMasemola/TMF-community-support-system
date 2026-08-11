@@ -1,13 +1,14 @@
-import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import type { CampaignToSponsor } from "@/data/sponsorDashboardData";
 
 type SponsorCampaignCardProps = {
   campaign: CampaignToSponsor;
+  onSponsor?: (campaign: CampaignToSponsor) => void;
+  isSponsoring?: boolean;
 };
 
-export function SponsorCampaignCard({ campaign }: SponsorCampaignCardProps) {
+export function SponsorCampaignCard({ campaign, onSponsor, isSponsoring }: SponsorCampaignCardProps) {
   return (
     <article className="overflow-hidden rounded-xl border border-border bg-card/70 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5">
       <div className="relative aspect-[16/9] overflow-hidden bg-muted">
@@ -34,13 +35,10 @@ export function SponsorCampaignCard({ campaign }: SponsorCampaignCardProps) {
           type="button"
           size="sm"
           className="w-full"
-          onClick={() =>
-            toast.message("Sponsorship enquiry coming soon", {
-              description: `You will be able to start sponsoring ${campaign.title} in a later update.`,
-            })
-          }
+          disabled={isSponsoring || !onSponsor}
+          onClick={() => onSponsor?.(campaign)}
         >
-          Sponsor this campaign
+          {isSponsoring ? "Submitting..." : "Sponsor this campaign"}
         </Button>
       </div>
     </article>
