@@ -1,12 +1,12 @@
 import {
   Bell,
-  Building2,
   ClipboardList,
   HandCoins,
   HeartHandshake,
   History,
   LayoutGrid,
   Settings,
+  TrendingUp,
   UserRound,
 } from "lucide-react";
 import type { SidebarNavGroup } from "@/components/app-shell/app-shared";
@@ -27,23 +27,28 @@ export const sponsorNavGroups: SidebarNavGroup[] = [
     items: [
       {
         title: "Sponsored campaigns",
-        path: "/sponsor/dashboard#sponsored-campaigns",
+        path: "/sponsor/campaigns",
         icon: <HeartHandshake className="size-4" aria-hidden="true" />,
       },
       {
+        title: "Sponsor a campaign",
+        path: "/sponsor/sponsorships",
+        icon: <HandCoins className="size-4" aria-hidden="true" />,
+      },
+      {
         title: "Sponsorship requests",
-        path: "/sponsor/dashboard#sponsorship-requests",
+        path: "/sponsor/requests",
         icon: <ClipboardList className="size-4" aria-hidden="true" />,
       },
       {
         title: "Sponsorship history",
-        path: "/sponsor/dashboard#sponsorship-history",
+        path: "/sponsor/history",
         icon: <History className="size-4" aria-hidden="true" />,
       },
       {
-        title: "Sponsor a campaign",
-        path: "/sponsor/dashboard#sponsor-campaign",
-        icon: <HandCoins className="size-4" aria-hidden="true" />,
+        title: "Community impact",
+        path: "/sponsor/impact",
+        icon: <TrendingUp className="size-4" aria-hidden="true" />,
       },
     ],
   },
@@ -51,23 +56,18 @@ export const sponsorNavGroups: SidebarNavGroup[] = [
     label: "Account",
     items: [
       {
-        title: "Organisation profile",
-        path: "/sponsor/dashboard#organisation-profile",
-        icon: <Building2 className="size-4" aria-hidden="true" />,
-      },
-      {
         title: "Profile",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/profile",
         icon: <UserRound className="size-4" aria-hidden="true" />,
       },
       {
         title: "Notifications",
-        path: "/sponsor/dashboard#foundation-updates",
+        path: "/sponsor/notifications",
         icon: <Bell className="size-4" aria-hidden="true" />,
       },
       {
         title: "Settings",
-        path: "/sponsor/dashboard",
+        path: "/sponsor/settings",
         icon: <Settings className="size-4" aria-hidden="true" />,
       },
     ],
