@@ -35,7 +35,7 @@ const milestones: Milestone[] = [
 
 export function OurJourneyTimeline(): ReactElement {
   return (
-    <section id="our-journey" className="px-6 pb-24 pt-10 md:pb-28">
+    <section id="our-journey" className="scroll-mt-28 px-6 pb-24 pt-10 md:pb-28">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
