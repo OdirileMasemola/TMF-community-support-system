@@ -5,6 +5,50 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { AboutStoryCarousel } from "@/components/blocks/about-story-carousel";
 import { aboutHeroContent, aboutManifesto, aboutOriginContent } from "@/data/aboutPageData";
 
+// this is the offset for the navigation bar
+// it is used to calculate the distance to the section
+const NAV_OFFSET_PX = 112;
+let scrollAnimationFrame = 0;
+// this easing function is used to set the speed of the scroll animation
+function easeOutCubic(progress: number) {
+  return 1 - (1 - progress) ** 3;
+}
+
+//this function is used to scroll to a section , in this situation its used for the buttons that are on the hero section 
+
+function scrollToSection(sectionId: string, reduceMotion: boolean | null) {
+  const section = document.getElementById(sectionId);
+  if (!section) {
+    return;
+  }
+//
+  window.history.replaceState(null, "", `#${sectionId}`);
+
+  if (reduceMotion) {
+    section.scrollIntoView({ behavior: "auto", block: "start" });
+    return;
+  }
+
+  // this is used to cancel the previous function call but onlyt if it is still runnning
+  cancelAnimationFrame(scrollAnimationFrame);
+
+  const start = window.scrollY;
+  const end = section.getBoundingClientRect().top + window.scrollY - NAV_OFFSET_PX;
+  const distance = end - start;
+  const duration = Math.min(1300, Math.max(700, Math.abs(distance) * 0.6));
+  const startedAt = performance.now();
+
+  const step = (now: number) => {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    window.scrollTo({ top: start + distance * easeOutCubic(progress) });
+    if (progress < 1) {
+      scrollAnimationFrame = requestAnimationFrame(step);
+    }
+  };
+// used to request the animation frame to scroll to the section 
+  scrollAnimationFrame = requestAnimationFrame(step);
+}
+
 export function AboutHero(): ReactElement {
   const shouldReduceMotion = useReducedMotion();
 
@@ -72,11 +116,18 @@ export function AboutHero(): ReactElement {
             className="mt-10 flex flex-wrap items-center justify-center gap-2.5"
           >
             <div className="rounded-xl border border-border bg-foreground/5 p-0.5">
-              <Button to="#our-story" className="rounded-lg px-3.5 py-1.5 text-sm">
+              <Button
+                className="rounded-lg px-3.5 py-1.5 text-sm"
+                onClick={() => scrollToSection("our-story", shouldReduceMotion)}
+              >
                 See our story
               </Button>
             </div>
-            <Button to="#our-journey" variant="outline" className="rounded-lg px-3.5 py-1.5 text-sm">
+            <Button
+              variant="outline"
+              className="rounded-lg px-3.5 py-1.5 text-sm"
+              onClick={() => scrollToSection("our-journey", shouldReduceMotion)}
+            >
               Our journey
             </Button>
           </motion.div>
