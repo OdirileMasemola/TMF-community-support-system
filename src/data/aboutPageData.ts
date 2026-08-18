@@ -30,7 +30,7 @@ export const aboutStorySlides: AboutStorySlide[] = [
     kicker: "Where it began",
     title: "A promise made in Nhlapo.",
     description:
-      "The foundation started as neighbours showing up for neighbours practical care for vulnerable families and child-headed households in Katlehong.",
+      "The foundation started as neighbours showing up for neighbours, with practical care for vulnerable families and child-headed households in Katlehong.",
   },
   {
     id: "family-care",
@@ -66,7 +66,7 @@ export const aboutStorySlides: AboutStorySlide[] = [
     kicker: "Winter relief",
     title: "Warmth when the season turns.",
     description:
-      "Blankets, clothing, and care through the cold months — because winter should not decide who gets to feel safe.",
+      "Blankets, clothing, and care through the cold months, because winter should not decide who gets to feel safe.",
   },
   {
     id: "community-health",
@@ -84,7 +84,7 @@ export const aboutOriginContent = {
   heading: "It started with showing up.",
   paragraphs: [
     "In February 2015, the Themba Molefe Foundation began as a community organisation in Nhlapo section, Katlehong. The work was close, local, and practical: food, care, school support, and a hand on the shoulder when a household had no one else to call.",
-    "That first Christmas programme set the tone. A day of joy for underprivileged children and child-headed households became a way of working — stay close to the community, organise the help, and keep going after the cameras leave.",
+    "That first Christmas programme set the tone. A day of joy for underprivileged children and child-headed households became a way of working: stay close to the community, organise the help, and keep going after the cameras leave.",
   ],
   quote: "Tomorrow is one dream away.",
   cite: "Themba Molefe Foundation",
@@ -101,7 +101,7 @@ export const aboutManifesto = [
   {
     number: "02",
     title: "We organise care.",
-    body: "Programmes, mentorship, food, schooling, and people — turned into one clear path of support.",
+    body: "Programmes, mentorship, food, schooling, and people, organised into one clear path of support.",
   },
   {
     number: "03",
