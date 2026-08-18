@@ -1,6 +1,10 @@
 import type { ReactElement } from "react";
 import { Button } from "@/components/ui/Button";
 import OurJourneyTimeline from "@/components/blocks/our-journey-timeline";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import aboutCommunityImage from "@/assets/images/about/DSC_0632.jpeg";
+import familyCareImage from "@/assets/images/campaigns/Family Care Support.webp";
+import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp";
 
 export function AboutHero(): ReactElement {
   return (
@@ -37,26 +41,20 @@ export function AboutHero(): ReactElement {
 
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-6 px-6 pb-24 md:grid-cols-3">
-            <img
-              src="DSC_0632.jpeg"
-              alt="Team working together"
+            <OptimizedImage
+              src={aboutCommunityImage}
+              alt="Themba Molefe Foundation community gathering"
               className="h-56 w-full rounded-lg object-cover"
-              loading="lazy"
-              decoding="async"
             />
-            <img
-              src="https://source.unsplash.com/900x600/?volunteer,helping"
-              alt="Volunteers"
+            <OptimizedImage
+              src={familyCareImage}
+              alt="Family care support in the community"
               className="h-56 w-full rounded-lg object-cover"
-              loading="lazy"
-              decoding="async"
             />
-            <img
-              src="https://source.unsplash.com/900x600/?workspace,office"
-              alt="Workspace"
+            <OptimizedImage
+              src={foodSupportImage}
+              alt="Food support drive with volunteers"
               className="h-56 w-full rounded-lg object-cover"
-              loading="lazy"
-              decoding="async"
             />
           </div>
         </div>
