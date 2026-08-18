@@ -147,7 +147,12 @@ function AboutOriginSection(): ReactElement {
   return (
     <section className="px-6 py-16 md:py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2 lg:gap-16">
-        <div>
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 28, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        >
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             {aboutOriginContent.label}
           </p>
@@ -159,7 +164,7 @@ function AboutOriginSection(): ReactElement {
               {paragraph}
             </p>
           ))}
-        </div>
+        </motion.div>
 
         <motion.figure
           initial={shouldReduceMotion ? false : { opacity: 0, y: 28, scale: 0.98 }}

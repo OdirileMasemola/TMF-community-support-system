@@ -1,11 +1,19 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { aboutStorySlides } from "@/data/aboutPageData";
 import { cn } from "@/lib/utils";
 
 const AUTOPLAY_MS = 5600;
+
+const storyRevealViewport = { once: true, amount: 0.22 } as const;
+const storyRevealTransition = {
+  type: "spring" as const,
+  stiffness: 130,
+  damping: 22,
+  mass: 0.85,
+};
 
 const textVariants = {
   enter: (direction: number) => ({
@@ -39,6 +47,8 @@ export function AboutStoryCarousel() {
   const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { amount: 0.2 });
   const slideCount = aboutStorySlides.length;
   const activeSlide = aboutStorySlides[activeIndex];
 
@@ -63,13 +73,13 @@ export function AboutStoryCarousel() {
   const goPrev = useCallback(() => goTo(activeIndex - 1, -1), [activeIndex, goTo]);
 
   useEffect(() => {
-    if (paused || shouldReduceMotion) {
+    if (paused || shouldReduceMotion || !isInView) {
       return;
     }
 
     const timer = window.setInterval(goNext, AUTOPLAY_MS);
     return () => window.clearInterval(timer);
-  }, [goNext, paused, shouldReduceMotion]);
+  }, [goNext, isInView, paused, shouldReduceMotion]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -83,6 +93,7 @@ export function AboutStoryCarousel() {
 
   return (
     <section
+      ref={sectionRef}
       id="our-story"
       aria-roledescription="carousel"
       aria-label="Stories from the Themba Molefe Foundation"
@@ -102,7 +113,13 @@ export function AboutStoryCarousel() {
       />
 
       <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:gap-6">
-        <div className="relative min-h-[240px] md:min-h-[280px]">
+        <motion.div
+          className="relative min-h-[240px] md:min-h-[280px]"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 36, filter: "blur(6px)", scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+          viewport={storyRevealViewport}
+          transition={storyRevealTransition}
+        >
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">Our story in motion</p>
 
           <AnimatePresence mode="wait" custom={direction}>
@@ -152,8 +169,14 @@ export function AboutStoryCarousel() {
               {String(slideCount).padStart(2, "0")}
             </p>
           </div>
-        </div>
+        </motion.div>
 
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 48, scale: 0.94 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={storyRevealViewport}
+          transition={{ ...storyRevealTransition, delay: 0.12 }}
+        >
         <motion.div
           className="relative h-[420px] w-full cursor-grab touch-pan-y [perspective:1400px] active:cursor-grabbing sm:h-[480px] md:h-[560px]"
           drag={shouldReduceMotion ? false : "x"}
@@ -236,17 +259,24 @@ export function AboutStoryCarousel() {
             );
           })}
         </motion.div>
+        </motion.div>
       </div>
 
-      <div className="mx-auto mt-8 max-w-7xl">
+      <motion.div
+        className="mx-auto mt-8 max-w-7xl"
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={storyRevealViewport}
+        transition={{ ...storyRevealTransition, delay: 0.22 }}
+      >
         <div className="h-[2px] overflow-hidden rounded-full bg-border/70">
           <motion.div
             key={`${activeIndex}-${paused ? "paused" : "play"}`}
             className="h-full origin-left bg-gradient-to-r from-primary to-secondary"
             initial={{ scaleX: 0 }}
-            animate={{ scaleX: paused || shouldReduceMotion ? 0 : 1 }}
+            animate={{ scaleX: paused || shouldReduceMotion || !isInView ? 0 : 1 }}
             transition={{
-              duration: shouldReduceMotion || paused ? 0 : AUTOPLAY_MS / 1000,
+              duration: shouldReduceMotion || paused || !isInView ? 0 : AUTOPLAY_MS / 1000,
               ease: "linear",
             }}
           />
@@ -272,7 +302,7 @@ export function AboutStoryCarousel() {
             );
           })}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
