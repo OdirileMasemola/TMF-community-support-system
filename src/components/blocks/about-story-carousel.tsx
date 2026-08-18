@@ -281,27 +281,6 @@ export function AboutStoryCarousel() {
             }}
           />
         </div>
-
-        <div className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">
-          {aboutStorySlides.map((slide, index) => {
-            const isActive = index === activeIndex;
-            return (
-              <button
-                key={slide.id}
-                type="button"
-                onClick={() => goTo(index, index > activeIndex ? 1 : -1)}
-                className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs font-medium tracking-wide transition-all duration-300",
-                  isActive
-                    ? "border-primary bg-primary text-primary-foreground shadow-[0_0_24px_color-mix(in_srgb,var(--primary)_35%,transparent)]"
-                    : "border-border bg-card/70 text-muted-foreground hover:border-primary/50 hover:text-foreground",
-                )}
-              >
-                {slide.kicker}
-              </button>
-            );
-          })}
-        </div>
       </motion.div>
     </section>
   );
