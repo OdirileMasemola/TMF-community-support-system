@@ -1,37 +1,64 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { AnimatedGlowingSearchBar } from "@/components/ui/AnimatedGlowingSearchBar";
 import { CampaignHeroPreview } from "@/components/ui/CampaignHeroPreview";
 import { CampaignListCard } from "@/components/ui/CampaignListCard";
 import { PageHero } from "@/components/ui/PageHero";
-import { campaigns } from "@/data/publicHomeData";
+import { resolveCampaignImage } from "@/lib/campaignImages";
+import { campaignStatusLabel, formatCurrency, formatShortDate } from "@/lib/display";
+import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { cn } from "@/lib/utils";
-import type { CampaignStatus } from "@/types/public";
+import { fetchCampaigns } from "@/services/campaigns";
+import type { Campaign, CampaignStatus } from "@/types/public";
 
 type CampaignFilter = "All" | CampaignStatus;
 
 const filters: CampaignFilter[] = ["All", "Active", "Upcoming", "Completed"];
+
+function mapPublicCampaignStatus(status: string): CampaignStatus {
+  const label = campaignStatusLabel(status);
+  if (label === "Active") return "Active";
+  if (label === "Draft") return "Upcoming";
+  return "Completed";
+}
 
 // so this page is public and allows users to view campaigns without authentication
 export function CampaignsPage() {
   const [activeFilter, setActiveFilter] = useState<CampaignFilter>("All");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const campaignsQuery = useQuery({
+    queryKey: ["public-campaigns"],
+    enabled: isSupabaseConfigured(),
+    queryFn: () => fetchCampaigns({ publicOnly: true }),
+  });
+
+  const campaigns: Campaign[] = useMemo(() => {
+    return (campaignsQuery.data ?? [])
+      .filter((campaign) => campaign.status !== "cancelled")
+      .map((campaign) => ({
+        id: campaign.id,
+        title: campaign.title,
+        description: campaign.description,
+        category: campaign.category ?? "General",
+        status: mapPublicCampaignStatus(campaign.status),
+        startDate: formatShortDate(campaign.start_date),
+        endDate: formatShortDate(campaign.end_date),
+        goal: campaign.funding_goal != null ? formatCurrency(campaign.funding_goal) : "Support this campaign",
+        image: resolveCampaignImage(campaign.image_url, campaign.title, campaign.category),
+      }));
+  }, [campaignsQuery.data]);
+
   const filteredCampaigns = useMemo(() => {
     const normalizedSearchQuery = searchQuery.trim().toLowerCase();
 
     return campaigns.filter((campaign) => {
       const matchesFilter = activeFilter === "All" || campaign.status === activeFilter;
-      const searchableContent = [
-        campaign.title,
-        campaign.description,
-        campaign.category,
-      ]
-        .join(" ")
-        .toLowerCase();
+      const searchableContent = [campaign.title, campaign.description, campaign.category].join(" ").toLowerCase();
 
       return matchesFilter && searchableContent.includes(normalizedSearchQuery);
     });
-  }, [activeFilter, searchQuery]);
+  }, [activeFilter, campaigns, searchQuery]);
 
   return (
     <>
@@ -78,20 +105,28 @@ export function CampaignsPage() {
             </div>
           </div>
 
-          {filteredCampaigns.length > 0 ? (
-            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filteredCampaigns.map((campaign) => (
-                <CampaignListCard key={campaign.id} campaign={campaign} />
-              ))}
-            </div>
-          ) : (
-            <div className="mx-auto mt-12 max-w-2xl rounded-3xl border border-border bg-card/70 p-8 text-center text-card-foreground backdrop-blur-xl">
-              <h2 className="text-xl font-semibold text-foreground">No campaigns found</h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Try a different search term or select another campaign status.
+          <div className="mt-12">
+            {campaignsQuery.isLoading ? (
+              <p className="text-center text-sm text-muted-foreground">Loading campaigns...</p>
+            ) : campaignsQuery.isError ? (
+              <p className="text-center text-sm text-muted-foreground">
+                We could not load campaigns right now. Please try again shortly.
               </p>
-            </div>
-          )}
+            ) : filteredCampaigns.length > 0 ? (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {filteredCampaigns.map((campaign) => (
+                  <CampaignListCard key={campaign.id} campaign={campaign} />
+                ))}
+              </div>
+            ) : (
+              <div className="mx-auto max-w-2xl rounded-3xl border border-border bg-card/70 p-8 text-center text-card-foreground backdrop-blur-xl">
+                <h2 className="text-xl font-semibold text-foreground">No campaigns found</h2>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  Try a different search term or select another campaign status.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
     </>

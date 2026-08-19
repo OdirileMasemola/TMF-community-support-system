@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabaseClient";
+import { roleHomePath } from "@/lib/display";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 // Handles the OAuth callback: exchange code for session, then route by profile status.
@@ -49,7 +50,7 @@ export function AuthCallbackPage() {
       return;
     }
 
-    navigate("/dashboard", { replace: true });
+    navigate(roleHomePath(profile.role), { replace: true });
   }, [hasExchanged, isLoading, profile, navigate]);
 
   return (

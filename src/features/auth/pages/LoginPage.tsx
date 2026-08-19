@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Building2, HandHeart, HeartHandshake, LayoutDashboard, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -83,32 +82,6 @@ export function LoginPage() {
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
       </form>
-
-      <div className="mt-4 border-t border-border pt-3">
-        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Preview dashboards</p>
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          <Button to="/admin/dashboard" variant="outline" size="sm" className="h-9 gap-1.5 px-3 text-xs">
-            <LayoutDashboard className="size-3.5 shrink-0" aria-hidden="true" />
-            Admin
-          </Button>
-          <Button to="/donor/dashboard" variant="outline" size="sm" className="h-9 gap-1.5 px-3 text-xs">
-            <UsersRound className="size-3.5 shrink-0" aria-hidden="true" />
-            Donor
-          </Button>
-          <Button to="/volunteer/dashboard" variant="outline" size="sm" className="h-9 gap-1.5 px-3 text-xs">
-            <HandHeart className="size-3.5 shrink-0" aria-hidden="true" />
-            Volunteer
-          </Button>
-          <Button to="/beneficiary/dashboard" variant="outline" size="sm" className="h-9 gap-1.5 px-3 text-xs">
-            <HeartHandshake className="size-3.5 shrink-0" aria-hidden="true" />
-            Beneficiary
-          </Button>
-          <Button to="/sponsor/dashboard" variant="outline" size="sm" className="h-9 gap-1.5 px-3 text-xs">
-            <Building2 className="size-3.5 shrink-0" aria-hidden="true" />
-            Sponsor
-          </Button>
-        </div>
-      </div>
     </AuthPageShell>
   );
 }
