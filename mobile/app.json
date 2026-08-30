@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "TMF Dashboard",
+    "slug": "tmf-dashboard",
+    "scheme": "tmfdashboard",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#ffffff"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-web-browser"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "org.tmf.dashboard"
+    },
+    "android": {
+      "package": "org.tmf.dashboard",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    }
+  }
+}
