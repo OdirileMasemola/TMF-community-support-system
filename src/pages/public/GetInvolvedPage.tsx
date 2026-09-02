@@ -1,22 +1,49 @@
+import {
+  GetInvolvedCtaSection,
+  ResourceSupportSection,
+  SupportCampaignsSection,
+  VolunteeringSection,
+  WaysToGetInvolvedSection,
+  WhyGetInvolvedSection,
+} from "@/components/blocks/get-involved-sections";
 import { PageHero } from "@/components/ui/PageHero";
-import ConnectWithUs from "@/components/ui/connect-with-us";
+import { SectionReveal } from "@/components/ui/SectionReveal";
 
 export function GetInvolvedPage() {
   return (
     <main className="min-h-screen">
       <PageHero
-        label="Get Involved"
-        title="Make an Impact with Us"
-        highlightedTitle="Join the Community"
-        subtitle="Volunteer, donate, or connect — your involvement helps us reach more people and create lasting change."
-        primaryCta={{ text: "Volunteer", to: "#volunteer" }}
-        secondaryCta={{ text: "Donate", to: "#donate" }}
-        tertiaryCta={{ text: "Sponsor", to: "#sponsor" }}
+        label="GET INVOLVED"
+        title="Be part of"
+        highlightedTitle="the change."
+        subtitle="There are many ways to support the Themba Molefe Foundation. Whether you volunteer your time, support a campaign, make a donation, or help provide resources to communities, your contribution can make a meaningful difference."
+        primaryCta={{ text: "Become a Volunteer", to: "/register" }}
+        secondaryCta={{ text: "Explore Campaigns", to: "/campaigns" }}
       />
 
-      <section className="max-w-4xl mx-auto px-4 py-12">
-        <ConnectWithUs />
-      </section>
+      <SectionReveal delay={0.05} direction="up">
+        <WaysToGetInvolvedSection />
+      </SectionReveal>
+
+      <SectionReveal delay={0.08} direction="up">
+        <VolunteeringSection />
+      </SectionReveal>
+
+      <SectionReveal delay={0.1} direction="up">
+        <SupportCampaignsSection />
+      </SectionReveal>
+
+      <SectionReveal delay={0.12} direction="up">
+        <ResourceSupportSection />
+      </SectionReveal>
+
+      <SectionReveal delay={0.14} direction="up">
+        <WhyGetInvolvedSection />
+      </SectionReveal>
+
+      <SectionReveal delay={0.16} direction="up">
+        <GetInvolvedCtaSection />
+      </SectionReveal>
     </main>
   );
 }

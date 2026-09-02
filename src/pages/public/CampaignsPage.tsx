@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatedGlowingSearchBar } from "@/components/ui/AnimatedGlowingSearchBar";
+import { CampaignEmptyState } from "@/components/ui/CampaignEmptyState";
 import { CampaignHeroPreview } from "@/components/ui/CampaignHeroPreview";
 import { CampaignListCard } from "@/components/ui/CampaignListCard";
 import { PageHero } from "@/components/ui/PageHero";
@@ -109,9 +110,9 @@ export function CampaignsPage() {
             {campaignsQuery.isLoading ? (
               <p className="text-center text-sm text-muted-foreground">Loading campaigns...</p>
             ) : campaignsQuery.isError ? (
-              <p className="text-center text-sm text-muted-foreground">
-                We could not load campaigns right now. Please try again shortly.
-              </p>
+              <CampaignEmptyState />
+            ) : campaigns.length === 0 ? (
+              <CampaignEmptyState />
             ) : filteredCampaigns.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {filteredCampaigns.map((campaign) => (
@@ -119,12 +120,10 @@ export function CampaignsPage() {
                 ))}
               </div>
             ) : (
-              <div className="mx-auto max-w-2xl rounded-3xl border border-border bg-card/70 p-8 text-center text-card-foreground backdrop-blur-xl">
-                <h2 className="text-xl font-semibold text-foreground">No campaigns found</h2>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  Try a different search term or select another campaign status.
-                </p>
-              </div>
+              <CampaignEmptyState
+                title="No campaigns found"
+                description="Try a different search term or select another campaign status."
+              />
             )}
           </div>
         </div>

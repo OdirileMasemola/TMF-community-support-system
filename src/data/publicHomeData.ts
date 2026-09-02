@@ -44,10 +44,10 @@ export const founderQuote: FounderQuote = {
 
 export const featuredCampaigns: FeaturedCampaign[] = [
   {
-    id: "food-support-drive",
-    title: "Food Support Drive",
+    id: "knock-n-drop",
+    title: 'KNOCK "N" DROP',
     description:
-      "Providing food parcels and basic support to families facing difficult living conditions.",
+      "Blanket distribution initiative providing blankets to people and families in need, particularly during colder periods.",
     status: "Active",
     gradientFrom: "#AF3800",
     gradientTo: "#FE621D",
@@ -55,25 +55,25 @@ export const featuredCampaigns: FeaturedCampaign[] = [
     href: "/campaigns",
   },
   {
-    id: "youth-education-support",
-    title: "Youth Education Support",
+    id: "christmas-day",
+    title: "Christmas Day",
     description:
-      "Helping young learners with school resources, mentorship, and academic support.",
+      "A Christmas support initiative providing Christmas clothing and groceries to help families and children experience a meaningful festive season.",
+    status: "Active",
+    gradientFrom: "#C41E3A",
+    gradientTo: "#FF6B6B",
+    glowColor: "#FF6B6B",
+    href: "/campaigns",
+  },
+  {
+    id: "dress-a-learner",
+    title: "Dress a Learner",
+    description:
+      "An initiative supporting school children by providing school uniforms to learners who need them.",
     status: "Active",
     gradientFrom: "#4ADE80",
     gradientTo: "#BBF7D0",
     glowColor: "#86EFAC",
-    href: "/campaigns",
-  },
-  {
-    id: "winter-relief-campaign",
-    title: "Winter Relief Campaign",
-    description:
-      "Collecting warm clothing and essentials for vulnerable families during winter.",
-    status: "Upcoming",
-    gradientFrom: "#00CFC1",
-    gradientTo: "#00FFE7",
-    glowColor: "#00FFE7",
     href: "/campaigns",
   },
 ];

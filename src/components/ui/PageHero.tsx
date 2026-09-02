@@ -21,6 +21,7 @@ export type PageHeroProps = {
     to: string;
   };
   children?: ReactNode;
+  compact?: boolean;
 };
 
 export function PageHero({
@@ -32,9 +33,15 @@ export function PageHero({
   secondaryCta,
   tertiaryCta,
   children,
+  compact = false,
 }: PageHeroProps) {
   return (
-    <section className="relative overflow-hidden bg-transparent px-6 pb-16 pt-32 md:pb-20 md:pt-40">
+    <section
+      className={cn(
+        "relative overflow-hidden bg-transparent px-6",
+        compact ? "pb-10 pt-28 md:pb-12 md:pt-32" : "pb-16 pt-32 md:pb-20 md:pt-40",
+      )}
+    >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(80%_60%_at_50%_0%,var(--hero-glow),transparent_70%)]"
@@ -44,7 +51,12 @@ export function PageHero({
         <AnimatedGroup>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{label}</p>
 
-          <h1 className="mx-auto mt-6 max-w-3xl text-balance text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
+          <h1
+            className={cn(
+              "mx-auto max-w-3xl text-balance font-bold text-foreground",
+              compact ? "mt-4 text-3xl md:text-4xl lg:text-5xl" : "mt-6 text-4xl md:text-5xl lg:text-6xl",
+            )}
+          >
             {title}
             {highlightedTitle ? (
               <>
@@ -56,12 +68,17 @@ export function PageHero({
             ) : null}
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p
+            className={cn(
+              "mx-auto max-w-2xl text-pretty leading-relaxed text-muted-foreground",
+              compact ? "mt-4 text-sm md:text-base" : "mt-6 text-base md:text-lg",
+            )}
+          >
             {subtitle}
           </p>
 
           {(primaryCta || secondaryCta || tertiaryCta) && (
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-2.5">
+            <div className={cn("flex flex-wrap items-center justify-center gap-2.5", compact ? "mt-6" : "mt-10")}>
               {primaryCta && (
                 <div className="rounded-xl border border-border bg-foreground/5 p-0.5">
                   <Button to={primaryCta.to} className="rounded-lg px-3.5 py-1.5 text-sm">
