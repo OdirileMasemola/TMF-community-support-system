@@ -1,6 +1,10 @@
 # Themba Molefe Foundation - Community Support Management System
 
-A React + TypeScript + Supabase starter project for the proposed Community Support Management System.
+Vite + React website for the Community Support Management System. From the repo root, work in this folder:
+
+```bash
+cd web
+```
 
 ## Main features covered in this skeleton
 
