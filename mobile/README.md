@@ -1,96 +1,90 @@
-# TMF Dashboard (mobile)
+# TMF Dashboard — Mobile App
 
-An Expo / React Native app for signed-in TMF dashboard users. It covers the five
-role portals (administrator, donor, volunteer, beneficiary, sponsor) and
-deliberately leaves out the public marketing pages, which stay web only.
+The mobile companion to the Themba Molefe Foundation (TMF) Community Support Management System.
 
-## Getting started
+**Motto:** *Tomorrow is one dream away.*
 
-```bash
-cd mobile
-npm install
-cp .env.example .env.local   # then fill in your Supabase credentials
-npm start
-```
+This app is for **people who already work inside TMF’s portals** — not for public browsing. The foundation’s story, campaigns marketing pages, and registration journey live on the website; the phone app is where signed-in users carry that same support work with them.
 
-Press `a` for an Android emulator, `i` for an iOS simulator (macOS only), or scan
-the QR code with Expo Go.
+---
 
-## Environment
+## About Themba Molefe Foundation
 
-| Variable | Purpose |
+TMF is a community foundation from **Nhlapo section, Katlehong**, started in February 2015. The work is practical and local: showing up for vulnerable families, learners, and child-headed households with food support, family care, school support, winter relief, health outreach, and campaign-led programmes.
+
+The foundation’s belief is captured in its motto — *tomorrow is one dream away* — and in a simple way of working: stay close to the community, organise help properly, and keep going after the cameras leave.
+
+---
+
+## What this app is for
+
+Community support does not only happen behind a desk. Volunteers are on the ground, beneficiaries need updates, donors and sponsors check progress, and administrators review what is waiting.
+
+This mobile app gives those **dashboard users** a phone-sized window into the same Community Support System:
+
+- sign in with the same TMF account used on the website
+- land in the portal that matches their role
+- see live activity for their part of the foundation’s work
+- stay connected through notifications, profile, and settings
+
+It does not replace the website. It extends the system so organised support can travel with the people doing the work.
+
+---
+
+## What the system offers on mobile
+
+### Role portals
+
+| Role | What they get on the phone |
 | --- | --- |
-| `EXPO_PUBLIC_SUPABASE_URL` | Supabase project URL, the same project as the web app |
-| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable (anon) key |
+| **Administrator** | Platform overview, campaigns, user and review queues, notifications, profile and settings |
+| **Donor** | Giving overview, donate flows, campaigns, donation history, notifications, profile and settings |
+| **Volunteer** | Assignments and opportunities, applications, hours, notifications, profile and settings |
+| **Beneficiary** | Support overview, new and existing assistance requests, programmes, notifications, profile and settings |
+| **Sponsor** | Commitments and campaigns, sponsorships and open requests, notifications, profile and settings |
 
-Expo inlines `EXPO_PUBLIC_*` variables into the bundle, so never put a service
-role key here. Access control has to come from row level security.
+Each person only enters the portal for their role, so a volunteer’s phone stays about volunteering, a donor’s about giving, and so on — the same idea as the website, shaped for mobile.
 
-## How this relates to the web app
+### Day-to-day community support
 
-`src/services/`, `src/types/` and `src/lib/display.ts` are **copies** of the same
-files in the web app's `src/`. They are pure TypeScript over `supabase-js` and
-work unchanged on native.
+Depending on role, the app helps people:
 
-> Because they are copies rather than a shared package, a schema change means
-> editing both `src/` and `mobile/src/`. Keep them in the same commit.
+- follow campaigns and funding progress
+- track donations, proofs, and sponsorship commitments
+- manage volunteer applications, assignments, and logged hours
+- submit and follow assistance requests and collection details
+- catch notifications when something needs attention
+- keep profile and account details up to date
 
-Three files are intentionally different on native:
+Administrators get a compact view of what needs the foundation’s attention across the programme.
 
-| File | Why it differs |
-| --- | --- |
-| `src/lib/supabaseClient.ts` | The web app uses `createBrowserClient` from `@supabase/ssr`, which persists the session in cookies. React Native has no cookie store, so this uses `createClient` with an AsyncStorage adapter and restarts token auto-refresh when the app returns to the foreground. |
-| `src/lib/errors.ts` | `import.meta.env.DEV` is a Vite feature; native uses `__DEV__`. |
-| `src/services/storage.ts` | Native file pickers return a local URI, not a DOM `File`, so uploads read the bytes first. |
+---
 
-## Structure
+## Who it is for
 
-```
-app/
-  _layout.tsx          providers + the auth and role gate
-  login.tsx            email/password sign in
-  complete-profile.tsx shown when a signed-in user has no profiles row
-  admin/               administrator portal
-  donor/               donor portal
-  volunteer/           volunteer portal
-  beneficiary/         beneficiary portal
-  sponsor/             sponsor portal
-src/
-  auth/                AuthProvider: session, profile and role
-  components/          shared native UI primitives
-  hooks/               useRoleProfile and friends
-  lib/ services/ types/ theme/
-```
+- TMF administrators coordinating programmes away from a laptop
+- Donors and sponsors checking their support on the go
+- Volunteers in the field reviewing assignments and hours
+- Beneficiaries following assistance and programme updates
 
-Routes mirror the web paths (`/admin/dashboard`, `/donor/dashboard`, ...), so
-`roleHomePath()` from `src/lib/display.ts` is reused verbatim to decide where a
-user lands after signing in.
+Anyone who only wants to learn about TMF, browse campaigns publicly, or create an account should use the **website**.
 
-## Google sign in
+---
 
-The login screen has a "Continue with Google" button. Because there is no page to
-redirect, the native flow differs from the web one: Supabase returns an
-authorisation URL, the app opens it in the system browser with
-`WebBrowser.openAuthSessionAsync`, and a deep link brings the result back to be
-exchanged for a session.
+## How it fits with the website
 
-**This needs one setting in Supabase to work.** Add the redirect URLs under
-*Authentication → URL Configuration → Redirect URLs*:
+| | Website | Mobile app |
+| --- | --- | --- |
+| Public story & campaigns marketing | Yes | No |
+| Register / choose a role | Yes | Directed to the web |
+| Role dashboards & portal work | Yes | Yes |
+| Same community, same programmes | Shared foundation mission | Shared foundation mission |
 
-| When | URL to allow |
-| --- | --- |
-| Running in Expo Go / dev | `exp://127.0.0.1:8081/--/auth/callback` (and your LAN address, e.g. `exp://192.168.0.10:8081/--/auth/callback`) |
-| Built app | `tmfdashboard://auth/callback` |
+Together they serve one purpose: help the Themba Molefe Foundation turn community care into **organised, accountable support**.
 
-Without these, Google sign in fails with a redirect mismatch. To see the exact URL
-the app is using, log the value of `Linking.createURL("auth/callback")`.
+---
 
-## Not implemented yet
+## Related
 
-- **Registration and role selection.** New users still sign up on the web app;
-  the mobile app sends them there.
-- **Charts and PDF export.** The admin dashboard's recharts views and the jspdf
-  report export have no native equivalent yet.
-- Each portal currently has a dashboard screen only; the remaining screens
-  (campaigns, donations, applications, requests, notifications, settings) are
-  still to come.
+- Project overview: [../README.md](../README.md)
+- Website: [../web/README.md](../web/README.md)

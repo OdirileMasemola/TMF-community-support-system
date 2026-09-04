@@ -1,63 +1,84 @@
-# Themba Molefe Foundation - Community Support Management System
+# TMF Website — Community Support System
 
-Vite + React website for the Community Support Management System. From the repo root, work in this folder:
+The public website and full browser dashboards for the **Themba Molefe Foundation (TMF)** Community Support Management System.
 
-```bash
-cd web
-```
+**Motto:** *Tomorrow is one dream away.*
 
-## Main features covered in this skeleton
+---
 
-- Role-based authentication using Supabase Auth
-- Role-based dashboards for Administrator, Volunteer, Beneficiary, Donor, and Sponsor
-- Campaign management
-- Volunteer campaign applications
-- Beneficiary assistance requests
-- Supporting document upload structure
-- Donation and sponsorship modules
-- Notifications module
-- Reports module with PDF-ready structure
-- Supabase database schema with Row Level Security policies
+## About Themba Molefe Foundation
 
-## Recommended setup
+TMF is a community foundation from **Nhlapo section, Katlehong**. It started in February 2015 as practical, neighbour-to-neighbour care — food, family support, school help, and a presence for households that had nowhere else to turn.
 
-```bash
-npm install
-cp .env.example .env.local
-npm run dev
-```
+That first Christmas programme set the tone: bring joy and dignity to underprivileged children and child-headed households, stay close to the community, and organise help so it lasts beyond a single event.
 
-## Environment variables
+Today the foundation’s programmes include family care, food support, youth education, winter relief, community health awareness, and campaign-led drives such as Knock “N” Drop, Christmas Day, and Dress a Learner.
 
-Create `.env.local` and add your Supabase details:
+---
 
-```bash
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
-```
+## What this website is
 
-## Supabase setup
+This site is TMF’s digital front door **and** its operations hub online.
 
-1. Create a new Supabase project.
-2. Open the SQL Editor.
-3. Run `supabase/migrations/0001_initial_schema.sql`.
-4. Create a private Storage bucket called `supporting-documents` if it was not created by the SQL script.
-5. Enable Email/Password authentication in Supabase Auth.
-6. Start the app and register a user.
+- **Outward:** tell the story, show campaigns, invite people to donate, volunteer, or get involved
+- **Inward:** give each signed-in role a dedicated portal so community support is planned, tracked, and reviewed in one system
 
-## Important database design note
+It works alongside the mobile dashboard app, which focuses on signed-in users on the phone. Public marketing pages live here on the website only.
 
-The original academic design has a `USER` table with a password field. In the real implementation, passwords must not be stored in your own public table. Supabase Auth stores and protects authentication data, while the app stores user profile data in the `profiles` table.
+---
 
-## Suggested development order
+## What the system offers on the web
 
-1. Authentication and role-based registration
-2. Dashboard layout and protected routes
-3. Campaign module
-4. Volunteer applications module
-5. Beneficiary assistance requests and documents
-6. Donations and sponsorships
-7. Notifications
-8. Reports and PDF export
-9. Admin user management
-10. Testing, RLS policy review, and deployment
+### Public experience
+
+Visitors can:
+
+- read about TMF’s origin, mission, and community focus
+- explore campaigns and impact areas
+- learn how to get involved (time, donations, campaign support, sponsorship)
+- donate or make contact without needing an account first
+
+### Role-based portals
+
+Once someone registers and completes their profile, they work inside a portal that matches their role:
+
+| Role | What they can do |
+| --- | --- |
+| **Administrator** | Run the platform — users, campaigns, donations and payment proofs, volunteer applications, sponsors, events, notifications, and reports |
+| **Donor** | Support campaigns, view giving history, submit proof of payment, manage profile and alerts |
+| **Volunteer** | Find opportunities, apply, track assignments, log hours, update availability |
+| **Beneficiary** | Request assistance, follow request status, see programmes and collection details |
+| **Sponsor** | Review campaigns and open sponsorship requests, track commitments and impact |
+
+Each portal is purpose-built so people only work with the part of the foundation’s pipeline that belongs to them — while administrators keep the whole picture.
+
+### Organised community support
+
+Behind the pages, the system is built to hold the foundation’s real workflows in one place:
+
+- campaigns with goals and progress
+- donations and verification of payment proofs
+- volunteer applications, assignments, and hours
+- beneficiary assistance requests and supporting documents
+- sponsorships and sponsorship requests
+- notifications so people know when something needs attention
+- admin reporting for operational oversight
+
+The goal is simple: **turn goodwill into organised support** — so families, learners, and volunteers in Katlehong are backed by a clear process, not only good intentions.
+
+---
+
+## Who it is for
+
+- Community members discovering TMF for the first time
+- Donors and sponsors who want their support to be visible and accountable
+- Volunteers coordinating outreach and logging their time
+- Beneficiaries seeking structured assistance
+- Foundation administrators coordinating programmes day to day
+
+---
+
+## Related
+
+- Project overview: [../README.md](../README.md)
+- Mobile dashboard app: [../mobile/README.md](../mobile/README.md)
