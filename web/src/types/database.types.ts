@@ -28,6 +28,8 @@ export type Database = {
           account_status: AccountStatus;
           invited_by: string | null;
           invited_at: string | null;
+          avatar_url: string | null;
+          avatar_change_count: number;
           created_at: string;
           updated_at: string;
         };
@@ -40,6 +42,8 @@ export type Database = {
           account_status?: AccountStatus;
           invited_by?: string | null;
           invited_at?: string | null;
+          avatar_url?: string | null;
+          avatar_change_count?: number;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];
@@ -487,6 +491,30 @@ export type Database = {
           status?: EventStatus;
         };
         Update: Partial<Database["public"]["Tables"]["events"]["Insert"]>;
+        Relationships: [];
+      };
+      contact_messages: {
+        Row: {
+          id: string;
+          first_name: string;
+          last_name: string;
+          email: string;
+          subject: string;
+          message: string;
+          status: "unread" | "read" | "archived";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          first_name: string;
+          last_name: string;
+          email: string;
+          subject: string;
+          message: string;
+          status?: "unread" | "read" | "archived";
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["contact_messages"]["Insert"]>;
         Relationships: [];
       };
       notifications: {

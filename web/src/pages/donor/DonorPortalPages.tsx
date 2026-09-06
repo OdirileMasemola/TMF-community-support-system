@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
+import { ProfilePictureEditor } from "@/components/shared/ProfilePictureEditor";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -35,7 +36,6 @@ import {
   formatMonthYear,
   formatRelativeTime,
   formatShortDate,
-  getInitials,
   notificationIsUnread,
   paymentStatusLabel,
   verificationStatusLabel,
@@ -758,7 +758,6 @@ export function DonorProfilePage() {
   });
 
   const displayName = profile?.full_name?.trim() || "Donor";
-  const initials = getInitials(displayName);
   const memberSince = formatMonthYear(donorProfile?.member_since ?? donorProfile?.created_at);
   const preference = donorProfile?.donation_preference?.trim() || "Not set";
 
@@ -793,7 +792,7 @@ export function DonorProfilePage() {
         <div className="grid gap-px bg-border lg:grid-cols-[0.75fr_1.25fr]">
           <DashboardCard>
             <CardContent className="flex flex-col items-center py-10 text-center">
-              <span className="flex size-20 items-center justify-center rounded-lg bg-primary text-xl font-bold text-primary-foreground">{initials}</span>
+              <ProfilePictureEditor />
               <p className="mt-4 text-lg font-semibold text-foreground">{displayName}</p>
               <p className="mt-1 text-sm text-muted-foreground">{roleProfileId ? `DON-${roleProfileId.slice(0, 8).toUpperCase()}` : "Donor"}</p>
               <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-primary">

@@ -130,7 +130,7 @@ export async function fetchProfiles(): Promise<ProfileRow[]> {
 
   const { data, error } = await client
     .from("profiles")
-    .select("id, role, full_name, email, phone_number, account_status, invited_by, invited_at, created_at, updated_at")
+    .select("id, role, full_name, email, phone_number, account_status, invited_by, invited_at, avatar_url, avatar_change_count, created_at, updated_at")
     .order("created_at", { ascending: false });
 
   if (error) {

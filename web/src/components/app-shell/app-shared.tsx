@@ -6,6 +6,7 @@ import {
   HandCoins,
   HeartHandshake,
   LayoutGrid,
+  Mail,
   Megaphone,
   Settings,
   UserRoundCheck,
@@ -81,6 +82,11 @@ export const navGroups: SidebarNavGroup[] = [
         title: "Notifications",
         path: "/admin/notifications",
         icon: <Bell className="size-4" aria-hidden="true" />,
+      },
+      {
+        title: "Messages",
+        path: "/admin/messages",
+        icon: <Mail className="size-4" aria-hidden="true" />,
       },
       {
         title: "Settings",

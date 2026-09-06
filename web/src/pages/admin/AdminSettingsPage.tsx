@@ -3,6 +3,7 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from "@/component
 import { Input } from "@/components/ui/Input";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
+import { ProfilePictureEditor } from "@/components/shared/ProfilePictureEditor";
 
 export function AdminSettingsPage() {
   return (
@@ -12,6 +13,15 @@ export function AdminSettingsPage() {
       description="Configure platform preferences, notification rules, and administrator access controls."
     >
       <div className="grid gap-px bg-border lg:grid-cols-2">
+        <DashboardCard>
+          <CardHeader>
+            <CardTitle>Your profile picture</CardTitle>
+            <CardDescription>Dashboard users can change this photo 3 times. After that it is locked.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center py-6">
+            <ProfilePictureEditor />
+          </CardContent>
+        </DashboardCard>
         <DashboardCard>
           <CardHeader>
             <CardTitle>General settings</CardTitle>

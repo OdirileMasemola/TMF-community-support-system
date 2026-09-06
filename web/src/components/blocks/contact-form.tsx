@@ -4,26 +4,21 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
-interface ContactDetails {
-  label: string;
-  url: string;
-}
+import { toUserMessage } from "@/lib/errors";
+import { submitContactMessage } from "@/services/contact";
 
 interface ContactSectionProps {
   title?: string;
   description?: string;
   phone?: string;
   email?: string;
-  website?: ContactDetails;
 }
 
 export function ContactSection({
   title = "Get in touch",
-  description = "We’re available for questions, feedback, and collaboration opportunities. Let us know how we can help.",
-  phone = "+27 12 345 6789",
-  email = "hello@themba-molefe-foundation.org",
-  website = { label: "themba-molefe-foundation.org", url: "https://www.themba-molefe-foundation.org" },
+  description = "We're available for questions, feedback, and collaboration opportunities. Let us know how we can help.",
+  phone = "+27 72 076 9116",
+  email = "hope.molefe@icloud.com",
 }: ContactSectionProps) {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -34,6 +29,7 @@ export function ContactSection({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [statusMessage, setStatusMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -59,7 +55,7 @@ export function ContactSection({
     return nextErrors;
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
 
@@ -69,10 +65,17 @@ export function ContactSection({
       return;
     }
 
-    console.info("Contact form submitted", formData);
-    setStatusMessage("Message sent. We’ll be in touch soon.");
-    setErrors({});
-    setFormData({ firstName: "", lastName: "", email: "", subject: "", message: "" });
+    setIsSubmitting(true);
+    try {
+      await submitContactMessage(formData);
+      setStatusMessage("Message sent. We'll be in touch soon.");
+      setErrors({});
+      setFormData({ firstName: "", lastName: "", email: "", subject: "", message: "" });
+    } catch {
+      setStatusMessage(toUserMessage("Your message could not be sent. Please try again."));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -89,18 +92,15 @@ export function ContactSection({
             <h3 className="text-xl font-semibold text-foreground">Reach us directly</h3>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>
-                <span className="font-semibold text-foreground">Phone:</span> {phone}
+                <span className="font-semibold text-foreground">Phone:</span>{" "}
+                <a href={`tel:${phone.replace(/\s/g, "")}`} className="text-primary underline-offset-4 hover:underline">
+                  {phone}
+                </a>
               </li>
               <li>
                 <span className="font-semibold text-foreground">Email:</span>{" "}
                 <a href={`mailto:${email}`} className="text-primary underline-offset-4 hover:underline">
                   {email}
-                </a>
-              </li>
-              <li>
-                <span className="font-semibold text-foreground">Website:</span>{" "}
-                <a href={website.url} target="_blank" rel="noreferrer" className="text-primary underline-offset-4 hover:underline">
-                  {website.label}
                 </a>
               </li>
             </ul>
@@ -140,8 +140,8 @@ export function ContactSection({
           </div>
 
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <Button type="submit" className="w-full sm:w-auto">
-              Send Message
+            <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+              {isSubmitting ? "Sending..." : "Send Message"}
             </Button>
             {statusMessage ? <p className="text-sm font-medium text-primary">{statusMessage}</p> : null}
           </div>

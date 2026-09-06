@@ -19,6 +19,7 @@ import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp"
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
+import { ProfilePictureEditor } from "@/components/shared/ProfilePictureEditor";
 import { DataState } from "@/components/shared/DataState";
 import { AnimatedGlowingSearchBar } from "@/components/ui/AnimatedGlowingSearchBar";
 import { Button } from "@/components/ui/Button";
@@ -33,7 +34,6 @@ import {
   formatRelativeTime,
   formatShortDate,
   formatStatusLabel,
-  getInitials,
   notificationIsUnread,
 } from "@/lib/display";
 import { cn } from "@/lib/utils";
@@ -624,9 +624,7 @@ export function VolunteerProfilePage() {
         <div className="grid gap-px bg-border lg:grid-cols-[0.75fr_1.25fr]">
           <DashboardCard>
             <CardContent className="flex flex-col items-center py-10 text-center">
-              <span className="flex size-20 items-center justify-center rounded-lg bg-primary text-xl font-bold text-primary-foreground">
-                {getInitials(name)}
-              </span>
+              <ProfilePictureEditor />
               <p className="mt-4 text-lg font-semibold text-foreground">{name}</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {volunteerRole?.id ? `VOL-${volunteerRole.id.slice(0, 8).toUpperCase()}` : "—"}

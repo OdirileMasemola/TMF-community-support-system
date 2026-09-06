@@ -68,6 +68,9 @@ const AdminEventsPage = lazy(() =>
 const AdminNotificationsPage = lazy(() =>
   import("@/pages/admin/AdminNotificationsPage").then((module) => ({ default: module.AdminNotificationsPage })),
 );
+const AdminMessagesPage = lazy(() =>
+  import("@/pages/admin/AdminMessagesPage").then((module) => ({ default: module.AdminMessagesPage })),
+);
 const AdminSettingsPage = lazy(() =>
   import("@/pages/admin/AdminSettingsPage").then((module) => ({ default: module.AdminSettingsPage })),
 );
@@ -250,6 +253,7 @@ export default function App() {
             <Route path="users" element={<AdminUsersPage />} />
             <Route path="events" element={<AdminEventsPage />} />
             <Route path="notifications" element={<AdminNotificationsPage />} />
+            <Route path="messages" element={<AdminMessagesPage />} />
             <Route path="settings" element={<AdminSettingsPage />} />
           </Route>
         </Route>

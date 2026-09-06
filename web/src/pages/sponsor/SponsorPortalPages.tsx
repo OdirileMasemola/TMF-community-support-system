@@ -25,6 +25,7 @@ import { SponsorshipHistoryCard } from "@/components/dashboard/SponsorshipHistor
 import { SponsorshipRequestCard } from "@/components/dashboard/SponsorshipRequestCard";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
+import { ProfilePictureEditor } from "@/components/shared/ProfilePictureEditor";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -49,7 +50,6 @@ import {
   formatRelativeTime,
   formatShortDate,
   formatStatusLabel,
-  getInitials,
   notificationIsUnread,
 } from "@/lib/display";
 import { cn } from "@/lib/utils";
@@ -592,7 +592,6 @@ function useSponsorAccountForm() {
 export function SponsorProfilePage() {
   const form = useSponsorAccountForm();
   const organisationName = form.organisationName || form.sponsorProfile?.organisation_name || "Organisation";
-  const initials = getInitials(organisationName);
   const sponsorLevel = formatStatusLabel(form.sponsorProfile?.sponsor_level) || "Partner";
   const memberSince = formatMonthYear(form.sponsorProfile?.created_at);
 
@@ -622,9 +621,7 @@ export function SponsorProfilePage() {
         <div className="grid gap-px bg-border lg:grid-cols-[0.75fr_1.25fr]">
           <DashboardCard>
             <CardContent className="flex flex-col items-center py-10 text-center">
-              <span className="flex size-20 items-center justify-center rounded-lg bg-primary text-xl font-bold text-primary-foreground">
-                {initials}
-              </span>
+              <ProfilePictureEditor />
               <p className="mt-4 text-lg font-semibold text-foreground">{organisationName}</p>
               <p className="mt-1 text-sm text-muted-foreground">{form.representative || "Representative"}</p>
               <span className="mt-4 inline-flex items-center gap-1.5 text-sm text-primary">

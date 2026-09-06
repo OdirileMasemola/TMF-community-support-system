@@ -14,18 +14,34 @@ export async function fetchProfile(userId: string): Promise<ProfileRow | null> {
   const client = getSupabaseClientOrNull();
   if (!client) return null;
 
-  const { data, error } = await client
+  const withAvatar = await client
+    .from("profiles")
+    .select("id, role, full_name, email, phone_number, account_status, invited_by, invited_at, avatar_url, avatar_change_count, created_at, updated_at")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!withAvatar.error) {
+    return withAvatar.data;
+  }
+
+  const missingColumn = /avatar_url|avatar_change_count|42703/i.test(withAvatar.error.message);
+  if (!missingColumn) {
+    logSupabaseError("fetchProfile", withAvatar.error);
+    throw withAvatar.error;
+  }
+
+  const fallback = await client
     .from("profiles")
     .select("id, role, full_name, email, phone_number, account_status, invited_by, invited_at, created_at, updated_at")
     .eq("id", userId)
     .maybeSingle();
 
-  if (error) {
-    logSupabaseError("fetchProfile", error);
-    throw error;
+  if (fallback.error) {
+    logSupabaseError("fetchProfile", fallback.error);
+    throw fallback.error;
   }
 
-  return data;
+  return fallback.data ? { ...fallback.data, avatar_url: null, avatar_change_count: 0 } : null;
 }
 
 export async function ensureRoleProfile(userId: string, role: UserRole, organisationName?: string): Promise<void> {
@@ -157,7 +173,7 @@ export async function fetchSponsorProfile(userId: string): Promise<SponsorProfil
 
 export async function updateProfile(
   userId: string,
-  values: Partial<Pick<ProfileRow, "full_name" | "phone_number">>,
+  values: Partial<Pick<ProfileRow, "full_name" | "phone_number" | "avatar_url">>,
 ): Promise<void> {
   const client = getSupabaseClientOrNull();
   if (!client) throw new Error("Supabase is not configured.");

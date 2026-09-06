@@ -15,6 +15,8 @@ type Profile = {
   phone_number: string | null;
   role: UserRole;
   account_status: AccountStatus;
+  avatar_url: string | null;
+  avatar_change_count: number;
 };
 
 type AuthContextValue = {
@@ -26,6 +28,7 @@ type AuthContextValue = {
   signInWithGoogle: () => Promise<void>;
   completeProfile: (values: { fullName: string; phoneNumber: string; role: UserRole; organisationName?: string }) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -38,6 +41,8 @@ function toProfile(data: NonNullable<Awaited<ReturnType<typeof fetchProfile>>>):
     phone_number: data.phone_number,
     role: data.role,
     account_status: data.account_status,
+    avatar_url: data.avatar_url ?? null,
+    avatar_change_count: data.avatar_change_count ?? 0,
   };
 }
 
@@ -235,6 +240,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
     [loadProfile, navigate, queryClient, session?.user.email, session?.user.id],
   );
 
+  const refreshProfile = useCallback(async () => {
+    if (!session?.user.id) return;
+    queryClient.removeQueries({ queryKey: ["profile", session.user.id] });
+    await loadProfile(session.user.id);
+  }, [loadProfile, queryClient, session?.user.id]);
+
   const signOut = useCallback(async () => {
     const supabase = getSupabaseClientOrNull();
     if (!supabase) return;
@@ -247,8 +258,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [navigate, queryClient]);
 
   const value = useMemo(
-    () => ({ session, profile, isLoading, signIn, signUp, signInWithGoogle, completeProfile, signOut }),
-    [session, profile, isLoading, signIn, signUp, signInWithGoogle, completeProfile, signOut],
+    () => ({ session, profile, isLoading, signIn, signUp, signInWithGoogle, completeProfile, signOut, refreshProfile }),
+    [session, profile, isLoading, signIn, signUp, signInWithGoogle, completeProfile, signOut, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
