@@ -36,8 +36,32 @@ export function AnimatedGlowingSearchBar({
             placeholder={placeholder}
             type="search"
             name="campaign-search"
-            className="h-12 w-full rounded-xl border border-[var(--glow-search-inner-border)] bg-[var(--glow-search-bg)] pl-14 pr-16 text-base text-[var(--glow-search-text)] outline-none transition-colors placeholder:text-[var(--glow-search-placeholder)] focus:outline-none"
+            className="h-12 w-full rounded-xl border border-[var(--glow-search-inner-border)] bg-[var(--glow-search-bg)] pl-14 pr-24 text-base text-[var(--glow-search-text)] outline-none transition-colors placeholder:text-[var(--glow-search-placeholder)] focus:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
           />
+          {value ? (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => onChange("")}
+              className="absolute right-[3.25rem] top-1/2 z-[2] -translate-y-1/2 rounded-md p-1 text-[var(--glow-search-icon)] transition-colors hover:text-[var(--glow-search-text)]"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          ) : null}
           <div className="pointer-events-none absolute left-[5px] top-1/2 h-[18px] w-[30px] -translate-y-1/2 bg-[#cf30aa]/40 opacity-30 blur-lg transition-all duration-[2000ms] group-hover:opacity-10" />
           <div className="absolute right-2 top-1/2 h-9 w-9 -translate-y-1/2 overflow-hidden rounded-lg opacity-60 before:absolute before:left-1/2 before:top-1/2 before:h-[600px] before:w-[600px] before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-90 before:animate-[spin_4s_linear_infinite] before:bg-[conic-gradient(rgba(0,0,0,0),rgba(61,58,79,0.55),rgba(0,0,0,0)_50%,rgba(0,0,0,0)_50%,rgba(61,58,79,0.55),rgba(0,0,0,0)_100%)] before:bg-no-repeat before:content-['']" />
           <div
