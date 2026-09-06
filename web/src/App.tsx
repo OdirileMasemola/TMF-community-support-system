@@ -36,6 +36,9 @@ const CampaignsPage = lazy(() =>
   import("@/pages/public/CampaignsPage").then((module) => ({ default: module.CampaignsPage })),
 );
 const ContactPage = lazy(() => import("@/pages/public/ContactPage").then((module) => ({ default: module.ContactPage })));
+const PrivacyPolicyPage = lazy(() =>
+  import("@/pages/public/PrivacyPolicyPage").then((module) => ({ default: module.PrivacyPolicyPage })),
+);
 const DonatePage = lazy(() => import("@/pages/public/DonatePage").then((module) => ({ default: module.DonatePage })));
 const GetInvolvedPage = lazy(() =>
   import("@/pages/public/GetInvolvedPage").then((module) => ({ default: module.GetInvolvedPage })),
@@ -239,6 +242,7 @@ export default function App() {
           <Route path="get-involved" element={<GetInvolvedPage />} />
           <Route path="donate" element={<DonatePage />} />
           <Route path="contact" element={<ContactPage />} />
+          <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
         </Route>
 
         <Route element={<RoleProtectedRoute allowedRoles={["administrator"]} />}>

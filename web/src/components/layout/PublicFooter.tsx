@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { Camera, PlayCircle, Share2, Users } from "lucide-react";
+import { Camera, Share2 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import logo from "@/assets/images/logo.jpeg";
 
@@ -14,8 +14,8 @@ const platformLinks = [
 const foundationLinks = [
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
+  { to: "/privacy-policy", label: "Privacy Policy" },
   { to: "/login", label: "Login" },
-  { to: "/", label: "Home" },
 ];
 
 const supportLinks = [
@@ -26,10 +26,8 @@ const supportLinks = [
 ];
 
 const socialLinks = [
-  { href: "#", label: "Facebook", icon: Share2 },
-  { href: "#", label: "Instagram", icon: Camera },
-  { href: "#", label: "YouTube", icon: PlayCircle },
-  { href: "#", label: "LinkedIn", icon: Users },
+  { href: "https://www.facebook.com/share/1DQh9hjv8o/", label: "Facebook", icon: Share2 },
+  { href: "https://www.instagram.com/thembamolefefoundation", label: "Instagram", icon: Camera },
 ];
 
 type AnimatedContainerProps = {
@@ -129,6 +127,8 @@ export function PublicFooter() {
                   <li key={link.label}>
                     <a
                       href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
                       aria-label={link.label}
                       className="inline-flex items-center gap-2 text-muted-foreground transition-colors duration-300 hover:text-primary"
                     >
