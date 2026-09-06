@@ -128,7 +128,7 @@ export function AdminDonationsPage() {
           <DataState
             isLoading={donationsQuery.isLoading}
             isError={donationsQuery.isError}
-            errorMessage={donationsQuery.error instanceof Error ? donationsQuery.error.message : undefined}
+            errorMessage="We could not load donations right now. Please try again shortly."
             isEmpty={donations.length === 0}
             emptyMessage="No donations found."
             loadingMessage="Loading donations..."

@@ -12,8 +12,8 @@ export function RoleProtectedRoute({ allowedRoles }: RoleProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center p-8">
-        <p className="text-sm text-muted-foreground">Loading account...</p>
+      <div className="flex min-h-[40vh] items-center justify-center p-8" role="status" aria-live="polite">
+        <p className="text-sm text-muted-foreground">Checking your account…</p>
       </div>
     );
   }

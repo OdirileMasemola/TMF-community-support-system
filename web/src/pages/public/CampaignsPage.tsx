@@ -108,11 +108,26 @@ export function CampaignsPage() {
 
           <div className="mt-12">
             {campaignsQuery.isLoading ? (
-              <p className="text-center text-sm text-muted-foreground">Loading campaigns...</p>
+              <div
+                className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+                role="status"
+                aria-live="polite"
+                aria-label="Loading campaigns"
+              >
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-[22rem] animate-pulse rounded-2xl border border-border bg-card/60"
+                  />
+                ))}
+              </div>
             ) : campaignsQuery.isError ? (
-              <CampaignEmptyState />
+              <CampaignEmptyState
+                title="Campaigns could not be loaded"
+                description="Please check your connection and try again shortly."
+              />
             ) : campaigns.length === 0 ? (
-              <CampaignEmptyState />
+              <CampaignEmptyState title="No campaigns currently" />
             ) : filteredCampaigns.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {filteredCampaigns.map((campaign) => (

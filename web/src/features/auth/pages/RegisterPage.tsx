@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { AuthDivider } from "@/features/auth/components/AuthDivider";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
+import { toAuthUserMessage } from "@/lib/errors";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types/app.types";
@@ -36,7 +37,7 @@ export function RegisterPage() {
       await signUp({ fullName, email, phoneNumber, password, role });
       toast.success("Account created. Check your email if confirmation is enabled.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Registration failed");
+      toast.error(toAuthUserMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -48,7 +49,7 @@ export function RegisterPage() {
     try {
       await signInWithGoogle();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Google sign-up failed");
+      toast.error(toAuthUserMessage(error));
       setIsGoogleLoading(false);
     }
   }

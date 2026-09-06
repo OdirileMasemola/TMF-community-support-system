@@ -16,6 +16,7 @@ import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { toUserMessage } from "@/lib/errors";
 import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
@@ -155,8 +156,8 @@ export function BeneficiaryRequestPage() {
       setDocumentFile(null);
       await queryClient.invalidateQueries({ queryKey: ["beneficiary-requests", roleProfileId] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not submit request");
+    onError: () => {
+      toast.error(toUserMessage("Could not submit request"));
     },
   });
 
@@ -481,7 +482,7 @@ export function BeneficiaryNotificationsPage() {
           onClick={() =>
             markAllRead.mutate(undefined, {
               onSuccess: () => toast.success("All notifications marked as read"),
-              onError: (error: Error) => toast.error(error.message),
+              onError: () => toast.error(toUserMessage("Could not update notifications.")),
             })
           }
         >
@@ -655,8 +656,8 @@ export function BeneficiarySettingsPage() {
       await refetch();
       await queryClient.invalidateQueries({ queryKey: ["role-profile"] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not save settings");
+    onError: () => {
+      toast.error(toUserMessage("Could not save settings"));
     },
   });
 

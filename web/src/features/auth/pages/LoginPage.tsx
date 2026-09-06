@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { AuthDivider } from "@/features/auth/components/AuthDivider";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
+import { toAuthUserMessage } from "@/lib/errors";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export function LoginPage() {
@@ -20,10 +21,10 @@ export function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await signIn(email, password);
+      await signIn(email.trim(), password);
       toast.success("Welcome back!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Login failed");
+      toast.error(toAuthUserMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -35,7 +36,7 @@ export function LoginPage() {
     try {
       await signInWithGoogle();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Google sign-in failed");
+      toast.error(toAuthUserMessage(error));
       setIsGoogleLoading(false);
     }
   }

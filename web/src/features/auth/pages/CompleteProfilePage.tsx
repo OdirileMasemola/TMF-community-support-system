@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { roleHomePath } from "@/lib/display";
+import { toAuthUserMessage } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types/app.types";
  // this is the roles array that is used to display the roles in the select dropdown
@@ -39,7 +41,7 @@ export function CompleteProfilePage() {
   }
 
   if (profile) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={roleHomePath(profile.role)} replace />;
   }
 
   // this is the function that is used to handle the submission of the form and the way that we do that is by using the completeProfile function from the useAuth hook that we have setup in the useAuth hook file
@@ -56,7 +58,7 @@ export function CompleteProfilePage() {
       });
       toast.success("Profile completed. Welcome!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save your profile");
+      toast.error(toAuthUserMessage(error));
     } finally {
       setIsSubmitting(false);
     }

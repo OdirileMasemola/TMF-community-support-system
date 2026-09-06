@@ -64,7 +64,10 @@ export function ProgrammeActivityChart({ className }: { className?: string }) {
     queryKey: ["admin-programme-activity"],
     enabled: isSupabaseConfigured(),
     queryFn: async () => {
-      const [campaigns, applications] = await Promise.all([fetchCampaigns(), fetchAllApplications(200)]);
+      const [campaigns, applications] = await Promise.all([
+        fetchCampaigns({ limit: 100 }),
+        fetchAllApplications(100),
+      ]);
       const chartData = buildProgrammeSeries(campaigns, applications);
       const first = chartData[0]?.campaigns ?? 0;
       const last = chartData.at(-1)?.campaigns ?? first;

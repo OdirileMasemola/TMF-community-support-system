@@ -33,12 +33,7 @@ export async function ensureRoleProfile(userId: string, role: UserRole, organisa
   if (!client) return;
 
   if (role === "administrator") {
-    const { error } = await client.from("administrator_profiles").upsert({ user_id: userId }, { onConflict: "user_id" });
-    if (error) {
-      logSupabaseError("ensureRoleProfile.administrator", error);
-      throw error;
-    }
-    return;
+    throw new Error("Administrator profiles cannot be created from the application.");
   }
 
   if (role === "volunteer") {
@@ -188,7 +183,7 @@ export async function updateVolunteerProfile(
 
 export async function updateBeneficiaryProfile(
   profileId: string,
-  values: Partial<Pick<BeneficiaryProfile, "residential_address" | "assistance_type" | "avatar_url" | "eligibility_status">>,
+  values: Partial<Pick<BeneficiaryProfile, "residential_address" | "assistance_type" | "avatar_url">>,
 ): Promise<void> {
   const client = getSupabaseClientOrNull();
   if (!client) throw new Error("Supabase is not configured.");

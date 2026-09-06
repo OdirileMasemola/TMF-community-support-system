@@ -65,7 +65,7 @@ export async function fetchAdminDashboardStats(): Promise<AdminDashboardStats> {
     client.from("profiles").select("id", { count: "exact", head: true }).eq("account_status", "active"),
     client.from("profiles").select("id", { count: "exact", head: true }).eq("account_status", "pending"),
     client.from("campaigns").select("id", { count: "exact", head: true }).eq("status", "active"),
-    client.from("donations").select("amount, status"),
+    client.from("donations").select("amount").eq("status", "successful"),
     client.from("campaign_applications").select("id", { count: "exact", head: true }),
     client.from("campaign_applications").select("id", { count: "exact", head: true }).eq("status", "pending"),
     client.from("sponsor_profiles").select("id", { count: "exact", head: true }),
@@ -98,9 +98,7 @@ export async function fetchAdminDashboardStats(): Promise<AdminDashboardStats> {
   }
 
   const donationRows = donationsRes.data ?? [];
-  const totalDonationAmount = donationRows
-    .filter((row) => row.status === "successful")
-    .reduce((sum, row) => sum + Number(row.amount ?? 0), 0);
+  const totalDonationAmount = donationRows.reduce((sum, row) => sum + Number(row.amount ?? 0), 0);
 
   const pendingVolunteerApplications = pendingAppsRes.count ?? 0;
   const pendingAssistanceRequests = pendingAssistanceRes.count ?? 0;

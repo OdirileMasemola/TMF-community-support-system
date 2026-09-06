@@ -29,7 +29,9 @@ export class AdminErrorBoundary extends Component<AdminErrorBoundaryProps, Admin
           <p className="page-description mt-2">
             This admin page could not be loaded. Try refreshing, or return to the dashboard.
           </p>
-          <p className="mt-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground">{this.state.error.message}</p>
+          <p className="mt-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground">
+            Please try again. If the problem continues, return to the dashboard.
+          </p>
           <div className="mt-5 flex gap-3">
             <Button type="button" onClick={() => this.setState({ error: null })}>
               Try again

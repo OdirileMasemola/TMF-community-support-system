@@ -61,13 +61,11 @@ function buildMonthlyTotals(donations: Awaited<ReturnType<typeof fetchAllDonatio
 }
 
 export function DonationTrendsChart({ className }: { className?: string }) {
-  const { data: chartData = [], isLoading, isError, error } = useQuery({
-    queryKey: ["admin-donation-trends"],
+  const { data: chartData = [], isLoading, isError } = useQuery({
+    queryKey: ["admin-donations", 200],
     enabled: isSupabaseConfigured(),
-    queryFn: async () => {
-      const donations = await fetchAllDonations(500);
-      return buildMonthlyTotals(donations);
-    },
+    queryFn: () => fetchAllDonations(200),
+    select: buildMonthlyTotals,
   });
 
   const firstMonth = chartData[0]?.donations ?? 0;

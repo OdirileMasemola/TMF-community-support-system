@@ -221,7 +221,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .campaign-animate-blob {
-    animation: none;
+  .campaign-animate-blob,
+  .animate-first,
+  .animate-second,
+  .animate-third,
+  .animate-fourth,
+  .animate-fifth {
+    animation: none !important;
+  }
+
+  .animated-blobs {
+    opacity: 0.28;
   }
 }

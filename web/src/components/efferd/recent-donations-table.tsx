@@ -10,10 +10,11 @@ import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { fetchAllDonations } from "@/services/donations";
 
 export function RecentDonationsTable({ className }: { className?: string }) {
-  const { data: donations = [], isLoading, isError, error } = useQuery({
-    queryKey: ["admin-recent-donations", 5],
+  const { data: donations = [], isLoading, isError } = useQuery({
+    queryKey: ["admin-donations", 200],
     enabled: isSupabaseConfigured(),
-    queryFn: () => fetchAllDonations(5),
+    queryFn: () => fetchAllDonations(200),
+    select: (rows) => rows.slice(0, 5),
   });
 
   return (

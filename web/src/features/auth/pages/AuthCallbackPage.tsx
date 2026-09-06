@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { toAuthUserMessage } from "@/lib/errors";
 import { createClient } from "@/lib/supabaseClient";
 import { roleHomePath } from "@/lib/display";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -34,7 +35,7 @@ export function AuthCallbackPage() {
 
         setHasExchanged(true);
       } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Authentication failed");
+        toast.error(toAuthUserMessage(error));
         navigate("/login", { replace: true });
       }
     }

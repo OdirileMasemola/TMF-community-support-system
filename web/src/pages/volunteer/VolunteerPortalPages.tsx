@@ -14,6 +14,7 @@ import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { toUserMessage } from "@/lib/errors";
 import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
@@ -100,8 +101,8 @@ export function VolunteerOpportunitiesPage() {
       toast.success("Application submitted");
       await queryClient.invalidateQueries({ queryKey: ["volunteer-applications", roleProfileId] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not submit application");
+    onError: () => {
+      toast.error(toUserMessage("Could not submit application"));
     },
   });
 
@@ -376,8 +377,8 @@ export function VolunteerHoursPage() {
       setNotes("");
       await queryClient.invalidateQueries({ queryKey: ["volunteer-hours", roleProfileId] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not record hours");
+    onError: () => {
+      toast.error(toUserMessage("Could not record hours"));
     },
   });
 
@@ -531,7 +532,7 @@ export function VolunteerNotificationsPage() {
           onClick={() =>
             markAllRead.mutate(undefined, {
               onSuccess: () => toast.success("All notifications marked as read"),
-              onError: (error: Error) => toast.error(error.message),
+              onError: () => toast.error(toUserMessage("Could not update notifications.")),
             })
           }
         >
@@ -698,8 +699,8 @@ export function VolunteerSettingsPage() {
       await refetch();
       await queryClient.invalidateQueries({ queryKey: ["role-profile"] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not save settings");
+    onError: () => {
+      toast.error(toUserMessage("Could not save settings"));
     },
   });
 

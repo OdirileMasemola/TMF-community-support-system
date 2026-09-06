@@ -29,8 +29,9 @@ export async function fetchCampaigns(options?: {
     }
   }
 
-  if (options?.limit) {
-    query = query.limit(options.limit);
+  const limit = options?.limit ?? (options?.publicOnly ? 48 : undefined);
+  if (limit) {
+    query = query.limit(limit);
   }
 
   const { data, error } = await query;

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import authImage from "@/assets/images/auth/Auth.png";
+import authImage from "@/assets/images/auth/Auth.webp";
 import logoImage from "@/assets/images/logo.jpeg";
 
 type AuthPageShellProps = {

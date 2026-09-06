@@ -25,6 +25,7 @@ export function OptimizedImage({
       fetchPriority={priority ? "high" : "auto"}
       decoding="async"
       className={className}
+      style={width && height ? { aspectRatio: `${width} / ${height}` } : undefined}
     />
   );
 }

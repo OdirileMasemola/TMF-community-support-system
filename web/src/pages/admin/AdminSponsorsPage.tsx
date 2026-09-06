@@ -80,7 +80,7 @@ export function AdminSponsorsPage() {
           <DataState
             isLoading={sponsorshipsQuery.isLoading}
             isError={sponsorshipsQuery.isError}
-            errorMessage={sponsorshipsQuery.error instanceof Error ? sponsorshipsQuery.error.message : undefined}
+            errorMessage="We could not load sponsorships right now. Please try again shortly."
             isEmpty={sponsorships.length === 0}
             emptyMessage="No sponsorships found."
             loadingMessage="Loading sponsorships..."

@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { toUserMessage } from "@/lib/errors";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { SponsoredCampaignCard } from "@/components/dashboard/SponsoredCampaignCard";
 import { SponsorCampaignCard } from "@/components/dashboard/SponsorCampaignCard";
@@ -214,8 +215,8 @@ export function SponsorSponsorshipsPage() {
       });
       await queryClient.invalidateQueries({ queryKey: ["sponsor-sponsorships", roleProfileId] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not create sponsorship.");
+    onError: () => {
+      toast.error(toUserMessage("Could not create sponsorship."));
     },
   });
 
@@ -302,8 +303,8 @@ export function SponsorRequestsPage() {
       });
       await queryClient.invalidateQueries({ queryKey: ["sponsor-responses", roleProfileId] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not submit your response.");
+    onError: () => {
+      toast.error(toUserMessage("Could not submit your response."));
     },
   });
 
@@ -563,8 +564,8 @@ function useSponsorAccountForm() {
       await refetch();
       await queryClient.invalidateQueries({ queryKey: ["role-profile"] });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || "Could not save profile changes.");
+    onError: () => {
+      toast.error(toUserMessage("Could not save profile changes."));
     },
   });
 

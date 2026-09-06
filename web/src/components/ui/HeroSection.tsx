@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Globe, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
@@ -51,6 +51,7 @@ export function HeroSection({
   className,
 }: HeroSectionProps) {
   const [clipPath, setClipPath] = useState(MOBILE_CLIP);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const desktopQuery = window.matchMedia("(min-width: 768px)");
@@ -70,9 +71,9 @@ export function HeroSection({
       <div className="relative flex w-full flex-col md:h-full md:flex-row md:overflow-hidden">
         <motion.div
           className="relative z-10 flex w-full flex-col justify-center px-6 pb-8 pt-32 md:h-full md:w-[58%] md:justify-between md:px-12 md:pb-8 md:pt-32 lg:w-[60%] lg:px-16"
-          initial="hidden"
+          initial={reduceMotion ? false : "hidden"}
           animate="visible"
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: reduceMotion ? 0 : 0.6, ease: "easeOut" }}
           variants={{
             hidden: {},
             visible: {
@@ -182,9 +183,9 @@ export function HeroSection({
             "mx-4 mb-8 rounded-2xl border border-border shadow-sm",
             "md:mx-0 md:mb-0 md:h-full md:w-[42%] md:rounded-none md:border-0 md:shadow-none lg:w-[40%]",
           )}
-          initial={{ clipPath: HIDDEN_CLIP }}
+          initial={reduceMotion ? false : { clipPath: HIDDEN_CLIP }}
           animate={{ clipPath }}
-          transition={{ duration: 1.1, ease: "easeOut", delay: 0.15 }}
+          transition={{ duration: reduceMotion ? 0 : 1.1, ease: "easeOut", delay: reduceMotion ? 0 : 0.15 }}
         >
           <OptimizedImage
             src={backgroundImage}

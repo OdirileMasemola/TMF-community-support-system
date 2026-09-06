@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/Input";
 import campaignFallbackImage from "@/assets/images/campaigns/Food Support Drive.webp";
 import { bankingDetails } from "@/data/donationData";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { toUserMessage } from "@/lib/errors";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useRoleProfile } from "@/hooks/useRoleProfile";
 import {
@@ -154,8 +155,8 @@ export function DonorDonatePage() {
       await queryClient.invalidateQueries({ queryKey: ["donor-donations"] });
       toast.success("Donation recorded. You can upload proof of payment next.");
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Could not create donation.");
+    onError: () => {
+      toast.error(toUserMessage("Could not create donation."));
     },
   });
 
@@ -185,8 +186,8 @@ export function DonorDonatePage() {
       await queryClient.invalidateQueries({ queryKey: ["donor-proofs"] });
       toast.success("Proof of payment submitted for review.");
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Could not upload proof.");
+    onError: () => {
+      toast.error(toUserMessage("Could not upload proof."));
     },
   });
 
@@ -495,8 +496,8 @@ export function DonorProofOfPaymentPage() {
       await queryClient.invalidateQueries({ queryKey: ["donor-proofs"] });
       toast.success("Proof of payment submitted.");
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Could not upload proof.");
+    onError: () => {
+      toast.error(toUserMessage("Could not upload proof."));
     },
   });
 
@@ -505,8 +506,8 @@ export function DonorProofOfPaymentPage() {
       const url = await getSignedFileUrl("donation-proofs", filePath);
       if (!url) throw new Error("Could not open proof file.");
       window.open(url, "_blank", "noopener,noreferrer");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not open proof file.");
+    } catch {
+      toast.error(toUserMessage("Could not open proof file."));
     }
   }
 
@@ -638,7 +639,7 @@ export function DonorNotificationsPage() {
           onClick={() => {
             markAllRead.mutate(undefined, {
               onSuccess: () => toast.success("All notifications marked as read."),
-              onError: (error) => toast.error(error instanceof Error ? error.message : "Could not update notifications."),
+              onError: () => toast.error(toUserMessage("Could not update notifications.")),
             });
           }}
         >
@@ -666,7 +667,7 @@ export function DonorNotificationsPage() {
                     onClick={() => {
                       if (!unread || markRead.isPending) return;
                       markRead.mutate(notification.id, {
-                        onError: (error) => toast.error(error instanceof Error ? error.message : "Could not mark as read."),
+                        onError: () => toast.error(toUserMessage("Could not mark as read.")),
                       });
                     }}
                   >
@@ -751,8 +752,8 @@ export function DonorProfilePage() {
       ]);
       toast.success("Profile updated.");
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Could not update profile.");
+    onError: () => {
+      toast.error(toUserMessage("Could not update profile."));
     },
   });
 
@@ -905,8 +906,8 @@ export function DonorSettingsPage() {
       ]);
       toast.success("Account settings saved.");
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Could not save settings.");
+    onError: () => {
+      toast.error(toUserMessage("Could not save settings."));
     },
   });
 

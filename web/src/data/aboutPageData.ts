@@ -1,4 +1,4 @@
-import aboutCommunityImage from "@/assets/images/about/DSC_0632.jpeg";
+import aboutCommunityImage from "@/assets/images/about/DSC_0632.webp";
 import familyCareImage from "@/assets/images/campaigns/Family Care Support.webp";
 import foodSupportImage from "@/assets/images/campaigns/Food Support Drive.webp";
 import youthEducationImage from "@/assets/images/campaigns/Youth Education Support.webp";

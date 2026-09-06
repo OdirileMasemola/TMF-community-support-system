@@ -15,29 +15,37 @@ function ratioPercent(numerator: number, denominator: number): number {
 }
 
 export function OperationalHealth({ className }: { className?: string }) {
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["admin-operational-health"],
+  const statsQuery = useQuery({
+    queryKey: ["admin-dashboard-stats"],
     enabled: isSupabaseConfigured(),
-    queryFn: async () => {
-      const [stats, donations, campaigns] = await Promise.all([
-        fetchAdminDashboardStats(),
-        fetchAllDonations(500),
-        fetchCampaigns(),
-      ]);
-
-      const verifiedDonations = donations.filter((donation) => donation.status === "successful").length;
-      const verifiedDonationRatio = ratioPercent(verifiedDonations, donations.length);
-      const activeCampaignRatio = ratioPercent(stats.activeCampaigns, campaigns.length || stats.activeCampaigns);
-      const pendingReviews = stats.pendingReviews;
-
-      return {
-        verifiedDonationRatio,
-        activeCampaignRatio,
-        pendingReviews,
-        caughtUp: pendingReviews === 0,
-      };
-    },
+    queryFn: fetchAdminDashboardStats,
   });
+  const donationsQuery = useQuery({
+    queryKey: ["admin-donations", 200],
+    enabled: isSupabaseConfigured(),
+    queryFn: () => fetchAllDonations(200),
+  });
+  const campaignsQuery = useQuery({
+    queryKey: ["admin-campaigns", 100],
+    enabled: isSupabaseConfigured(),
+    queryFn: () => fetchCampaigns({ limit: 100 }),
+  });
+
+  const stats = statsQuery.data;
+  const donations = donationsQuery.data ?? [];
+  const campaigns = campaignsQuery.data ?? [];
+  const verifiedDonations = donations.filter((donation) => donation.status === "successful").length;
+  const data = stats
+    ? {
+        verifiedDonationRatio: ratioPercent(verifiedDonations, donations.length),
+        activeCampaignRatio: ratioPercent(stats.activeCampaigns, campaigns.length || stats.activeCampaigns),
+        pendingReviews: stats.pendingReviews,
+        caughtUp: stats.pendingReviews === 0,
+      }
+    : undefined;
+
+  const isLoading = statsQuery.isLoading || donationsQuery.isLoading || campaignsQuery.isLoading;
+  const isError = statsQuery.isError || donationsQuery.isError || campaignsQuery.isError;
 
   const caughtUp = data?.caughtUp ?? true;
 
