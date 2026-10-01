@@ -83,39 +83,57 @@ describe('Supabase auth provider', () => {
     });
   });
 
-  describe('getRole', () => {
-    it('reads profiles.role as the user (their token is sent, so RLS applies)', async () => {
-      const { provider, requests } = providerWithFetch(async () => jsonResponse(200, [{ role: 'volunteer' }]));
-      await expect(provider.getRole(USER_ID, 'user-token')).resolves.toBe('volunteer');
+  describe('getProfile', () => {
+    it('reads role and account_status in one query as the user (their token is sent, so RLS applies)', async () => {
+      const { provider, requests } = providerWithFetch(async () =>
+        jsonResponse(200, [{ role: 'volunteer', account_status: 'pending' }]),
+      );
+      await expect(provider.getProfile(USER_ID, 'user-token')).resolves.toEqual({
+        role: 'volunteer',
+        accountStatus: 'pending',
+      });
+      expect(requests).toHaveLength(1);
       const url = new URL(requests[0]?.url ?? '');
       expect(url.pathname).toBe('/rest/v1/profiles');
-      expect(url.searchParams.get('select')).toBe('role');
+      expect(url.searchParams.get('select')).toBe('role,account_status');
       expect(url.searchParams.get('id')).toBe(`eq.${USER_ID}`);
       expect(requests[0]?.authorization).toBe('Bearer user-token');
     });
 
     it('returns null when there is no profile row', async () => {
       const { provider } = providerWithFetch(async () => jsonResponse(200, []));
-      await expect(provider.getRole(USER_ID, 'user-token')).resolves.toBeNull();
+      await expect(provider.getProfile(USER_ID, 'user-token')).resolves.toBeNull();
     });
 
-    it('returns null for an unknown role value', async () => {
-      const { provider } = providerWithFetch(async () => jsonResponse(200, [{ role: 'superuser' }]));
-      await expect(provider.getRole(USER_ID, 'user-token')).resolves.toBeNull();
+    it('maps unknown role and status values to null', async () => {
+      const { provider } = providerWithFetch(async () =>
+        jsonResponse(200, [{ role: 'superuser', account_status: 'banned' }]),
+      );
+      await expect(provider.getProfile(USER_ID, 'user-token')).resolves.toEqual({ role: null, accountStatus: null });
+    });
+
+    it('returns a suspended status as stored (authenticate decides)', async () => {
+      const { provider } = providerWithFetch(async () =>
+        jsonResponse(200, [{ role: 'administrator', account_status: 'suspended' }]),
+      );
+      await expect(provider.getProfile(USER_ID, 'user-token')).resolves.toEqual({
+        role: 'administrator',
+        accountStatus: 'suspended',
+      });
     });
 
     it('throws a 503 ApiError when the database is unreachable', async () => {
       const { provider } = providerWithFetch(async () => {
         throw new TypeError('fetch failed');
       });
-      await expectApiError(provider.getRole(USER_ID, 'user-token'), 503, 'SERVICE_UNAVAILABLE');
+      await expectApiError(provider.getProfile(USER_ID, 'user-token'), 503, 'SERVICE_UNAVAILABLE');
     });
 
     it('throws a generic 500 ApiError for a database error without exposing details', async () => {
       const { provider } = providerWithFetch(async () =>
         jsonResponse(400, { code: '42703', message: 'column profiles.role does not exist', details: null, hint: null }),
       );
-      const error: unknown = await provider.getRole(USER_ID, 'user-token').catch((rejection: unknown) => rejection);
+      const error: unknown = await provider.getProfile(USER_ID, 'user-token').catch((rejection: unknown) => rejection);
       expect(error).toBeInstanceOf(ApiError);
       expect(error).toMatchObject({ statusCode: 500, code: 'INTERNAL_ERROR', message: 'Unable to load user profile' });
     });

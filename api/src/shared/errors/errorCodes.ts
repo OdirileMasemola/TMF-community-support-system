@@ -4,6 +4,8 @@ export const ErrorCodes = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
+  /** Authenticated, but the account (profiles.account_status) may not use the API, e.g. suspended. */
+  ACCOUNT_DISABLED: 'ACCOUNT_DISABLED',
   NOT_FOUND: 'NOT_FOUND',
   METHOD_NOT_ALLOWED: 'METHOD_NOT_ALLOWED',
   CONFLICT: 'CONFLICT',

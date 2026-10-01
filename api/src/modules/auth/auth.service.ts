@@ -2,10 +2,11 @@ import { isAuthApiError, isAuthSessionMissingError, type SupabaseClient } from '
 import { ApiError } from '../../shared/errors/ApiError.js';
 import { ErrorCodes } from '../../shared/errors/errorCodes.js';
 import {
+  isAccountStatus,
   isUserRole,
+  type AuthProfile,
   type AuthProvider,
   type UserId,
-  type UserRole,
   type VerifiedSupabaseUser,
 } from '../../shared/types/auth.types.js';
 
@@ -49,14 +50,14 @@ export function createSupabaseAuthProvider(deps: SupabaseAuthDeps): AuthProvider
       return { id: data.user.id, email: data.user.email };
     },
 
-    async getRole(userId: UserId, accessToken: string): Promise<UserRole | null> {
+    async getProfile(userId: UserId, accessToken: string): Promise<AuthProfile | null> {
       const client = deps.createUserClient(accessToken);
       // RLS ("Users can read their own profile": id = auth.uid()) limits this to the caller's row.
       // Retries are disabled: this runs on every authenticated request, so fail fast (503)
       // instead of waiting through supabase-js's exponential backoff (up to ~7s).
       const { data, error, status } = await client
         .from('profiles')
-        .select('role')
+        .select('role, account_status')
         .eq('id', userId)
         .maybeSingle()
         .retry(false);
@@ -72,10 +73,15 @@ export function createSupabaseAuthProvider(deps: SupabaseAuthDeps): AuthProvider
       }
 
       const row: unknown = data;
-      if (typeof row !== 'object' || row === null || !('role' in row)) {
+      if (typeof row !== 'object' || row === null) {
         return null; // No profile row visible to this user.
       }
-      return isUserRole(row.role) ? row.role : null;
+      const role = 'role' in row ? row.role : undefined;
+      const accountStatus = 'account_status' in row ? row.account_status : undefined;
+      return {
+        role: isUserRole(role) ? role : null,
+        accountStatus: isAccountStatus(accountStatus) ? accountStatus : null,
+      };
     },
   };
 }

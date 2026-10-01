@@ -93,7 +93,7 @@ The server exits on startup with a clear message if a required variable is missi
 | Method | Path | Description |
 | --- | --- | --- |
 | GET | `/api/health` | Health check (does not query the database) |
-| GET | `/api/v1/auth/me` | Current user `{ data: { id, email, role } }` (requires `Authorization: Bearer <token>`) |
+| GET | `/api/v1/auth/me` | Current user `{ data: { id, email, role, accountStatus } }` (requires `Authorization: Bearer <token>`) |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }
@@ -107,6 +107,9 @@ Clients sign in with Supabase (web/mobile) and send the Supabase access token:
 - `authenticate` verifies the token with the Supabase Auth server (`auth.getUser(token)`), then reads
   the user's role from `public.profiles` using a client that acts as that user (RLS applies). No
   service-role key is used, and the role is never taken from the request or from `user_metadata`.
+- `authenticate` also reads `profiles.account_status` (same query): `active` and `pending` accounts are
+  allowed (as in the web and mobile apps), `suspended` accounts get `403 ACCOUNT_DISABLED`.
+  `request.user.accountStatus` is available for modules that need approved (`active`) accounts only.
 - `requireRole('administrator', ...)` restricts a route to the given roles (run after `authenticate`).
 - Missing/malformed/invalid token: `401 UNAUTHORIZED`. Wrong role: `403 FORBIDDEN`.
   Supabase unreachable: `503 SERVICE_UNAVAILABLE`.

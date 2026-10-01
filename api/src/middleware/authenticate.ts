@@ -1,5 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { ApiError } from '../shared/errors/ApiError.js';
+import { ErrorCodes } from '../shared/errors/errorCodes.js';
+import { isPermittedAccountStatus, type PermittedAccountStatus } from '../shared/types/auth.types.js';
 
 /**
  * Extracts the token from an `Authorization: Bearer <token>` header.
@@ -17,11 +19,16 @@ export function extractBearerToken(authorizationHeader: string | undefined): str
  * 1. Requires `Authorization: Bearer <token>` (missing or malformed -> 401).
  * 2. Verifies the token with the Supabase Auth server (invalid/expired -> 401,
  *    Auth unreachable -> 503).
- * 3. Loads the role from `public.profiles` as that user (RLS applies).
- * 4. Sets `request.user = { id, email, role }`.
+ * 3. Loads role and account_status from `public.profiles` as that user (RLS applies).
+ * 4. Rejects accounts whose status is not permitted (e.g. 'suspended') with 403
+ *    ACCOUNT_DISABLED. 'active' and 'pending' are allowed (see PERMITTED_ACCOUNT_STATUSES).
+ *    A user without a profile row is let through with role and accountStatus null, so
+ *    requireRole() still rejects them.
+ * 5. Sets `request.user = { id, email, role, accountStatus }`.
  *
  * The token is never logged or returned (the logger also redacts the Authorization header).
- * User id and role are never taken from the request body, query string or other headers.
+ * User id, role and account status are never taken from the request body, query string
+ * or other headers.
  */
 export async function authenticate(request: FastifyRequest, _reply: FastifyReply): Promise<void> {
   const header = request.headers.authorization;
@@ -40,11 +47,21 @@ export async function authenticate(request: FastifyRequest, _reply: FastifyReply
     throw ApiError.unauthorized('Invalid or expired access token');
   }
 
-  const role = await authProvider.getRole(verifiedUser.id, accessToken);
+  const profile = await authProvider.getProfile(verifiedUser.id, accessToken);
+
+  let accountStatus: PermittedAccountStatus | null = null;
+  if (profile !== null) {
+    if (!isPermittedAccountStatus(profile.accountStatus)) {
+      // Generic message: the reason (status) is not echoed back.
+      throw new ApiError(403, ErrorCodes.ACCOUNT_DISABLED, 'Account is not permitted to access this resource');
+    }
+    accountStatus = profile.accountStatus;
+  }
 
   request.user = {
     id: verifiedUser.id,
     email: verifiedUser.email ?? null,
-    role,
+    role: profile?.role ?? null,
+    accountStatus,
   };
 }

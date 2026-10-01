@@ -5,19 +5,43 @@ import { loadConfig } from '../src/config/env.js';
 import { authenticate } from '../src/middleware/authenticate.js';
 import { requireRole } from '../src/middleware/authorize.js';
 import { ApiError } from '../src/shared/errors/ApiError.js';
-import type { AuthProvider, UserRole } from '../src/shared/types/auth.types.js';
+import type { AuthProfile, AuthProvider } from '../src/shared/types/auth.types.js';
 
 // In-memory stand-in for Supabase Auth + public.profiles. No network calls are made.
 interface FakeAccount {
   id: string;
   email: string;
-  role: UserRole | null;
+  /** The account's profiles row; null = no profile row. */
+  profile: AuthProfile | null;
 }
 
 const ACCOUNTS: Record<string, FakeAccount> = {
-  'admin-token-abc123': { id: '11111111-1111-4111-8111-111111111111', email: 'admin@example.org', role: 'administrator' },
-  'donor-token-def456': { id: '22222222-2222-4222-8222-222222222222', email: 'donor@example.org', role: 'donor' },
-  'norole-token-ghi789': { id: '33333333-3333-4333-8333-333333333333', email: 'new@example.org', role: null },
+  'admin-token-abc123': {
+    id: '11111111-1111-4111-8111-111111111111',
+    email: 'admin@example.org',
+    profile: { role: 'administrator', accountStatus: 'active' },
+  },
+  'donor-token-def456': {
+    id: '22222222-2222-4222-8222-222222222222',
+    email: 'donor@example.org',
+    profile: { role: 'donor', accountStatus: 'active' },
+  },
+  'norole-token-ghi789': { id: '33333333-3333-4333-8333-333333333333', email: 'new@example.org', profile: null },
+  'pending-token-jkl012': {
+    id: '55555555-5555-4555-8555-555555555555',
+    email: 'pending@example.org',
+    profile: { role: 'volunteer', accountStatus: 'pending' },
+  },
+  'suspended-admin-token-mno345': {
+    id: '66666666-6666-4666-8666-666666666666',
+    email: 'suspended-admin@example.org',
+    profile: { role: 'administrator', accountStatus: 'suspended' },
+  },
+  'unknown-status-token-pqr678': {
+    id: '77777777-7777-4777-8777-777777777777',
+    email: 'odd@example.org',
+    profile: { role: 'donor', accountStatus: null },
+  },
 };
 const UNAVAILABLE_TOKEN = 'auth-down-token-xyz';
 
@@ -29,12 +53,12 @@ const getUser = vi.fn<AuthProvider['getUser']>(async (token) => {
   return account === undefined ? null : { id: account.id, email: account.email };
 });
 
-const getRole = vi.fn<AuthProvider['getRole']>(async (userId, token) => {
+const getProfile = vi.fn<AuthProvider['getProfile']>(async (userId, token) => {
   const account = ACCOUNTS[token];
-  return account !== undefined && account.id === userId ? account.role : null;
+  return account !== undefined && account.id === userId ? account.profile : null;
 });
 
-const fakeAuthProvider: AuthProvider = { getUser, getRole };
+const fakeAuthProvider: AuthProvider = { getUser, getProfile };
 
 function expectErrorShape(response: LightMyRequestResponse, statusCode: number, code: string): void {
   expect(response.statusCode).toBe(statusCode);
@@ -60,6 +84,11 @@ describe('authentication and authorization', () => {
       { preHandler: [authenticate, requireRole('donor', 'sponsor')] },
       async () => ({ ok: true }),
     );
+    app.get(
+      '/test/volunteer-only',
+      { preHandler: [authenticate, requireRole('volunteer')] },
+      async () => ({ ok: true }),
+    );
     app.get('/test/role-without-authenticate', { preHandler: [requireRole('administrator')] }, async () => ({
       ok: true,
     }));
@@ -73,7 +102,7 @@ describe('authentication and authorization', () => {
 
   beforeEach(() => {
     getUser.mockClear();
-    getRole.mockClear();
+    getProfile.mockClear();
   });
 
   describe('authenticate', () => {
@@ -102,7 +131,7 @@ describe('authentication and authorization', () => {
       expectErrorShape(response, 401, 'UNAUTHORIZED');
       expect(response.json()).toEqual({ error: { code: 'UNAUTHORIZED', message: 'Invalid or expired access token' } });
       expect(getUser).toHaveBeenCalledWith('not-a-real-token');
-      expect(getRole).not.toHaveBeenCalled();
+      expect(getProfile).not.toHaveBeenCalled();
       expect(response.body).not.toContain('not-a-real-token');
     });
 
@@ -124,9 +153,14 @@ describe('authentication and authorization', () => {
       });
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual({
-        user: { id: '22222222-2222-4222-8222-222222222222', email: 'donor@example.org', role: 'donor' },
+        user: {
+          id: '22222222-2222-4222-8222-222222222222',
+          email: 'donor@example.org',
+          role: 'donor',
+          accountStatus: 'active',
+        },
       });
-      expect(getRole).toHaveBeenCalledWith('22222222-2222-4222-8222-222222222222', 'donor-token-def456');
+      expect(getProfile).toHaveBeenCalledWith('22222222-2222-4222-8222-222222222222', 'donor-token-def456');
     });
   });
 
@@ -154,13 +188,18 @@ describe('authentication and authorization', () => {
       });
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual({
-        data: { id: '11111111-1111-4111-8111-111111111111', email: 'admin@example.org', role: 'administrator' },
+        data: {
+          id: '11111111-1111-4111-8111-111111111111',
+          email: 'admin@example.org',
+          role: 'administrator',
+          accountStatus: 'active',
+        },
       });
       expect(response.body).not.toContain('admin-token-abc123');
       expect(response.headers['authorization']).toBeUndefined();
     });
 
-    it('returns role null when the user has no profile role', async () => {
+    it('returns role and accountStatus null when the user has no profile row', async () => {
       const response = await app.inject({
         method: 'GET',
         url: '/api/v1/auth/me',
@@ -168,20 +207,72 @@ describe('authentication and authorization', () => {
       });
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual({
-        data: { id: '33333333-3333-4333-8333-333333333333', email: 'new@example.org', role: null },
+        data: { id: '33333333-3333-4333-8333-333333333333', email: 'new@example.org', role: null, accountStatus: null },
       });
     });
 
-    it('ignores a role supplied by the client in headers or query', async () => {
+    it('ignores a role or status supplied by the client in headers or query', async () => {
       const response = await app.inject({
         method: 'GET',
-        url: '/api/v1/auth/me?role=administrator',
-        headers: { authorization: 'Bearer donor-token-def456', 'x-user-role': 'administrator', 'x-user-id': 'someone-else' },
+        url: '/api/v1/auth/me?role=administrator&account_status=active&accountStatus=active',
+        headers: {
+          authorization: 'Bearer pending-token-jkl012',
+          'x-user-role': 'administrator',
+          'x-user-id': 'someone-else',
+          'x-account-status': 'active',
+        },
       });
       expect(response.statusCode).toBe(200);
       expect(response.json()).toEqual({
-        data: { id: '22222222-2222-4222-8222-222222222222', email: 'donor@example.org', role: 'donor' },
+        data: {
+          id: '55555555-5555-4555-8555-555555555555',
+          email: 'pending@example.org',
+          role: 'volunteer',
+          accountStatus: 'pending',
+        },
       });
+    });
+
+    it('allows a pending account (like the web and mobile apps) and exposes the status', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/auth/me',
+        headers: { authorization: 'Bearer pending-token-jkl012' },
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toMatchObject({ data: { role: 'volunteer', accountStatus: 'pending' } });
+    });
+
+    it('rejects a suspended account with 403 ACCOUNT_DISABLED without revealing the status', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/auth/me',
+        headers: { authorization: 'Bearer suspended-admin-token-mno345' },
+      });
+      expectErrorShape(response, 403, 'ACCOUNT_DISABLED');
+      expect(response.json()).toEqual({
+        error: { code: 'ACCOUNT_DISABLED', message: 'Account is not permitted to access this resource' },
+      });
+      expect(response.body).not.toContain('suspended');
+      expect(response.body).not.toContain('suspended-admin-token-mno345');
+    });
+
+    it('rejects a suspended account even if the client claims it is active', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/auth/me?account_status=active',
+        headers: { authorization: 'Bearer suspended-admin-token-mno345', 'x-account-status': 'active' },
+      });
+      expectErrorShape(response, 403, 'ACCOUNT_DISABLED');
+    });
+
+    it('rejects an account with an unrecognised status (fails closed)', async () => {
+      const response = await app.inject({
+        method: 'GET',
+        url: '/api/v1/auth/me',
+        headers: { authorization: 'Bearer unknown-status-token-pqr678' },
+      });
+      expectErrorShape(response, 403, 'ACCOUNT_DISABLED');
     });
   });
 
@@ -224,12 +315,36 @@ describe('authentication and authorization', () => {
       expectErrorShape(response, 403, 'FORBIDDEN');
     });
 
-    it('ignores a role supplied in the body or headers', async () => {
+    it('rejects a suspended administrator before the role check', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/test/admin-only',
+        headers: { authorization: 'Bearer suspended-admin-token-mno345' },
+      });
+      expectErrorShape(response, 403, 'ACCOUNT_DISABLED');
+    });
+
+    it('lets a pending account through to the role check', async () => {
+      const allowed = await app.inject({
+        method: 'GET',
+        url: '/test/volunteer-only',
+        headers: { authorization: 'Bearer pending-token-jkl012' },
+      });
+      expect(allowed.statusCode).toBe(200);
+      const denied = await app.inject({
+        method: 'POST',
+        url: '/test/admin-only',
+        headers: { authorization: 'Bearer pending-token-jkl012' },
+      });
+      expectErrorShape(denied, 403, 'FORBIDDEN');
+    });
+
+    it('ignores a role or status supplied in the body or headers', async () => {
       const response = await app.inject({
         method: 'POST',
         url: '/test/admin-only',
         headers: { authorization: 'Bearer donor-token-def456', 'x-user-role': 'administrator' },
-        payload: { role: 'administrator', user: { role: 'administrator' } },
+        payload: { role: 'administrator', account_status: 'active', user: { role: 'administrator' } },
       });
       expectErrorShape(response, 403, 'FORBIDDEN');
     });

@@ -10,5 +10,5 @@ export async function getMe(request: FastifyRequest, _reply: FastifyReply): Prom
   if (user === null) {
     throw ApiError.unauthorized();
   }
-  return successResponse({ id: user.id, email: user.email, role: user.role });
+  return successResponse({ id: user.id, email: user.email, role: user.role, accountStatus: user.accountStatus });
 }
