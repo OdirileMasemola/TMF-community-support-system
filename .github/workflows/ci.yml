@@ -10,6 +10,7 @@ on:
     branches:
       - main
 
+# The web, api and mobile jobs run in parallel.
 jobs:
   build-and-check:
     name: Build and Check Project
@@ -50,3 +51,65 @@ jobs:
       # Run tests only if a test script is defined.
       - name: Run tests
         run: npm run test --if-present
+
+  api:
+    name: Build and Check API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # The API requires Node.js 22.12 or newer (see api/package.json "engines").
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: api/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      # Test env values (dummy Supabase URL/key, no network calls) come from api/vitest.config.ts.
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  mobile:
+    name: Build and Check Mobile
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Expo SDK 54 / React Native 0.81 need Node.js 20.19.4 or newer.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      # Bundles the Android JavaScript (Metro + Hermes) to prove the app compiles.
+      # No EAS account, signing or secrets needed. Output goes to mobile/dist (gitignored).
+      - name: Bundle app (Expo export, Android)
+        run: npx expo export --platform android
