@@ -12,16 +12,39 @@ export function extractBearerToken(authorizationHeader: string | undefined): str
 }
 
 /**
- * EXTENSION POINT - authentication is NOT implemented yet and this hook is not
- * registered on any route.
+ * preHandler that requires a valid Supabase access token.
  *
- * Next phase: verify the Supabase access token server-side (e.g. Supabase JWKS /
- * `supabase.auth.getClaims()` or `supabase.auth.getUser(token)`), resolve the user's
- * role from the database, then set `request.auth`. User id and role must never be
- * taken from the request body, query string or custom headers.
+ * 1. Requires `Authorization: Bearer <token>` (missing or malformed -> 401).
+ * 2. Verifies the token with the Supabase Auth server (invalid/expired -> 401,
+ *    Auth unreachable -> 503).
+ * 3. Loads the role from `public.profiles` as that user (RLS applies).
+ * 4. Sets `request.user = { id, email, role }`.
  *
- * Until then it always fails closed with 501 NOT_IMPLEMENTED.
+ * The token is never logged or returned (the logger also redacts the Authorization header).
+ * User id and role are never taken from the request body, query string or other headers.
  */
-export async function authenticate(_request: FastifyRequest, _reply: FastifyReply): Promise<void> {
-  throw ApiError.notImplemented('Authentication is not implemented yet');
+export async function authenticate(request: FastifyRequest, _reply: FastifyReply): Promise<void> {
+  const header = request.headers.authorization;
+  if (header === undefined || header.trim() === '') {
+    throw ApiError.unauthorized('Missing access token');
+  }
+
+  const accessToken = extractBearerToken(header);
+  if (accessToken === null) {
+    throw ApiError.unauthorized('Authorization header must be in the format: Bearer <token>');
+  }
+
+  const { authProvider } = request.server;
+  const verifiedUser = await authProvider.getUser(accessToken);
+  if (verifiedUser === null) {
+    throw ApiError.unauthorized('Invalid or expired access token');
+  }
+
+  const role = await authProvider.getRole(verifiedUser.id, accessToken);
+
+  request.user = {
+    id: verifiedUser.id,
+    email: verifiedUser.email ?? null,
+    role,
+  };
 }

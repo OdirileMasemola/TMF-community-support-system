@@ -3,8 +3,8 @@
 REST API foundation for the Themba Molefe Foundation (TMF) Community Support System. It sits alongside
 `web/` (React + Vite) and `mobile/` (Expo) and uses the same Supabase project for auth and data.
 
-> **Status: foundation only.** The only endpoint is the health check. Business endpoints and
-> authentication (Supabase JWT verification) come in later phases.
+> **Status: foundation.** Health check and authentication (Supabase access tokens) are in place.
+> Business endpoints come in later phases.
 
 ## Stack
 
@@ -30,11 +30,12 @@ api/
       swagger.ts            # OpenAPI docs at /docs
       supabase.ts           # Supabase client + createUserClient(accessToken)
     middleware/
-      authenticate.ts       # Extension point only (not implemented, not used by any route)
-      authorize.ts          # Role check foundation (not used by any route)
+      authenticate.ts       # Verifies the Bearer token with Supabase Auth, sets request.user
+      authorize.ts          # requireRole(...roles) preHandler
       errorHandler.ts       # Central error + 404 handling
     modules/
       health/               # health.routes.ts -> health.controller.ts
+      auth/                 # auth.routes.ts -> auth.controller.ts; auth.service.ts (Supabase)
     routes/
       index.ts              # Registers modules; /api/v1 placeholder for future modules
     shared/
@@ -92,9 +93,26 @@ The server exits on startup with a clear message if a required variable is missi
 | Method | Path | Description |
 | --- | --- | --- |
 | GET | `/api/health` | Health check (does not query the database) |
+| GET | `/api/v1/auth/me` | Current user `{ data: { id, email, role } }` (requires `Authorization: Bearer <token>`) |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }
+```
+
+## Authentication
+
+Clients sign in with Supabase (web/mobile) and send the Supabase access token:
+`Authorization: Bearer <access_token>`.
+
+- `authenticate` verifies the token with the Supabase Auth server (`auth.getUser(token)`), then reads
+  the user's role from `public.profiles` using a client that acts as that user (RLS applies). No
+  service-role key is used, and the role is never taken from the request or from `user_metadata`.
+- `requireRole('administrator', ...)` restricts a route to the given roles (run after `authenticate`).
+- Missing/malformed/invalid token: `401 UNAUTHORIZED`. Wrong role: `403 FORBIDDEN`.
+  Supabase unreachable: `503 SERVICE_UNAVAILABLE`.
+
+```ts
+app.get('/admin-only', { preHandler: [authenticate, requireRole('administrator')] }, handler);
 ```
 
 ## API docs

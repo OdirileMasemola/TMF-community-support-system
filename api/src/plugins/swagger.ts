@@ -17,7 +17,25 @@ export async function registerSwagger(app: FastifyInstance, config: AppConfig): 
         description: 'REST API for the Themba Molefe Foundation Community Support System.',
         version: config.apiVersion,
       },
-      tags: [{ name: 'health', description: 'Service health' }],
+      tags: [
+        { name: 'health', description: 'Service health' },
+        { name: 'auth', description: 'Authentication (Supabase access tokens)' },
+      ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+            description: 'Supabase access token: Authorization: Bearer <access_token>',
+          },
+        },
+      },
+    },
+    // Name shared schemas (e.g. ErrorResponse) by their $id in components.schemas.
+    refResolver: {
+      buildLocalReference: (json, _baseUri, _fragment, i) =>
+        typeof json.$id === 'string' ? json.$id : `def-${i}`,
     },
   });
 
