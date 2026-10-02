@@ -33,8 +33,18 @@ export function createSupabaseClient(
   });
 }
 
-/** Decorates the root instance with `supabase` and `createUserClient`. */
-export function registerSupabase(app: FastifyInstance, config: AppConfig): void {
+/**
+ * Decorates the root instance with `supabase` and `createUserClient`.
+ * `createUserClient` can be overridden for tests (see BuildAppOptions).
+ */
+export function registerSupabase(
+  app: FastifyInstance,
+  config: AppConfig,
+  createUserClient?: (accessToken: string) => SupabaseClient,
+): void {
   app.decorate('supabase', createSupabaseClient(config));
-  app.decorate('createUserClient', (accessToken: string) => createSupabaseClient(config, accessToken));
+  app.decorate(
+    'createUserClient',
+    createUserClient ?? ((accessToken: string) => createSupabaseClient(config, accessToken)),
+  );
 }

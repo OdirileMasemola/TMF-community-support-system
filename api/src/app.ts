@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import Fastify, { type FastifyInstance } from 'fastify';
 import type { AppConfig } from './config/env.js';
 import { registerErrorHandlers } from './middleware/errorHandler.js';
@@ -17,6 +18,11 @@ export interface BuildAppOptions {
    * Defaults to the Supabase-backed provider.
    */
   authProvider?: AuthProvider;
+  /**
+   * Overrides how user-scoped Supabase clients are created (tests only, e.g. a client with a fake
+   * fetch). Defaults to a publishable-key client that sends the caller's access token.
+   */
+  createUserClient?: (accessToken: string) => SupabaseClient;
 }
 
 /**
@@ -33,7 +39,7 @@ export async function buildApp(config: AppConfig, options: BuildAppOptions = {})
   await registerCors(app, config);
   await registerRateLimit(app, config);
   await registerSwagger(app, config);
-  registerSupabase(app, config);
+  registerSupabase(app, config, options.createUserClient);
 
   app.decorate('authProvider', options.authProvider ?? createSupabaseAuthProvider(app));
   app.decorateRequest('user', null);

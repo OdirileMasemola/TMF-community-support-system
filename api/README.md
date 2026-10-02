@@ -3,8 +3,8 @@
 REST API foundation for the Themba Molefe Foundation (TMF) Community Support System. It sits alongside
 `web/` (React + Vite) and `mobile/` (Expo) and uses the same Supabase project for auth and data.
 
-> **Status: foundation.** Health check and authentication (Supabase access tokens) are in place.
-> Business endpoints come in later phases.
+> **Status: foundation.** Health check, authentication (Supabase access tokens) and campaigns are in place.
+> Other business endpoints come in later phases.
 
 ## Stack
 
@@ -36,6 +36,7 @@ api/
     modules/
       health/               # health.routes.ts -> health.controller.ts
       auth/                 # auth.routes.ts -> auth.controller.ts; auth.service.ts (Supabase)
+      campaigns/            # campaign.routes.ts -> .controller.ts -> .service.ts; .schema.ts, .types.ts
     routes/
       index.ts              # Registers modules; /api/v1 placeholder for future modules
     shared/
@@ -45,6 +46,7 @@ api/
       utils/                # Response and pagination helpers
   tests/
     health.test.ts
+    campaigns.test.ts
 ```
 
 Request flow for future modules: **Route -> Controller -> Service -> Supabase**. Business modules will be
@@ -94,6 +96,11 @@ The server exits on startup with a clear message if a required variable is missi
 | --- | --- | --- |
 | GET | `/api/health` | Health check (does not query the database) |
 | GET | `/api/v1/auth/me` | Current user `{ data: { id, email, role, accountStatus } }` (requires `Authorization: Bearer <token>`) |
+| GET | `/api/v1/campaigns?page=&pageSize=` | Campaigns the caller may see (RLS), newest first: `{ data: [...], meta: { page, pageSize, total, totalPages } }`. Signed-in users |
+| GET | `/api/v1/campaigns/:id` | One campaign `{ data }`; 404 if missing or hidden by RLS. Signed-in users |
+| POST | `/api/v1/campaigns` | Create (administrator). `admin_id` is set from the caller's administrator profile |
+| PATCH | `/api/v1/campaigns/:id` | Partial update (administrator) |
+| DELETE | `/api/v1/campaigns/:id` | Archive (administrator): sets `status` to `cancelled`; campaigns are never hard-deleted |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }
@@ -113,6 +120,10 @@ Clients sign in with Supabase (web/mobile) and send the Supabase access token:
 - `requireRole('administrator', ...)` restricts a route to the given roles (run after `authenticate`).
 - Missing/malformed/invalid token: `401 UNAUTHORIZED`. Wrong role: `403 FORBIDDEN`.
   Supabase unreachable: `503 SERVICE_UNAVAILABLE`.
+
+Campaign fields use the `public.campaigns` column names (snake_case), like web/ and mobile/. All campaign
+queries run through `createUserClient(accessToken)`, so the database RLS policies apply to the caller.
+`id`, `admin_id`, `amount_raised`, `created_at` and `updated_at` are never taken from the request.
 
 ```ts
 app.get('/admin-only', { preHandler: [authenticate, requireRole('administrator')] }, handler);
