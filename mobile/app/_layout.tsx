@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { AppButton, Card, LoadingState } from "@/components/ui";
+import { useAccountThemeSync } from "@/hooks/useUserSettings";
 import { roleHomePath } from "@/lib/display";
 import { ThemeProvider, useTheme, useThemedStyles } from "@/theme/ThemeProvider";
 import { spacing, typography, type ThemeColors } from "@/theme/tokens";
@@ -55,6 +56,7 @@ function RootNavigator() {
   const segments = useSegments();
   const router = useRouter();
   const { colors: themeColors } = useTheme();
+  useAccountThemeSync();
 
   useEffect(() => {
     if (isLoading) return;

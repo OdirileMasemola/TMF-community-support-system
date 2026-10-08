@@ -14,6 +14,8 @@ export type AssignmentStatus = "upcoming" | "active" | "completed";
 export type EventStatus = "draft" | "scheduled" | "completed" | "cancelled";
 export type SponsorshipRequestStatus = "open" | "accepted" | "declined" | "closed";
 export type CollectionScheduleStatus = "upcoming" | "confirmed" | "completed" | "missed";
+/** Values allowed by user_settings_theme_preference_check. */
+export type ThemePreference = "light" | "dark" | "system";
 
 export type Database = {
   public: {
@@ -538,6 +540,26 @@ export type Database = {
           file_path?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["reports"]["Insert"]>;
+        Relationships: [];
+      };
+      user_settings: {
+        Row: {
+          user_id: string;
+          theme_preference: ThemePreference;
+          notify_campaign_updates: boolean;
+          notify_request_updates: boolean;
+          notify_donation_updates: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          theme_preference?: ThemePreference;
+          notify_campaign_updates?: boolean;
+          notify_request_updates?: boolean;
+          notify_donation_updates?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["user_settings"]["Insert"]>;
         Relationships: [];
       };
     };
