@@ -21,6 +21,7 @@ export async function registerSwagger(app: FastifyInstance, config: AppConfig): 
         { name: 'health', description: 'Service health' },
         { name: 'auth', description: 'Authentication (Supabase access tokens)' },
         { name: 'campaigns', description: 'Campaigns (reads: signed-in users, writes: administrators)' },
+        { name: 'me', description: 'My profile, role profile and settings' },
       ],
       components: {
         securitySchemes: {

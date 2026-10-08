@@ -37,16 +37,20 @@ api/
       health/               # health.routes.ts -> health.controller.ts
       auth/                 # auth.routes.ts -> auth.controller.ts; auth.service.ts (Supabase)
       campaigns/            # campaign.routes.ts -> .controller.ts -> .service.ts; .schema.ts, .types.ts
+      me/                   # /me: own profile, role profile, settings (same file layout as campaigns)
     routes/
       index.ts              # Registers modules; /api/v1 placeholder for future modules
     shared/
       errors/               # ApiError, error codes
       logger/               # Pino logger options (redacts auth headers)
       types/                # Generic API and auth context types
-      utils/                # Response and pagination helpers
+      supabase/             # Shared PostgREST error mapping, paged queries, role profile lookup
+      utils/                # Response, pagination, caller, shared JSON schema and date helpers
   tests/
     health.test.ts
     campaigns.test.ts
+    me.test.ts
+    helpers/              # In-memory PostgREST + RLS emulation used by the module route tests
 ```
 
 Request flow for future modules: **Route -> Controller -> Service -> Supabase**. Business modules will be
@@ -101,6 +105,11 @@ The server exits on startup with a clear message if a required variable is missi
 | POST | `/api/v1/campaigns` | Create (administrator). `admin_id` is set from the caller's administrator profile |
 | PATCH | `/api/v1/campaigns/:id` | Partial update (administrator) |
 | DELETE | `/api/v1/campaigns/:id` | Archive (administrator): sets `status` to `cancelled`; campaigns are never hard-deleted |
+| GET | `/api/v1/me` | My profile `{ data: { profile, role_profile } }` (role profile row for my stored role, or null). Signed-in users |
+| PATCH | `/api/v1/me` | Update `full_name`, `phone_number` and my own role profile fields (`role_profile: {...}`); role/account_status are never changed |
+| POST | `/api/v1/me/profile` | Complete my profile: creates the missing role profile row for my stored role (201). 409 if a different role is requested or the profile is already complete; administrator cannot be chosen; 501 if I have no profile row |
+| GET | `/api/v1/me/settings` | My `user_settings` row; the default row is created first if missing |
+| PUT | `/api/v1/me/settings` | Save `theme_preference` (light/dark/system) and the three notification switches (omitted ones keep their value) |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }

@@ -3,6 +3,7 @@ import { API_PREFIX, API_V1_PREFIX } from '../config/constants.js';
 import { authRoutes } from '../modules/auth/auth.routes.js';
 import { campaignRoutes } from '../modules/campaigns/campaign.routes.js';
 import { healthRoutes } from '../modules/health/health.routes.js';
+import { meRoutes } from '../modules/me/me.routes.js';
 
 /**
  * Versioned v1 routes (/api/v1/...). Add modules here, e.g.
@@ -11,6 +12,7 @@ import { healthRoutes } from '../modules/health/health.routes.js';
 async function v1Routes(app: FastifyInstance): Promise<void> {
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(campaignRoutes, { prefix: '/campaigns' });
+  await app.register(meRoutes, { prefix: '/me' });
 }
 
 /** Registers all route modules. */
