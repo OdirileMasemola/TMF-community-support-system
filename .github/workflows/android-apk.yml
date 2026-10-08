@@ -1,0 +1,95 @@
+name: Android APK
+
+# Builds an installable Android APK from mobile/ and uploads it as a workflow artifact.
+# Runs on demand and when mobile code changes on main. It is deliberately NOT run on
+# pull requests: the existing CI workflow covers PR checks, and this build is slow.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/android-apk.yml'
+
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels an older, still-running build.
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: mobile
+    # EXPO_PUBLIC_* values are inlined into the JavaScript bundle during the Gradle build,
+    # so they must be present for the whole job. They are the public Supabase URL and
+    # publishable key (the same values the app reads from mobile/.env.local).
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+
+    steps:
+      # Fail in seconds, with a clear message, instead of building an APK that cannot sign in.
+      - name: Check required secrets
+        working-directory: .
+        run: |
+          missing=""
+          if [ -z "$EXPO_PUBLIC_SUPABASE_URL" ]; then missing="$missing EXPO_PUBLIC_SUPABASE_URL"; fi
+          if [ -z "$EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY" ]; then missing="$missing EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"; fi
+          if [ -n "$missing" ]; then
+            echo "::error title=Missing repository secrets::Add these in GitHub (Settings > Secrets and variables > Actions > New repository secret):$missing"
+            exit 1
+          fi
+          echo "Required secrets are set."
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Expo SDK 54 / React Native 0.81 need Node.js 20.19.4 or newer (same as the CI workflow).
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+
+      # React Native 0.81 builds with JDK 17.
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Caches the Gradle wrapper and dependencies between runs.
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Installed first so the config plugins in app.json resolve during prebuild.
+      - name: Install dependencies
+        run: npm ci
+
+      # Generates the native android/ project from app.json (gitignored, never committed).
+      - name: Generate Android project (Expo prebuild)
+        run: npx expo prebuild --platform android --no-install
+
+      # Release build, signed with the debug key from the Expo template: installable on a
+      # phone, not for the Play Store. arm64-v8a covers practically every current phone and
+      # keeps the build time down.
+      - name: Build release APK
+        working-directory: mobile/android
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tmf-mobile-apk
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
