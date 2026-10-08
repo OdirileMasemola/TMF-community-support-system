@@ -16,7 +16,7 @@ export const PHONE_PATTERN = '^\\+?[0-9 ()-]{6,20}$';
 
 const nullableText = { type: ['string', 'null'] } as const;
 
-const profileSchema = {
+export const profileSchema = {
   type: 'object',
   required: ['id', 'role', 'full_name', 'email', 'phone_number', 'account_status', 'created_at', 'updated_at'],
   properties: {

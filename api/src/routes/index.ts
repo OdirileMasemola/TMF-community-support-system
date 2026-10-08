@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { API_PREFIX, API_V1_PREFIX } from '../config/constants.js';
+import { adminRoutes } from '../modules/admin/admin.routes.js';
 import { assistanceRoutes } from '../modules/assistance/assistance.routes.js';
 import { authRoutes } from '../modules/auth/auth.routes.js';
 import { campaignRoutes } from '../modules/campaigns/campaign.routes.js';
@@ -27,6 +28,7 @@ async function v1Routes(app: FastifyInstance): Promise<void> {
   await app.register(volunteerRoutes);
   // Spans /sponsorships and /sponsorship-requests.
   await app.register(sponsorshipRoutes);
+  await app.register(adminRoutes, { prefix: '/admin' });
 }
 
 /** Registers all route modules. */

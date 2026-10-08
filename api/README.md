@@ -3,8 +3,10 @@
 REST API foundation for the Themba Molefe Foundation (TMF) Community Support System. It sits alongside
 `web/` (React + Vite) and `mobile/` (Expo) and uses the same Supabase project for auth and data.
 
-> **Status: foundation.** Health check, authentication (Supabase access tokens) and campaigns are in place.
-> Other business endpoints come in later phases.
+> **Status: v1 endpoints in place.** Health check, authentication (Supabase access tokens), campaigns, me,
+> notifications, donations, assistance, volunteers, sponsorships and admin. Every data request runs as the
+> caller (their Supabase access token), so the database's Row Level Security policies always apply.
+> `POST /api/v1/me/profile` answers 501 for users without a profile row (it needs a database change).
 
 ## Stack
 
@@ -43,8 +45,9 @@ api/
       assistance/           # /assistance-requests, /collection-schedules (beneficiaries) and their /admin/ routes
       volunteers/           # /volunteer/opportunities, /campaign-applications, /volunteer-assignments, /volunteer-hours
       sponsorships/         # /sponsorships, /sponsorship-requests (sponsors; lists: administrators)
+      admin/                # /admin/dashboard, /admin/users (administrators)
     routes/
-      index.ts              # Registers modules; /api/v1 placeholder for future modules
+      index.ts              # Registers the modules under /api/v1
     shared/
       errors/               # ApiError, error codes
       logger/               # Pino logger options (redacts auth headers)
@@ -60,11 +63,12 @@ api/
     assistance.test.ts
     volunteers.test.ts
     sponsorships.test.ts
+    admin.test.ts
     helpers/              # In-memory PostgREST + RLS emulation used by the module route tests
 ```
 
-Request flow for future modules: **Route -> Controller -> Service -> Supabase**. Business modules will be
-registered under `/api/v1` in `src/routes/index.ts`.
+Request flow: **Route -> Controller -> Service -> Supabase** (user-scoped client). Modules are registered
+under `/api/v1` in `src/routes/index.ts`.
 
 ## Local setup
 
@@ -151,6 +155,9 @@ The server exits on startup with a clear message if a required variable is missi
 | GET | `/api/v1/sponsorships/me?status=&page=&pageSize=` | My sponsorships (sponsor) with the campaign |
 | GET | `/api/v1/sponsorship-requests?status=&page=&pageSize=` | Sponsorship requests (sponsor or administrator); sponsors only ever see `open` ones |
 | POST | `/api/v1/sponsorship-requests/:id/responses` | Register interest in an open request (sponsor): optional `notes` and `sponsorship_id` (must be mine). One response per request (409) |
+| GET | `/api/v1/admin/dashboard` | Totals (administrator): users by role and status, campaigns, donations (incl. the sum of successful money donations), pending proofs, assistance requests awaiting review, pending applications, sponsorships, open sponsorship requests, scheduled events |
+| GET | `/api/v1/admin/users?role=&status=&search=&page=&pageSize=` | Users (administrator), newest first; `search` matches full name or email (letters, digits, spaces and `@ . ' + _ -`) |
+| PATCH | `/api/v1/admin/users/:id/status` | Set `account_status` (pending/active/suspended) of another user (administrator); 409 for your own account |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }

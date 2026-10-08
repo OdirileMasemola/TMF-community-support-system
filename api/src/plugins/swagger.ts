@@ -27,6 +27,7 @@ export async function registerSwagger(app: FastifyInstance, config: AppConfig): 
         { name: 'assistance', description: 'Assistance requests, supporting documents and collection schedules (beneficiaries; review: administrators)' },
         { name: 'volunteers', description: 'Volunteer opportunities, applications, assignments and hours (volunteers; review: administrators)' },
         { name: 'sponsorships', description: 'Sponsorships and sponsorship requests (sponsors; lists: administrators)' },
+        { name: 'admin', description: 'Dashboard and user management (administrators)' },
       ],
       components: {
         securitySchemes: {
