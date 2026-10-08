@@ -109,6 +109,11 @@ jobs:
       - name: Type-check
         run: npm run typecheck
 
+      # Jest (jest-expo preset): utils, validation, settings service and auth screens.
+      # Supabase is mocked, so no secrets or network access are needed.
+      - name: Run tests
+        run: npm test -- --ci
+
       # Bundles the Android JavaScript (Metro + Hermes) to prove the app compiles.
       # No EAS account, signing or secrets needed. Output goes to mobile/dist (gitignored).
       - name: Bundle app (Expo export, Android)
