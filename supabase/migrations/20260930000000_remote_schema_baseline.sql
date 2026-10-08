@@ -1369,6 +1369,11 @@ CREATE POLICY "Users manage own volunteer profile" ON public.volunteer_profiles 
 -- The export lists the complete table privileges of these three roles. REVOKE
 -- ALL first so that Supabase default privileges (GRANT ALL on new tables) do not
 -- leave extra rights; then grant exactly what live has.
+-- information_schema does not list MAINTAIN (PostgreSQL 17), so the exported
+-- GRANTs below lack it; a read-only check of pg_class.relacl on live
+-- (live_relacl.csv) shows MAINTAIN for anon, authenticated and service_role on
+-- all 22 tables, so it is granted separately at the end of this section.
+-- Result = live relacl exactly.
 REVOKE ALL ON TABLE public.administrator_profiles FROM anon, authenticated, service_role;
 REVOKE ALL ON TABLE public.assistance_requests FROM anon, authenticated, service_role;
 REVOKE ALL ON TABLE public.beneficiary_profiles FROM anon, authenticated, service_role;
@@ -1457,6 +1462,28 @@ GRANT REFERENCES, TRIGGER, TRUNCATE ON TABLE public.volunteer_hours TO service_r
 GRANT REFERENCES, TRIGGER, TRUNCATE ON TABLE public.volunteer_profiles TO anon;
 GRANT INSERT, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON TABLE public.volunteer_profiles TO authenticated;
 GRANT REFERENCES, TRIGGER, TRUNCATE ON TABLE public.volunteer_profiles TO service_role;
+GRANT MAINTAIN ON TABLE public.administrator_profiles TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.assistance_requests TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.beneficiary_profiles TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.campaign_applications TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.campaigns TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.collection_schedules TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.contact_messages TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.donation_proofs TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.donations TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.donor_profiles TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.events TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.notifications TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.profiles TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.reports TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.sponsor_profiles TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.sponsorship_request_responses TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.sponsorship_requests TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.sponsorships TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.supporting_documents TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.volunteer_assignments TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.volunteer_hours TO anon, authenticated, service_role;
+GRANT MAINTAIN ON TABLE public.volunteer_profiles TO anon, authenticated, service_role;
 
 -- =============================================================================
 -- 14. Storage buckets (4)
