@@ -4,6 +4,7 @@ import { authRoutes } from '../modules/auth/auth.routes.js';
 import { campaignRoutes } from '../modules/campaigns/campaign.routes.js';
 import { healthRoutes } from '../modules/health/health.routes.js';
 import { meRoutes } from '../modules/me/me.routes.js';
+import { notificationRoutes } from '../modules/notifications/notification.routes.js';
 
 /**
  * Versioned v1 routes (/api/v1/...). Add modules here, e.g.
@@ -13,6 +14,7 @@ async function v1Routes(app: FastifyInstance): Promise<void> {
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(campaignRoutes, { prefix: '/campaigns' });
   await app.register(meRoutes, { prefix: '/me' });
+  await app.register(notificationRoutes, { prefix: '/notifications' });
 }
 
 /** Registers all route modules. */
