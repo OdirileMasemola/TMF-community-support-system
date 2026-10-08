@@ -31,6 +31,10 @@ export function createClient(): TypedSupabaseClient {
         autoRefreshToken: true,
         // There is no URL to parse a session out of outside the browser.
         detectSessionInUrl: false,
+        // flowType stays on the default (implicit). PKCE would also turn the
+        // confirmation and password-reset email links into one-time codes that
+        // only this device can redeem, and those links open the website.
+        // signInWithGoogle already accepts both a code and fragment tokens.
       },
     });
 

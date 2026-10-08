@@ -111,6 +111,7 @@ function RootNavigator() {
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="register" options={{ title: "Create account" }} />
       <Stack.Screen name="forgot-password" options={{ title: "Reset password" }} />
+      <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
       <Stack.Screen name="complete-profile" options={{ title: "Complete your profile" }} />
       <Stack.Screen name="admin" options={{ headerShown: false }} />
       <Stack.Screen name="donor" options={{ headerShown: false }} />
