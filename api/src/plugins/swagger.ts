@@ -24,6 +24,7 @@ export async function registerSwagger(app: FastifyInstance, config: AppConfig): 
         { name: 'me', description: 'My profile, role profile and settings' },
         { name: 'notifications', description: 'My notifications' },
         { name: 'donations', description: 'Donations and proofs of payment (donors; review: administrators)' },
+        { name: 'assistance', description: 'Assistance requests, supporting documents and collection schedules (beneficiaries; review: administrators)' },
       ],
       components: {
         securitySchemes: {

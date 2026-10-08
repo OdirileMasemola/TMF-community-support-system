@@ -6,6 +6,8 @@ import { requireRoleProfileId } from '../../shared/supabase/roleProfiles.js';
 import type { UserId } from '../../shared/types/auth.types.js';
 import { todayInJohannesburg } from '../../shared/utils/dates.js';
 import { toRange, type PaginationParams } from '../../shared/utils/pagination.js';
+import { assertOwnFolder } from '../../shared/utils/storagePaths.js';
+import { trimmedOrNull } from '../../shared/utils/text.js';
 import {
   DONATION_COLUMNS,
   DONATION_PROOFS_BUCKET,
@@ -47,12 +49,6 @@ const donationNotFound = (): ApiError => ApiError.notFound('Donation not found')
 const proofNotFound = (): ApiError => ApiError.notFound('Donation proof not found');
 const alreadyReviewed = (): ApiError => conflictError('This donation proof has already been reviewed');
 
-function trimmedOrNull(value: string | null | undefined): string | null {
-  if (value === undefined || value === null) return null;
-  const trimmed = value.trim();
-  return trimmed === '' ? null : trimmed;
-}
-
 /** numeric(12,2): at most two decimal places. */
 function hasAtMostTwoDecimals(value: number): boolean {
   return Math.abs(value * 100 - Math.round(value * 100)) < 1e-6;
@@ -91,14 +87,6 @@ function donationRow(body: CreateDonationBody, donorId: string): Record<string, 
     notes: trimmedOrNull(body.notes),
     status: 'pending',
   };
-}
-
-/** Storage paths must be inside the caller's own folder (`<auth user id>/...`), as the bucket policy requires. */
-function assertOwnFolder(filePath: string, userId: UserId): void {
-  const [folder, ...rest] = filePath.split('/');
-  if (folder?.toLowerCase() !== userId.toLowerCase() || rest.join('/') === '') {
-    throw validationError('file_path must be inside your own folder: <your user id>/<file name>');
-  }
 }
 
 /**

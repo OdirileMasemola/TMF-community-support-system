@@ -40,6 +40,7 @@ api/
       me/                   # /me: own profile, role profile, settings (same file layout as campaigns)
       notifications/        # /notifications: my notifications, mark read
       donations/            # /donations (donors) and /admin/donation-proofs (administrators)
+      assistance/           # /assistance-requests, /collection-schedules (beneficiaries) and their /admin/ routes
     routes/
       index.ts              # Registers modules; /api/v1 placeholder for future modules
     shared/
@@ -47,13 +48,14 @@ api/
       logger/               # Pino logger options (redacts auth headers)
       types/                # Generic API and auth context types
       supabase/             # Shared PostgREST error mapping, paged queries, role profile lookup
-      utils/                # Response, pagination, caller, shared JSON schema and date helpers
+      utils/                # Response, pagination, caller, shared JSON schema, date, text and storage path helpers
   tests/
     health.test.ts
     campaigns.test.ts
     me.test.ts
     notifications.test.ts
     donations.test.ts
+    assistance.test.ts
     helpers/              # In-memory PostgREST + RLS emulation used by the module route tests
 ```
 
@@ -122,6 +124,15 @@ The server exits on startup with a clear message if a required variable is missi
 | POST | `/api/v1/donations/:id/proofs` | Submit a proof of payment for my pending or failed donation (donor). Upload the file to `donation-proofs/<my user id>/...` first and send its `file_path` |
 | GET | `/api/v1/admin/donation-proofs?status=&page=&pageSize=` | Proofs to review (administrator) with the donation and a 5-minute signed file URL |
 | PATCH | `/api/v1/admin/donation-proofs/:id` | Approve or reject a pending proof (administrator): approved -> donation `successful`, rejected -> pending donation `failed`; 409 if already reviewed |
+| POST | `/api/v1/assistance-requests` | Request assistance (beneficiary): `request_type`, `description` (10-1000 chars), optional `priority` and `preferred_collection_area`. Always created `pending` |
+| GET | `/api/v1/assistance-requests?status=&page=&pageSize=` | All requests (administrator), newest first, with the beneficiary's name and email |
+| GET | `/api/v1/assistance-requests/me?status=&page=&pageSize=` | My requests (beneficiary) with their documents and collection schedules |
+| GET | `/api/v1/assistance-requests/:id` | One request with documents, schedules and beneficiary; only its beneficiary and administrators (404 otherwise) |
+| POST | `/api/v1/assistance-requests/:id/documents` | Attach a supporting document to my request (beneficiary); upload to `supporting-documents/<my user id>/...` first. 409 for rejected/completed requests |
+| PATCH | `/api/v1/admin/assistance-requests/:id` | Change status (administrator): pending -> under_review/approved/rejected, under_review -> approved/rejected, approved -> completed; anything else 409 |
+| POST | `/api/v1/admin/collection-schedules` | Schedule a collection (administrator); `request_id` optional, must be an approved request |
+| GET | `/api/v1/admin/collection-schedules?status=&request_id=&page=&pageSize=` | All collection schedules (administrator), earliest first |
+| GET | `/api/v1/collection-schedules/me?status=&page=&pageSize=` | Collections scheduled for my requests (beneficiary), earliest first |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }

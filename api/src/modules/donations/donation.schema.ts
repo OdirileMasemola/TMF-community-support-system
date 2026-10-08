@@ -7,6 +7,7 @@ import {
   listResponse,
   paginationQueryProperties,
 } from '../../shared/utils/schemas.js';
+import { FILE_PATH_MAX_LENGTH, OWN_FILE_PATH_PATTERN } from '../../shared/utils/storagePaths.js';
 import {
   DONATION_KINDS,
   PAYMENT_STATUSES,
@@ -26,8 +27,6 @@ export const TEXT_MAX_LENGTH = 300;
 export const NOTES_MAX_LENGTH = 1000;
 /** numeric(12,2) */
 export const AMOUNT_MAX = 9_999_999_999.99;
-/** `<auth user id>/<path>`: no leading slash, no backslashes and no "..". */
-export const FILE_PATH_PATTERN = '^(?!.*\\.\\.)[0-9A-Fa-f-]{36}/[A-Za-z0-9._/-]+$';
 
 const nullableText = { type: ['string', 'null'] } as const;
 const optionalText = { type: ['string', 'null'], maxLength: TEXT_MAX_LENGTH } as const;
@@ -152,8 +151,8 @@ const createProofBodySchema = {
   properties: {
     file_path: {
       type: 'string',
-      maxLength: 500,
-      pattern: FILE_PATH_PATTERN,
+      maxLength: FILE_PATH_MAX_LENGTH,
+      pattern: OWN_FILE_PATH_PATTERN,
       description: 'Path of the uploaded file in the donation-proofs bucket; must start with your auth user id',
     },
     file_name: optionalText,
