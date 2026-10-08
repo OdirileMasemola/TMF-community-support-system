@@ -41,6 +41,7 @@ api/
       notifications/        # /notifications: my notifications, mark read
       donations/            # /donations (donors) and /admin/donation-proofs (administrators)
       assistance/           # /assistance-requests, /collection-schedules (beneficiaries) and their /admin/ routes
+      volunteers/           # /volunteer/opportunities, /campaign-applications, /volunteer-assignments, /volunteer-hours
     routes/
       index.ts              # Registers modules; /api/v1 placeholder for future modules
     shared/
@@ -56,6 +57,7 @@ api/
     notifications.test.ts
     donations.test.ts
     assistance.test.ts
+    volunteers.test.ts
     helpers/              # In-memory PostgREST + RLS emulation used by the module route tests
 ```
 
@@ -133,6 +135,15 @@ The server exits on startup with a clear message if a required variable is missi
 | POST | `/api/v1/admin/collection-schedules` | Schedule a collection (administrator); `request_id` optional, must be an approved request |
 | GET | `/api/v1/admin/collection-schedules?status=&request_id=&page=&pageSize=` | All collection schedules (administrator), earliest first |
 | GET | `/api/v1/collection-schedules/me?status=&page=&pageSize=` | Collections scheduled for my requests (beneficiary), earliest first |
+| GET | `/api/v1/volunteer/opportunities?page=&pageSize=` | Active campaigns (volunteer), earliest start first, with `hasApplied` and `application_status` |
+| POST | `/api/v1/campaign-applications` | Apply to an active campaign (volunteer): `campaign_id`, optional `participation_role`. Always `pending`; 409 if I already applied |
+| GET | `/api/v1/campaign-applications?status=&campaign_id=&page=&pageSize=` | All applications (administrator) with the campaign and volunteer |
+| GET | `/api/v1/campaign-applications/me?status=&page=&pageSize=` | My applications (volunteer) with the campaign |
+| PATCH | `/api/v1/admin/campaign-applications/:id` | Approve or reject a pending application (administrator); approving creates the volunteer assignment. 409 if already reviewed |
+| GET | `/api/v1/volunteer-assignments/me?status=&page=&pageSize=` | My assignments (volunteer) with the campaign |
+| POST | `/api/v1/volunteer-hours` | Record hours (volunteer): `hours` 0.25-24, `work_date` not in the future, optional `assignment_id` (must be mine) and `notes` |
+| GET | `/api/v1/volunteer-hours?volunteer_id=&page=&pageSize=` | All hours entries (administrator) with the assignment and volunteer |
+| GET | `/api/v1/volunteer-hours/me?page=&pageSize=` | My hours entries (volunteer); `meta.totalHours` and `meta.thisMonthHours` |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }

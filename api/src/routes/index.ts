@@ -7,6 +7,7 @@ import { donationRoutes } from '../modules/donations/donation.routes.js';
 import { healthRoutes } from '../modules/health/health.routes.js';
 import { meRoutes } from '../modules/me/me.routes.js';
 import { notificationRoutes } from '../modules/notifications/notification.routes.js';
+import { volunteerRoutes } from '../modules/volunteers/volunteer.routes.js';
 
 /**
  * Versioned v1 routes (/api/v1/...). Add modules here, e.g.
@@ -21,6 +22,8 @@ async function v1Routes(app: FastifyInstance): Promise<void> {
   await app.register(donationRoutes);
   // Spans /assistance-requests, /collection-schedules and /admin/..., so it is registered at the v1 root.
   await app.register(assistanceRoutes);
+  // Spans /volunteer, /campaign-applications, /volunteer-assignments, /volunteer-hours and /admin/...
+  await app.register(volunteerRoutes);
 }
 
 /** Registers all route modules. */
