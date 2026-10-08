@@ -39,6 +39,7 @@ api/
       campaigns/            # campaign.routes.ts -> .controller.ts -> .service.ts; .schema.ts, .types.ts
       me/                   # /me: own profile, role profile, settings (same file layout as campaigns)
       notifications/        # /notifications: my notifications, mark read
+      donations/            # /donations (donors) and /admin/donation-proofs (administrators)
     routes/
       index.ts              # Registers modules; /api/v1 placeholder for future modules
     shared/
@@ -52,6 +53,7 @@ api/
     campaigns.test.ts
     me.test.ts
     notifications.test.ts
+    donations.test.ts
     helpers/              # In-memory PostgREST + RLS emulation used by the module route tests
 ```
 
@@ -115,6 +117,11 @@ The server exits on startup with a clear message if a required variable is missi
 | GET | `/api/v1/notifications?status=&page=&pageSize=` | My notifications, newest first; `meta.unreadCount` = all my unread notifications |
 | PATCH | `/api/v1/notifications/:id/read` | Mark one of my notifications as read (404 for someone else's) |
 | POST | `/api/v1/notifications/read-all` | Mark all my unread notifications as read: `{ data: { updated } }` |
+| POST | `/api/v1/donations` | Record a donation (donor): `money` needs `amount`, `in_kind` needs `item_description` + `item_quantity`. Always created `pending`; `status`, `receipt_number` and `donor_id` from the client are ignored. `campaign_id` must be an active campaign |
+| GET | `/api/v1/donations/me?status=&page=&pageSize=` | My donations (donor), newest first, with the campaign and proofs |
+| POST | `/api/v1/donations/:id/proofs` | Submit a proof of payment for my pending or failed donation (donor). Upload the file to `donation-proofs/<my user id>/...` first and send its `file_path` |
+| GET | `/api/v1/admin/donation-proofs?status=&page=&pageSize=` | Proofs to review (administrator) with the donation and a 5-minute signed file URL |
+| PATCH | `/api/v1/admin/donation-proofs/:id` | Approve or reject a pending proof (administrator): approved -> donation `successful`, rejected -> pending donation `failed`; 409 if already reviewed |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }
