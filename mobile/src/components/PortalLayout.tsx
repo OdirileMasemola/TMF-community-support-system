@@ -1,7 +1,7 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Stack, usePathname, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Bell, LogOut, Settings } from "lucide-react-native";
+import { Bell, CircleHelp, LogOut, Settings } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/auth/AuthProvider";
 import { BottomNavBar } from "@/components/BottomNavBar";
@@ -99,6 +99,7 @@ export function PortalLayout() {
                 if (settingsRoute) router.push(settingsRoute as never);
               },
             },
+            { label: "Help", icon: CircleHelp, onPress: () => router.push("/help") },
             { label: "Sign out", icon: LogOut, onPress: signOut, danger: true },
           ]}
         />

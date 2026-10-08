@@ -157,6 +157,11 @@ export default function LoginScreen() {
                 Don&apos;t have an account? <Text style={styles.link}>Create account</Text>
               </Text>
             </Pressable>
+            <Pressable accessibilityRole="link" onPress={() => router.push("/help")} style={styles.helpLink}>
+              <Text style={styles.footerText}>
+                Need help? <Text style={styles.link}>Read the FAQ</Text>
+              </Text>
+            </Pressable>
           </View>
 
           {!isConfigured ? (
@@ -274,6 +279,9 @@ const createStyles = (colors: ThemeColors) =>
       ...typography.caption,
       color: colors.mutedForeground,
       textAlign: "center",
+    },
+    helpLink: {
+      marginTop: spacing.md,
     },
     forgotLink: {
       alignSelf: "flex-end",

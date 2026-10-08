@@ -84,6 +84,12 @@ Together they serve one purpose: help the Themba Molefe Foundation turn communit
 
 ---
 
+## Google sign-up and roles
+
+Signing up with Google (on the phone or the website) always creates a **beneficiary** account, because Google does not tell the system which role the person wants. People cannot change their own role; an administrator can change it afterwards. The in-app Help screen explains this to users.
+
+---
+
 ## Related
 
 - Project overview: [../README.md](../README.md)
