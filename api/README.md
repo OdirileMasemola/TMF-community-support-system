@@ -42,6 +42,7 @@ api/
       donations/            # /donations (donors) and /admin/donation-proofs (administrators)
       assistance/           # /assistance-requests, /collection-schedules (beneficiaries) and their /admin/ routes
       volunteers/           # /volunteer/opportunities, /campaign-applications, /volunteer-assignments, /volunteer-hours
+      sponsorships/         # /sponsorships, /sponsorship-requests (sponsors; lists: administrators)
     routes/
       index.ts              # Registers modules; /api/v1 placeholder for future modules
     shared/
@@ -58,6 +59,7 @@ api/
     donations.test.ts
     assistance.test.ts
     volunteers.test.ts
+    sponsorships.test.ts
     helpers/              # In-memory PostgREST + RLS emulation used by the module route tests
 ```
 
@@ -144,6 +146,11 @@ The server exits on startup with a clear message if a required variable is missi
 | POST | `/api/v1/volunteer-hours` | Record hours (volunteer): `hours` 0.25-24, `work_date` not in the future, optional `assignment_id` (must be mine) and `notes` |
 | GET | `/api/v1/volunteer-hours?volunteer_id=&page=&pageSize=` | All hours entries (administrator) with the assignment and volunteer |
 | GET | `/api/v1/volunteer-hours/me?page=&pageSize=` | My hours entries (volunteer); `meta.totalHours` and `meta.thisMonthHours` |
+| POST | `/api/v1/sponsorships` | Pledge a sponsorship (sponsor): `amount`, optional active `campaign_id` and `sponsorship_type`. Always `pending` |
+| GET | `/api/v1/sponsorships?status=&page=&pageSize=` | All sponsorships (administrator) with the campaign and sponsor |
+| GET | `/api/v1/sponsorships/me?status=&page=&pageSize=` | My sponsorships (sponsor) with the campaign |
+| GET | `/api/v1/sponsorship-requests?status=&page=&pageSize=` | Sponsorship requests (sponsor or administrator); sponsors only ever see `open` ones |
+| POST | `/api/v1/sponsorship-requests/:id/responses` | Register interest in an open request (sponsor): optional `notes` and `sponsorship_id` (must be mine). One response per request (409) |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }

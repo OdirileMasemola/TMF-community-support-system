@@ -166,7 +166,10 @@ export const RELATIONS: Record<string, Record<string, Relation>> = {
     volunteer_assignments: { local: 'assignment_id', foreign: 'id' },
     volunteer_profiles: { local: 'volunteer_id', foreign: 'id' },
   },
-  sponsorships: { campaigns: { local: 'campaign_id', foreign: 'id' } },
+  sponsorships: {
+    campaigns: { local: 'campaign_id', foreign: 'id' },
+    sponsor_profiles: { local: 'sponsor_id', foreign: 'id' },
+  },
   sponsorship_requests: {
     campaigns: { local: 'campaign_id', foreign: 'id' },
     sponsorship_request_responses: { local: 'id', foreign: 'request_id', many: true },
