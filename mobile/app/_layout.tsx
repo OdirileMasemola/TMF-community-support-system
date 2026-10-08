@@ -11,6 +11,10 @@ import { ThemeProvider, useTheme, useThemedStyles } from "@/theme/ThemeProvider"
 import { spacing, typography, type ThemeColors } from "@/theme/tokens";
 
 const PORTAL_SEGMENTS = ["admin", "donor", "volunteer", "beneficiary", "sponsor"] as const;
+/** Screens for people who are not signed in; a signed-in user is sent on to their portal. */
+const SIGNED_OUT_SEGMENTS = ["login", "register", "forgot-password", "auth"];
+/** Screens anyone may open without a session. */
+const PUBLIC_SEGMENTS = [...SIGNED_OUT_SEGMENTS, "help"];
 
 export default function RootLayout() {
   const queryClient = useMemo(
@@ -56,10 +60,10 @@ function RootNavigator() {
     if (isLoading) return;
 
     const current = segments[0];
-    const isAuthScreen = current === "login";
+    const isAuthScreen = SIGNED_OUT_SEGMENTS.includes(current ?? "");
 
     if (!session) {
-      if (!isAuthScreen) router.replace("/login");
+      if (!PUBLIC_SEGMENTS.includes(current ?? "")) router.replace("/login");
       return;
     }
 
@@ -105,6 +109,8 @@ function RootNavigator() {
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="register" options={{ title: "Create account" }} />
+      <Stack.Screen name="forgot-password" options={{ title: "Reset password" }} />
       <Stack.Screen name="complete-profile" options={{ title: "Complete your profile" }} />
       <Stack.Screen name="admin" options={{ headerShown: false }} />
       <Stack.Screen name="donor" options={{ headerShown: false }} />

@@ -4,6 +4,7 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
 import { AppButton, Divider, GoogleButton, TextField } from "@/components/ui";
 import { useThemedStyles } from "@/theme/ThemeProvider";
@@ -21,6 +23,7 @@ const logoImage = require("../assets/brand/logo.jpeg");
 
 export default function LoginScreen() {
   const { signIn, signInWithGoogle, isConfigured } = useAuth();
+  const router = useRouter();
   const styles = useThemedStyles(createStyles);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -129,6 +132,15 @@ export default function LoginScreen() {
               returnKeyType="go"
             />
 
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push("/forgot-password")}
+              disabled={isBusy}
+              style={styles.forgotLink}
+            >
+              <Text style={styles.link}>Forgot your password?</Text>
+            </Pressable>
+
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
             <AppButton
@@ -140,9 +152,11 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Don&apos;t have an account? Create one on the TMF web dashboard.
-            </Text>
+            <Pressable accessibilityRole="link" onPress={() => router.push("/register")} disabled={isBusy}>
+              <Text style={styles.footerText}>
+                Don&apos;t have an account? <Text style={styles.link}>Create account</Text>
+              </Text>
+            </Pressable>
           </View>
 
           {!isConfigured ? (
@@ -260,6 +274,14 @@ const createStyles = (colors: ThemeColors) =>
       ...typography.caption,
       color: colors.mutedForeground,
       textAlign: "center",
+    },
+    forgotLink: {
+      alignSelf: "flex-end",
+    },
+    link: {
+      ...typography.caption,
+      color: colors.primary,
+      fontWeight: "700",
     },
     notice: {
       ...typography.caption,

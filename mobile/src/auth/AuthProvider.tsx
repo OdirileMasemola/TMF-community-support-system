@@ -3,6 +3,8 @@ import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import type { Session } from "@supabase/supabase-js";
 import { createClient, getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
+import { WEB_APP_URL } from "@/lib/links";
+import { isPublicSignupRole, type PublicSignupRole } from "@/lib/validation";
 import { fetchProfile } from "@/services/profiles";
 import type { UserRole } from "@/types/app.types";
 import type { AccountStatus } from "@/types/database.types";
@@ -16,6 +18,20 @@ export type Profile = {
   account_status: AccountStatus;
 };
 
+export type SignUpValues = {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  role: PublicSignupRole;
+  organisationName?: string;
+};
+
+export type SignUpResult = {
+  /** True when Supabase created the account but wants the email address confirmed before signing in. */
+  needsEmailConfirmation: boolean;
+};
+
 type AuthContextValue = {
   session: Session | null;
   profile: Profile | null;
@@ -25,6 +41,8 @@ type AuthContextValue = {
   isConfigured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signUp: (values: SignUpValues) => Promise<SignUpResult>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -124,6 +142,72 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [loadProfile]);
 
   /**
+   * Mirrors the web registration: the role and contact details travel as sign-up
+   * metadata, and the handle_new_user trigger creates the profile and the role
+   * profile from them. Like the web, no email redirect is passed, so any
+   * confirmation email uses the project's Site URL.
+   */
+  const signUp = useCallback(
+    async (values: SignUpValues): Promise<SignUpResult> => {
+      if (!isPublicSignupRole(values.role)) {
+        throw new Error("That account type cannot be created from registration.");
+      }
+
+      const client = getSupabaseClientOrNull();
+      if (!client) {
+        throw new Error("Supabase is not configured. Add your credentials to mobile/.env.local and restart Expo.");
+      }
+
+      const organisationName = values.organisationName?.trim();
+      const { data, error } = await client.auth.signUp({
+        email: values.email.trim(),
+        password: values.password,
+        options: {
+          data: {
+            full_name: values.fullName.trim(),
+            phone_number: values.phoneNumber.trim() || null,
+            role: values.role,
+            ...(values.role === "sponsor" && organisationName ? { organisation_name: organisationName } : {}),
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      // With email confirmation on, Supabase does not reveal that an address is
+      // taken: it returns a user with no identities and sends no email.
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        throw new Error("An account with this email address already exists. Sign in instead.");
+      }
+
+      if (data.session && data.user?.id) {
+        // Confirmation is off: the user is signed in straight away.
+        await loadProfile(data.user.id).catch(() => undefined);
+        return { needsEmailConfirmation: false };
+      }
+
+      return { needsEmailConfirmation: true };
+    },
+    [loadProfile],
+  );
+
+  /**
+   * The web app has no "set a new password" page yet, so the reset link opens
+   * the website's sign-in page rather than a screen in this app.
+   */
+  const resetPassword = useCallback(async (email: string) => {
+    const client = getSupabaseClientOrNull();
+    if (!client) {
+      throw new Error("Supabase is not configured. Add your credentials to mobile/.env.local and restart Expo.");
+    }
+
+    const { error } = await client.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${WEB_APP_URL}/login`,
+    });
+    if (error) throw error;
+  }, []);
+
+  /**
    * The web flow redirects to window.location.origin, which does not exist here.
    * Instead Supabase hands back an authorisation URL, we host it in the system
    * browser, and the tmfdashboard:// deep link returns the code to exchange.
@@ -213,10 +297,24 @@ export function AuthProvider({ children }: PropsWithChildren) {
       isConfigured,
       signIn,
       signInWithGoogle,
+      signUp,
+      resetPassword,
       signOut,
       refreshProfile,
     }),
-    [session, profile, profileError, isLoading, isConfigured, signIn, signInWithGoogle, signOut, refreshProfile],
+    [
+      session,
+      profile,
+      profileError,
+      isLoading,
+      isConfigured,
+      signIn,
+      signInWithGoogle,
+      signUp,
+      resetPassword,
+      signOut,
+      refreshProfile,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
