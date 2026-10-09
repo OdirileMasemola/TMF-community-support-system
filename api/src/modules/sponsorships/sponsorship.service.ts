@@ -14,12 +14,16 @@ import {
   type AdminSponsorship,
   type CreateResponseBody,
   type CreateSponsorshipBody,
+  type CreateSponsorshipRequestBody,
   type MySponsorship,
   type Sponsorship,
+  type SponsorshipRequest,
   type SponsorshipRequestStatus,
   type SponsorshipRequestWithCampaign,
   type SponsorshipResponse,
   type SponsorshipStatus,
+  type UpdateSponsorshipBody,
+  type UpdateSponsorshipRequestBody,
 } from './sponsorship.types.js';
 
 export interface SponsorshipServiceDeps {
@@ -31,7 +35,11 @@ export interface SponsorshipService {
   create(accessToken: string, userId: UserId, body: CreateSponsorshipBody): Promise<Sponsorship>;
   list(accessToken: string, status: SponsorshipStatus | undefined, pagination: PaginationParams): Promise<Page<AdminSponsorship>>;
   listMine(accessToken: string, userId: UserId, status: SponsorshipStatus | undefined, pagination: PaginationParams): Promise<Page<MySponsorship>>;
+  update(accessToken: string, id: string, body: UpdateSponsorshipBody): Promise<Sponsorship>;
   listRequests(accessToken: string, status: SponsorshipRequestStatus | undefined, pagination: PaginationParams): Promise<Page<SponsorshipRequestWithCampaign>>;
+  createRequest(accessToken: string, userId: UserId, body: CreateSponsorshipRequestBody): Promise<SponsorshipRequest>;
+  updateRequest(accessToken: string, id: string, body: UpdateSponsorshipRequestBody): Promise<SponsorshipRequest>;
+  listMyResponses(accessToken: string, userId: UserId, pagination: PaginationParams): Promise<Page<SponsorshipResponse>>;
   respond(accessToken: string, userId: UserId, requestId: string, body: CreateResponseBody): Promise<SponsorshipResponse>;
 }
 
@@ -210,6 +218,110 @@ export function createSponsorshipService(deps: SponsorshipServiceDeps): Sponsors
         .retry(false);
       if (error !== null) throw toApiError(error, status, 'create', 'sponsorship response');
       return data;
+    },
+
+    async update(accessToken, id, body) {
+      if (body.amount !== undefined && !hasAtMostTwoDecimals(body.amount)) {
+        throw validationError('amount must have at most two decimal places');
+      }
+      const client = deps.createUserClient(accessToken);
+      if (body.campaign_id) {
+        const campaign = await client.from('campaigns').select('id').eq('id', body.campaign_id).maybeSingle<{ id: string }>().retry(false);
+        if (campaign.error !== null) throw toApiError(campaign.error, campaign.status, 'load', 'campaign');
+        if (campaign.data === null) throw ApiError.notFound('Campaign not found');
+      }
+      const row: Record<string, unknown> = {};
+      if (body.amount !== undefined) row.amount = body.amount;
+      if (body.campaign_id !== undefined) row.campaign_id = body.campaign_id;
+      if (body.sponsorship_type !== undefined) row.sponsorship_type = trimmedOrNull(body.sponsorship_type);
+      if (body.status !== undefined) row.status = body.status;
+      if (body.sponsorship_date !== undefined) row.sponsorship_date = body.sponsorship_date;
+      const { data, error, status } = await client
+        .from('sponsorships')
+        .update(row)
+        .eq('id', id)
+        .select(SPONSORSHIP_COLUMNS)
+        .maybeSingle<Sponsorship>()
+        .retry(false);
+      if (error !== null) throw toApiError(error, status, 'update', 'sponsorship');
+      if (data === null) throw ApiError.notFound('Sponsorship not found');
+      return data;
+    },
+
+    async createRequest(accessToken, userId, body) {
+      const client = deps.createUserClient(accessToken);
+      const adminId = await requireRoleProfileId(client, 'administrator', userId);
+      const campaignId = body.campaign_id ?? null;
+      if (campaignId !== null) {
+        const campaign = await client.from('campaigns').select('id').eq('id', campaignId).maybeSingle<{ id: string }>().retry(false);
+        if (campaign.error !== null) throw toApiError(campaign.error, campaign.status, 'load', 'campaign');
+        if (campaign.data === null) throw ApiError.notFound('Campaign not found');
+      }
+      const row: Record<string, unknown> = {
+        title: body.title.trim(),
+        requested_support: body.requested_support.trim(),
+        campaign_id: campaignId,
+        category: trimmedOrNull(body.category),
+        priority: trimmedOrNull(body.priority) ?? 'normal',
+        deadline: body.deadline ?? null,
+        estimated_impact: trimmedOrNull(body.estimated_impact),
+        created_by: adminId,
+      };
+      if (body.status !== undefined) row.status = body.status;
+      const { data, error, status } = await client
+        .from('sponsorship_requests')
+        .insert(row)
+        .select(REQUEST_COLUMNS)
+        .single<SponsorshipRequest>()
+        .retry(false);
+      if (error !== null) throw toApiError(error, status, 'create', 'sponsorship request');
+      return data;
+    },
+
+    async updateRequest(accessToken, id, body) {
+      const client = deps.createUserClient(accessToken);
+      if (body.campaign_id) {
+        const campaign = await client.from('campaigns').select('id').eq('id', body.campaign_id).maybeSingle<{ id: string }>().retry(false);
+        if (campaign.error !== null) throw toApiError(campaign.error, campaign.status, 'load', 'campaign');
+        if (campaign.data === null) throw ApiError.notFound('Campaign not found');
+      }
+      const row: Record<string, unknown> = {};
+      if (body.title !== undefined) row.title = body.title.trim();
+      if (body.requested_support !== undefined) row.requested_support = body.requested_support.trim();
+      if (body.campaign_id !== undefined) row.campaign_id = body.campaign_id;
+      if (body.category !== undefined) row.category = trimmedOrNull(body.category);
+      if (body.priority !== undefined) row.priority = trimmedOrNull(body.priority);
+      if (body.deadline !== undefined) row.deadline = body.deadline;
+      if (body.estimated_impact !== undefined) row.estimated_impact = trimmedOrNull(body.estimated_impact);
+      if (body.status !== undefined) row.status = body.status;
+      const { data, error, status } = await client
+        .from('sponsorship_requests')
+        .update(row)
+        .eq('id', id)
+        .select(REQUEST_COLUMNS)
+        .maybeSingle<SponsorshipRequest>()
+        .retry(false);
+      if (error !== null) throw toApiError(error, status, 'update', 'sponsorship request');
+      if (data === null) throw ApiError.notFound('Sponsorship request not found');
+      return data;
+    },
+
+    async listMyResponses(accessToken, userId, pagination) {
+      const client = deps.createUserClient(accessToken);
+      const sponsorId = await requireRoleProfileId(client, 'sponsor', userId);
+      const { from, to } = toRange(pagination);
+      const filtered = (head: boolean) =>
+        client.from('sponsorship_request_responses').select(head ? 'id' : RESPONSE_COLUMNS, { count: 'exact', head }).eq('sponsor_id', sponsorId);
+      return runPagedQuery<SponsorshipResponse>(
+        filtered(false)
+          .order('responded_at', { ascending: false })
+          .order('id', { ascending: false })
+          .range(from, to)
+          .overrideTypes<SponsorshipResponse[], { merge: false }>()
+          .retry(false),
+        () => filtered(true).retry(false),
+        listError('sponsorship responses'),
+      );
     },
   };
 }

@@ -91,6 +91,7 @@ describe('donations API', () => {
   describe('authentication and roles', () => {
     it.each([
       ['POST', BASE],
+      ['GET', BASE],
       ['GET', `${BASE}/me`],
       ['POST', `${BASE}/${D(1)}/proofs`],
       ['GET', ADMIN_BASE],
@@ -104,6 +105,7 @@ describe('donations API', () => {
     it.each([
       ['beneficiary', 'POST', BASE],
       ['admin', 'POST', BASE],
+      ['donor', 'GET', BASE],
       ['sponsor', 'GET', `${BASE}/me`],
       ['volunteer', 'POST', `${BASE}/${D(1)}/proofs`],
       ['donor', 'GET', ADMIN_BASE],
@@ -526,6 +528,26 @@ describe('donations API', () => {
     });
   });
 
+  describe('GET /donations', () => {
+    it('lists every donation for an administrator, newest first, with the donor', async () => {
+      const response = await app.inject({ method: 'GET', url: BASE, headers: auth('admin') });
+      expect(response.statusCode).toBe(200);
+      const body = response.json<{ data: Row[]; meta: { total: number } }>();
+      expect(body.meta.total).toBe(5);
+      expect(body.data.map((row) => row.id)).toEqual([D(5), D(4), D(3), D(2), D(1)]);
+      expect(body.data[0]?.donor_profiles).toMatchObject({
+        id: ROLE_IDS.donor,
+        profiles: { full_name: 'Dineo Donor', email: USERS.donor.email },
+      });
+    });
+
+    it('filters by status', async () => {
+      const response = await app.inject({ method: 'GET', url: `${BASE}?status=pending`, headers: auth('admin') });
+      expect(response.statusCode).toBe(200);
+      expect(response.json<{ data: Row[] }>().data.map((row) => row.id)).toEqual([D(5), D(4), D(1)]);
+    });
+  });
+
   describe('OpenAPI docs', () => {
     it('documents the donation endpoints', async () => {
       const spec = (await app.inject({ method: 'GET', url: '/docs/json' })).json<{ paths: Record<string, Record<string, { tags?: string[]; security?: unknown; responses: Record<string, unknown> }>> }>();
@@ -543,6 +565,9 @@ describe('donations API', () => {
       }
       expect(Object.keys(operations[0]?.responses ?? {})).toEqual(expect.arrayContaining(['201', '404']));
       expect(Object.keys(operations[4]?.responses ?? {})).toEqual(expect.arrayContaining(['200', '404', '409']));
+      const list = spec.paths['/api/v1/donations']?.['get'];
+      expect(list?.tags).toEqual(['donations']);
+      expect(list?.security).toEqual([{ bearerAuth: [] }]);
     });
   });
 });

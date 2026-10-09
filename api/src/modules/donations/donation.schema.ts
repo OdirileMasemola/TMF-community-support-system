@@ -186,6 +186,39 @@ export const createDonationSchema = {
   response: { 201: dataResponse(donationSchema), ...errorResponses(404) },
 } as const;
 
+const adminDonationSchema = {
+  type: 'object',
+  required: [...Object.keys(donationProperties), 'campaigns', 'donor_profiles'],
+  properties: {
+    ...donationProperties,
+    campaigns: campaignRef,
+    donor_profiles: {
+      type: ['object', 'null'],
+      properties: {
+        id: { type: 'string', format: 'uuid' },
+        user_id: { type: 'string', format: 'uuid' },
+        profiles: {
+          type: ['object', 'null'],
+          properties: { full_name: { type: 'string' }, email: { type: 'string' } },
+        },
+      },
+    },
+  },
+} as const;
+
+export const listDonationsSchema = {
+  tags,
+  summary: 'List donations (administrators)',
+  description: 'Newest first, optionally filtered by status, with the campaign and the donor.',
+  security,
+  querystring: {
+    type: 'object',
+    additionalProperties: false,
+    properties: { status: { type: 'string', enum: [...PAYMENT_STATUSES] }, ...paginationQueryProperties },
+  },
+  response: { 200: listResponse(adminDonationSchema), ...errorResponses() },
+} as const;
+
 export const listMyDonationsSchema = {
   tags,
   summary: 'List my donations (donors)',

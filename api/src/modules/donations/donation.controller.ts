@@ -5,11 +5,13 @@ import { buildPaginationMeta, parsePagination } from '../../shared/utils/paginat
 import { paginatedResponse, successResponse } from '../../shared/utils/response.js';
 import type { DonationService } from './donation.service.js';
 import type {
+  AdminDonation,
   CreateDonationBody,
   CreateProofBody,
   Donation,
   DonationIdParams,
   DonationProof,
+  ListDonationsQuery,
   ListMyDonationsQuery,
   ListProofsQuery,
   MyDonation,
@@ -28,6 +30,16 @@ export function createDonationController(service: DonationService) {
       const donation = await service.create(accessToken, user.id, request.body);
       reply.code(201);
       return successResponse(donation);
+    },
+
+    async list(
+      request: FastifyRequest<{ Querystring: ListDonationsQuery }>,
+      _reply: FastifyReply,
+    ): Promise<PaginatedBody<AdminDonation>> {
+      const { accessToken } = caller(request);
+      const pagination = parsePagination(request.query);
+      const { items, total } = await service.list(accessToken, request.query.status, pagination);
+      return paginatedResponse(items, buildPaginationMeta(total, pagination));
     },
 
     async listMine(

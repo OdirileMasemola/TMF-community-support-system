@@ -1,75 +1,68 @@
 import type { Tables, TablesInsert, TablesUpdate } from "@/types/database.types";
+import { apiData, apiList, isApiError } from "@/lib/apiClient";
 import { getSupabaseClientOrNull } from "@/lib/supabaseClient";
-import { logSupabaseError } from "@/lib/errors";
 
 export type CampaignRow = Tables<"campaigns">;
 
-const campaignColumns =
-  "id, admin_id, title, description, location, start_date, end_date, status, category, image_url, funding_goal, amount_raised, is_public, created_at, updated_at";
+const WRITABLE = [
+  "title",
+  "description",
+  "location",
+  "start_date",
+  "end_date",
+  "status",
+  "category",
+  "image_url",
+  "funding_goal",
+  "is_public",
+] as const;
+
+function writableBody(values: object): Record<string, unknown> {
+  const source = values as Record<string, unknown>;
+  const body: Record<string, unknown> = {};
+  for (const field of WRITABLE) {
+    if (source[field] !== undefined) body[field] = source[field];
+  }
+  return body;
+}
 
 export async function fetchCampaigns(options?: {
   publicOnly?: boolean;
   status?: Tables<"campaigns">["status"] | Tables<"campaigns">["status"][];
   limit?: number;
 }): Promise<CampaignRow[]> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return [];
+  if (!getSupabaseClientOrNull()) return [];
 
-  let query = client.from("campaigns").select(campaignColumns).order("created_at", { ascending: false });
-
-  if (options?.publicOnly) {
-    query = query.eq("is_public", true).eq("status", "active");
-  }
-
-  if (options?.status) {
-    if (Array.isArray(options.status)) {
-      query = query.in("status", options.status);
-    } else {
-      query = query.eq("status", options.status);
-    }
-  }
+  const rows = await apiList<CampaignRow>("/api/v1/campaigns");
+  const statuses = options?.status === undefined ? null : Array.isArray(options.status) ? options.status : [options.status];
+  const filtered = rows.filter((campaign) => {
+    if (options?.publicOnly && (!campaign.is_public || campaign.status !== "active")) return false;
+    if (statuses && !statuses.includes(campaign.status)) return false;
+    return true;
+  });
 
   const limit = options?.limit ?? (options?.publicOnly ? 48 : undefined);
-  if (limit) {
-    query = query.limit(limit);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    logSupabaseError("fetchCampaigns", error);
-    throw error;
-  }
-  return data ?? [];
+  return limit ? filtered.slice(0, limit) : filtered;
 }
 
 export async function fetchCampaignById(id: string): Promise<CampaignRow | null> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return null;
-  const { data, error } = await client.from("campaigns").select(campaignColumns).eq("id", id).maybeSingle();
-  if (error) {
-    logSupabaseError("fetchCampaignById", error);
+  if (!getSupabaseClientOrNull()) return null;
+  try {
+    return await apiData<CampaignRow>(`/api/v1/campaigns/${id}`);
+  } catch (error) {
+    if (isApiError(error) && error.status === 404) return null;
     throw error;
   }
-  return data;
 }
 
 export async function createCampaign(payload: TablesInsert<"campaigns">): Promise<CampaignRow> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { data, error } = await client.from("campaigns").insert(payload).select(campaignColumns).single();
-  if (error) {
-    logSupabaseError("createCampaign", error);
-    throw error;
-  }
-  return data;
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+  return apiData<CampaignRow>("/api/v1/campaigns", { method: "POST", body: writableBody(payload) });
 }
 
 export async function updateCampaign(id: string, values: TablesUpdate<"campaigns">): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("campaigns").update(values).eq("id", id);
-  if (error) {
-    logSupabaseError("updateCampaign", error);
-    throw error;
-  }
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+  const body = writableBody(values);
+  if (Object.keys(body).length === 0) throw new Error("At least one campaign field is required.");
+  await apiData(`/api/v1/campaigns/${id}`, { method: "PATCH", body });
 }

@@ -3,19 +3,27 @@ import { authenticate } from '../../middleware/authenticate.js';
 import { requireRole } from '../../middleware/authorize.js';
 import { createSponsorshipController } from './sponsorship.controller.js';
 import {
+  createRequestSchema,
   createResponseSchema,
   createSponsorshipSchema,
+  listMyResponsesSchema,
   listMySponsorshipsSchema,
   listRequestsSchema,
   listSponsorshipsSchema,
+  updateRequestSchema,
+  updateSponsorshipSchema,
 } from './sponsorship.schema.js';
 import { createSponsorshipService } from './sponsorship.service.js';
 import type {
   CreateResponseBody,
   CreateSponsorshipBody,
+  CreateSponsorshipRequestBody,
   ListRequestsQuery,
   ListSponsorshipsQuery,
+  PageQuery,
   SponsorshipIdParams,
+  UpdateSponsorshipBody,
+  UpdateSponsorshipRequestBody,
 } from './sponsorship.types.js';
 
 /**
@@ -51,10 +59,30 @@ export async function sponsorshipRoutes(app: FastifyInstance): Promise<void> {
     { preValidation: sponsorOnly, schema: listMySponsorshipsSchema },
     controller.listMine,
   );
+  app.patch<{ Params: SponsorshipIdParams; Body: UpdateSponsorshipBody }>(
+    '/sponsorships/:id',
+    { preValidation: adminOnly, schema: updateSponsorshipSchema },
+    controller.update,
+  );
   app.get<{ Querystring: ListRequestsQuery }>(
     '/sponsorship-requests',
     { preValidation: sponsorOrAdmin, schema: listRequestsSchema },
     controller.listRequests,
+  );
+  app.post<{ Body: CreateSponsorshipRequestBody }>(
+    '/sponsorship-requests',
+    { preValidation: adminOnly, schema: createRequestSchema },
+    controller.createRequest,
+  );
+  app.patch<{ Params: SponsorshipIdParams; Body: UpdateSponsorshipRequestBody }>(
+    '/sponsorship-requests/:id',
+    { preValidation: adminOnly, schema: updateRequestSchema },
+    controller.updateRequest,
+  );
+  app.get<{ Querystring: PageQuery }>(
+    '/sponsorship-request-responses/me',
+    { preValidation: sponsorOnly, schema: listMyResponsesSchema },
+    controller.listMyResponses,
   );
   app.post<{ Params: SponsorshipIdParams; Body: CreateResponseBody }>(
     '/sponsorship-requests/:id/responses',

@@ -131,6 +131,8 @@ export const POLICIES: Record<string, TablePolicy> = {
     insert: admin,
     update: admin,
   },
+  // "Admins manage reports" (ALL). No other role can read reports.
+  reports: { select: admin, insert: admin, update: admin },
 };
 
 export interface Relation {

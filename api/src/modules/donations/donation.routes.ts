@@ -5,6 +5,7 @@ import { createDonationController } from './donation.controller.js';
 import {
   createDonationSchema,
   createProofSchema,
+  listDonationsSchema,
   listMyDonationsSchema,
   listProofsSchema,
   reviewProofSchema,
@@ -14,6 +15,7 @@ import type {
   CreateDonationBody,
   CreateProofBody,
   DonationIdParams,
+  ListDonationsQuery,
   ListMyDonationsQuery,
   ListProofsQuery,
   ReviewProofBody,
@@ -36,6 +38,11 @@ export async function donationRoutes(app: FastifyInstance): Promise<void> {
     '/donations',
     { preValidation: donorOnly, schema: createDonationSchema },
     controller.create,
+  );
+  app.get<{ Querystring: ListDonationsQuery }>(
+    '/donations',
+    { preValidation: adminOnly, schema: listDonationsSchema },
+    controller.list,
   );
   app.get<{ Querystring: ListMyDonationsQuery }>(
     '/donations/me',
