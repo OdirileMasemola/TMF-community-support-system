@@ -124,7 +124,10 @@ export async function updateProfile(
   const body: { full_name?: string; phone_number?: string | null; avatar_url?: string | null } = {};
   if (values.full_name !== undefined) body.full_name = values.full_name;
   if (values.phone_number !== undefined) body.phone_number = values.phone_number;
-  if (values.avatar_url !== undefined) body.avatar_url = values.avatar_url;
+  if (values.avatar_url !== undefined) {
+    const avatarUrl: string | null = values.avatar_url;
+    body.avatar_url = avatarUrl;
+  }
   if (Object.keys(body).length === 0) return;
 
   await apiData("/api/v1/me", { method: "PATCH", body });
