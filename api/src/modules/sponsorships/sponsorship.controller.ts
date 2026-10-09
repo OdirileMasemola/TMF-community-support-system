@@ -8,13 +8,18 @@ import type {
   AdminSponsorship,
   CreateResponseBody,
   CreateSponsorshipBody,
+  CreateSponsorshipRequestBody,
   ListRequestsQuery,
   ListSponsorshipsQuery,
   MySponsorship,
+  PageQuery,
   Sponsorship,
   SponsorshipIdParams,
+  SponsorshipRequest,
   SponsorshipRequestWithCampaign,
   SponsorshipResponse,
+  UpdateSponsorshipBody,
+  UpdateSponsorshipRequestBody,
 } from './sponsorship.types.js';
 
 /** HTTP layer for sponsorships. The caller's identity comes from the verified token, never from the request. */
@@ -50,6 +55,14 @@ export function createSponsorshipController(service: SponsorshipService) {
       return paginatedResponse(items, buildPaginationMeta(total, pagination));
     },
 
+    async update(
+      request: FastifyRequest<{ Params: SponsorshipIdParams; Body: UpdateSponsorshipBody }>,
+      _reply: FastifyReply,
+    ): Promise<ApiSuccessBody<Sponsorship>> {
+      const { accessToken } = caller(request);
+      return successResponse(await service.update(accessToken, request.params.id, request.body));
+    },
+
     async listRequests(
       request: FastifyRequest<{ Querystring: ListRequestsQuery }>,
       _reply: FastifyReply,
@@ -57,6 +70,34 @@ export function createSponsorshipController(service: SponsorshipService) {
       const { accessToken } = caller(request);
       const pagination = parsePagination(request.query);
       const { items, total } = await service.listRequests(accessToken, request.query.status, pagination);
+      return paginatedResponse(items, buildPaginationMeta(total, pagination));
+    },
+
+    async createRequest(
+      request: FastifyRequest<{ Body: CreateSponsorshipRequestBody }>,
+      reply: FastifyReply,
+    ): Promise<ApiSuccessBody<SponsorshipRequest>> {
+      const { user, accessToken } = caller(request);
+      const created = await service.createRequest(accessToken, user.id, request.body);
+      reply.code(201);
+      return successResponse(created);
+    },
+
+    async updateRequest(
+      request: FastifyRequest<{ Params: SponsorshipIdParams; Body: UpdateSponsorshipRequestBody }>,
+      _reply: FastifyReply,
+    ): Promise<ApiSuccessBody<SponsorshipRequest>> {
+      const { accessToken } = caller(request);
+      return successResponse(await service.updateRequest(accessToken, request.params.id, request.body));
+    },
+
+    async listMyResponses(
+      request: FastifyRequest<{ Querystring: PageQuery }>,
+      _reply: FastifyReply,
+    ): Promise<PaginatedBody<SponsorshipResponse>> {
+      const { user, accessToken } = caller(request);
+      const pagination = parsePagination(request.query);
+      const { items, total } = await service.listMyResponses(accessToken, user.id, pagination);
       return paginatedResponse(items, buildPaginationMeta(total, pagination));
     },
 

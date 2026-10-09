@@ -5,6 +5,8 @@ import { assistanceRoutes } from '../modules/assistance/assistance.routes.js';
 import { authRoutes } from '../modules/auth/auth.routes.js';
 import { campaignRoutes } from '../modules/campaigns/campaign.routes.js';
 import { donationRoutes } from '../modules/donations/donation.routes.js';
+import { eventRoutes } from '../modules/events/event.routes.js';
+import { reportRoutes } from '../modules/reports/report.routes.js';
 import { healthRoutes } from '../modules/health/health.routes.js';
 import { meRoutes } from '../modules/me/me.routes.js';
 import { notificationRoutes } from '../modules/notifications/notification.routes.js';
@@ -28,6 +30,8 @@ async function v1Routes(app: FastifyInstance): Promise<void> {
   await app.register(volunteerRoutes);
   // Spans /sponsorships and /sponsorship-requests.
   await app.register(sponsorshipRoutes);
+  await app.register(eventRoutes, { prefix: '/events' });
+  await app.register(reportRoutes, { prefix: '/reports' });
   await app.register(adminRoutes, { prefix: '/admin' });
 }
 

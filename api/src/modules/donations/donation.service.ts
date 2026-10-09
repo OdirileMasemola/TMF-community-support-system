@@ -18,6 +18,7 @@ import {
   type CreateProofBody,
   type Donation,
   type DonationProof,
+  type AdminDonation,
   type MyDonation,
   type PaymentStatus,
   type ReviewProof,
@@ -32,12 +33,15 @@ export interface DonationServiceDeps {
 
 export interface DonationService {
   create(accessToken: string, userId: UserId, body: CreateDonationBody): Promise<Donation>;
+  list(accessToken: string, status: PaymentStatus | undefined, pagination: PaginationParams): Promise<Page<AdminDonation>>;
   listMine(accessToken: string, userId: UserId, status: PaymentStatus | undefined, pagination: PaginationParams): Promise<Page<MyDonation>>;
   addProof(accessToken: string, userId: UserId, donationId: string, body: CreateProofBody): Promise<DonationProof>;
   listProofs(accessToken: string, status: VerificationStatus | undefined, pagination: PaginationParams): Promise<Page<ReviewProof>>;
   reviewProof(accessToken: string, userId: UserId, id: string, body: ReviewProofBody): Promise<ReviewProof>;
 }
 
+const ADMIN_DONATION_SELECT =
+  `${DONATION_COLUMNS}, campaigns(id, title), donor_profiles(id, user_id, profiles(full_name, email))`;
 const MY_DONATION_SELECT = `${DONATION_COLUMNS}, campaigns(id, title), donation_proofs(id, verification_status, uploaded_at)`;
 const REVIEW_PROOF_SELECT =
   `${PROOF_COLUMNS}, donations(id, donor_id, campaign_id, amount, donation_kind, payment_reference, donation_date, status, campaigns(id, title))`;
@@ -142,6 +146,26 @@ export function createDonationService(deps: DonationServiceDeps): DonationServic
         .retry(false);
       if (error !== null) throw toApiError(error, status, 'create', 'donation');
       return data;
+    },
+
+    async list(accessToken, statusFilter, pagination) {
+      const client = deps.createUserClient(accessToken);
+      const { from, to } = toRange(pagination);
+      const filtered = (head: boolean) => {
+        let query = client.from('donations').select(head ? 'id' : ADMIN_DONATION_SELECT, { count: 'exact', head });
+        if (statusFilter !== undefined) query = query.eq('status', statusFilter);
+        return query;
+      };
+      return runPagedQuery<AdminDonation>(
+        filtered(false)
+          .order('donation_date', { ascending: false })
+          .order('id', { ascending: false })
+          .range(from, to)
+          .overrideTypes<AdminDonation[], { merge: false }>()
+          .retry(false),
+        () => filtered(true).retry(false),
+        (error: PostgrestError, code: number) => toApiError(error, code, 'list', 'donations'),
+      );
     },
 
     async listMine(accessToken, userId, statusFilter, pagination) {

@@ -59,6 +59,8 @@ export interface Me {
 export interface UpdateMeBody {
   full_name?: string;
   phone_number?: string | null;
+  /** public.profiles.avatar_url. The database counts each change (avatar_change_count, max 3). */
+  avatar_url?: string | null;
   role_profile?: Record<string, string | null>;
 }
 

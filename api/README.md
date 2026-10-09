@@ -128,6 +128,7 @@ The server exits on startup with a clear message if a required variable is missi
 | PATCH | `/api/v1/notifications/:id/read` | Mark one of my notifications as read (404 for someone else's) |
 | POST | `/api/v1/notifications/read-all` | Mark all my unread notifications as read: `{ data: { updated } }` |
 | POST | `/api/v1/donations` | Record a donation (donor): `money` needs `amount`, `in_kind` needs `item_description` + `item_quantity`. Always created `pending`; `status`, `receipt_number` and `donor_id` from the client are ignored. `campaign_id` must be an active campaign |
+| GET | `/api/v1/donations?status=&page=&pageSize=` | All donations (administrator), newest first, with the campaign and donor. Status changes only when a proof is reviewed |
 | GET | `/api/v1/donations/me?status=&page=&pageSize=` | My donations (donor), newest first, with the campaign and proofs |
 | POST | `/api/v1/donations/:id/proofs` | Submit a proof of payment for my pending or failed donation (donor). Upload the file to `donation-proofs/<my user id>/...` first and send its `file_path` |
 | GET | `/api/v1/admin/donation-proofs?status=&page=&pageSize=` | Proofs to review (administrator) with the donation and a 5-minute signed file URL |
@@ -153,8 +154,17 @@ The server exits on startup with a clear message if a required variable is missi
 | POST | `/api/v1/sponsorships` | Pledge a sponsorship (sponsor): `amount`, optional active `campaign_id` and `sponsorship_type`. Always `pending` |
 | GET | `/api/v1/sponsorships?status=&page=&pageSize=` | All sponsorships (administrator) with the campaign and sponsor |
 | GET | `/api/v1/sponsorships/me?status=&page=&pageSize=` | My sponsorships (sponsor) with the campaign |
+| PATCH | `/api/v1/sponsorships/:id` | Update a sponsorship (administrator): `amount`, `campaign_id`, `sponsorship_type`, `status`, `sponsorship_date`. `sponsor_id` cannot be changed |
 | GET | `/api/v1/sponsorship-requests?status=&page=&pageSize=` | Sponsorship requests (sponsor or administrator); sponsors only ever see `open` ones |
+| POST | `/api/v1/sponsorship-requests` | Create a sponsorship request (administrator). `created_by` is the caller's administrator profile; status defaults to `open` |
+| PATCH | `/api/v1/sponsorship-requests/:id` | Update a sponsorship request (administrator). `created_by` cannot be changed |
+| GET | `/api/v1/sponsorship-request-responses/me?page=&pageSize=` | My responses (sponsor), newest first |
 | POST | `/api/v1/sponsorship-requests/:id/responses` | Register interest in an open request (sponsor): optional `notes` and `sponsorship_id` (must be mine). One response per request (409) |
+| GET | `/api/v1/events?status=&page=&pageSize=` | Events, earliest first. Administrators see every event; other signed-in users see `scheduled` events |
+| POST | `/api/v1/events` | Create an event (administrator). `admin_id` is the caller's administrator profile. `event_date` is `YYYY-MM-DD` or an ISO date-time. status defaults to `draft` |
+| PATCH | `/api/v1/events/:id` | Update an event (administrator) |
+| GET | `/api/v1/reports?page=&pageSize=` | Reports (administrator), newest first |
+| POST | `/api/v1/reports` | Create a report (administrator). `admin_id` is the caller's administrator profile. status is `generated` or `archived` |
 | GET | `/api/v1/admin/dashboard` | Totals (administrator): users by role and status, campaigns, donations (incl. the sum of successful money donations), pending proofs, assistance requests awaiting review, pending applications, sponsorships, open sponsorship requests, scheduled events |
 | GET | `/api/v1/admin/users?role=&status=&search=&page=&pageSize=` | Users (administrator), newest first; `search` matches full name or email (letters, digits, spaces and `@ . ' + _ -`) |
 | PATCH | `/api/v1/admin/users/:id/status` | Set `account_status` (pending/active/suspended) of another user (administrator); 409 for your own account |

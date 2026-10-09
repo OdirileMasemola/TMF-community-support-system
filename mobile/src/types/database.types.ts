@@ -30,6 +30,8 @@ export type Database = {
           account_status: AccountStatus;
           invited_by: string | null;
           invited_at: string | null;
+          avatar_url: string | null;
+          avatar_change_count: number;
           created_at: string;
           updated_at: string;
         };
@@ -42,6 +44,8 @@ export type Database = {
           account_status?: AccountStatus;
           invited_by?: string | null;
           invited_at?: string | null;
+          avatar_url?: string | null;
+          avatar_change_count?: number;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];

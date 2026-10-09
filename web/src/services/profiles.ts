@@ -1,7 +1,7 @@
 import type { UserRole } from "@/types/app.types";
 import type { Tables } from "@/types/database.types";
+import { apiData, isApiError } from "@/lib/apiClient";
 import { getSupabaseClientOrNull } from "@/lib/supabaseClient";
-import { logSupabaseError } from "@/lib/errors";
 
 export type ProfileRow = Tables<"profiles">;
 export type AdministratorProfile = Tables<"administrator_profiles">;
@@ -10,217 +10,150 @@ export type BeneficiaryProfile = Tables<"beneficiary_profiles">;
 export type DonorProfile = Tables<"donor_profiles">;
 export type SponsorProfile = Tables<"sponsor_profiles">;
 
+type MeProfile = Omit<ProfileRow, "avatar_change_count"> & { avatar_change_count?: number };
+
+type MeResponse = {
+  profile: MeProfile;
+  role_profile: Record<string, unknown> | null;
+};
+
+const ROLE_FIELDS = {
+  donor: ["donation_preference", "avatar_url"],
+  beneficiary: ["residential_address", "assistance_type", "avatar_url"],
+  volunteer: ["residential_address", "availability_status", "preferred_area", "avatar_url"],
+  sponsor: ["organisation_name", "sponsorship_type", "representative_name", "business_address", "logo_url"],
+} as const;
+
+function toProfileRow(profile: MeProfile): ProfileRow {
+  return { ...profile, avatar_change_count: profile.avatar_change_count ?? 0 };
+}
+
+async function loadMe(): Promise<MeResponse | null> {
+  try {
+    return await apiData<MeResponse>("/api/v1/me");
+  } catch (error) {
+    if (isApiError(error) && error.status === 404) return null;
+    throw error;
+  }
+}
+
+async function readRoleProfile<T>(userId: string, role: UserRole): Promise<T | null> {
+  if (!getSupabaseClientOrNull()) return null;
+  const me = await loadMe();
+  if (!me || me.profile.id !== userId || me.profile.role !== role || !me.role_profile) return null;
+  return me.role_profile as T;
+}
+
+async function updateRoleProfile(values: object, allowed: readonly string[]): Promise<void> {
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+
+  const source = values as Record<string, string | null | undefined>;
+  const roleProfile: Record<string, string | null> = {};
+  for (const field of allowed) {
+    if (source[field] === undefined) continue;
+    if (field === "organisation_name" && !source[field]?.trim()) {
+      throw new Error("Organisation name is required.");
+    }
+    const value = source[field];
+    roleProfile[field] = typeof value === "string" && value.trim() === "" ? null : (value ?? null);
+  }
+
+  if (Object.keys(roleProfile).length === 0) {
+    if (Object.values(source).some((value) => value !== undefined)) {
+      throw new Error("This profile change is not available on the API.");
+    }
+    return;
+  }
+
+  await apiData("/api/v1/me", { method: "PATCH", body: { role_profile: roleProfile } });
+}
+
 export async function fetchProfile(userId: string): Promise<ProfileRow | null> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return null;
-
-  const withAvatar = await client
-    .from("profiles")
-    .select("id, role, full_name, email, phone_number, account_status, invited_by, invited_at, avatar_url, avatar_change_count, created_at, updated_at")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (!withAvatar.error) {
-    return withAvatar.data;
-  }
-
-  const missingColumn = /avatar_url|avatar_change_count|42703/i.test(withAvatar.error.message);
-  if (!missingColumn) {
-    logSupabaseError("fetchProfile", withAvatar.error);
-    throw withAvatar.error;
-  }
-
-  const fallback = await client
-    .from("profiles")
-    .select("id, role, full_name, email, phone_number, account_status, invited_by, invited_at, created_at, updated_at")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (fallback.error) {
-    logSupabaseError("fetchProfile", fallback.error);
-    throw fallback.error;
-  }
-
-  return fallback.data ? { ...fallback.data, avatar_url: null, avatar_change_count: 0 } : null;
+  if (!getSupabaseClientOrNull()) return null;
+  const me = await loadMe();
+  if (!me || me.profile.id !== userId) return null;
+  return toProfileRow(me.profile);
 }
 
 export async function ensureRoleProfile(userId: string, role: UserRole, organisationName?: string): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return;
+  if (!getSupabaseClientOrNull()) return;
+  if (!userId) return;
 
   if (role === "administrator") {
     throw new Error("Administrator profiles cannot be created from the application.");
   }
 
-  if (role === "volunteer") {
-    const { error } = await client
-      .from("volunteer_profiles")
-      .upsert({ user_id: userId, member_since: new Date().toISOString().slice(0, 10) }, { onConflict: "user_id" });
-    if (error) {
-      logSupabaseError("ensureRoleProfile.volunteer", error);
-      throw error;
-    }
-    return;
-  }
+  const body: { role: UserRole; organisation_name?: string } = { role };
+  if (role === "sponsor") body.organisation_name = organisationName?.trim() || "Organisation";
 
-  if (role === "beneficiary") {
-    const { error } = await client.from("beneficiary_profiles").upsert({ user_id: userId }, { onConflict: "user_id" });
-    if (error) {
-      logSupabaseError("ensureRoleProfile.beneficiary", error);
-      throw error;
-    }
-    return;
-  }
-
-  if (role === "donor") {
-    const { error } = await client
-      .from("donor_profiles")
-      .upsert({ user_id: userId, member_since: new Date().toISOString().slice(0, 10) }, { onConflict: "user_id" });
-    if (error) {
-      logSupabaseError("ensureRoleProfile.donor", error);
-      throw error;
-    }
-    return;
-  }
-
-  if (role === "sponsor") {
-    const { error } = await client.from("sponsor_profiles").upsert(
-      {
-        user_id: userId,
-        organisation_name: organisationName?.trim() || "Organisation",
-      },
-      { onConflict: "user_id" },
-    );
-    if (error) {
-      logSupabaseError("ensureRoleProfile.sponsor", error);
-      throw error;
-    }
+  try {
+    await apiData("/api/v1/me/profile", { method: "POST", body });
+  } catch (error) {
+    if (isApiError(error) && error.status === 409) return;
+    throw error;
   }
 }
 
 export async function fetchAdministratorProfile(userId: string): Promise<AdministratorProfile | null> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return null;
-  const { data, error } = await client.from("administrator_profiles").select("id, user_id, created_at").eq("user_id", userId).maybeSingle();
-  if (error) {
-    logSupabaseError("fetchAdministratorProfile", error);
-    throw error;
-  }
-  return data;
+  return readRoleProfile<AdministratorProfile>(userId, "administrator");
 }
 
 export async function fetchVolunteerProfile(userId: string): Promise<VolunteerProfile | null> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return null;
-  const { data, error } = await client
-    .from("volunteer_profiles")
-    .select("id, user_id, residential_address, availability_status, preferred_area, member_since, status, avatar_url, created_at")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (error) {
-    logSupabaseError("fetchVolunteerProfile", error);
-    throw error;
-  }
-  return data;
+  return readRoleProfile<VolunteerProfile>(userId, "volunteer");
 }
 
 export async function fetchBeneficiaryProfile(userId: string): Promise<BeneficiaryProfile | null> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return null;
-  const { data, error } = await client
-    .from("beneficiary_profiles")
-    .select("id, user_id, residential_address, assistance_type, avatar_url, eligibility_status, created_at")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (error) {
-    logSupabaseError("fetchBeneficiaryProfile", error);
-    throw error;
-  }
-  return data;
+  return readRoleProfile<BeneficiaryProfile>(userId, "beneficiary");
 }
 
 export async function fetchDonorProfile(userId: string): Promise<DonorProfile | null> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return null;
-  const { data, error } = await client
-    .from("donor_profiles")
-    .select("id, user_id, donation_preference, avatar_url, member_since, created_at")
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (error) {
-    logSupabaseError("fetchDonorProfile", error);
-    throw error;
-  }
-  return data;
+  return readRoleProfile<DonorProfile>(userId, "donor");
 }
 
 export async function fetchSponsorProfile(userId: string): Promise<SponsorProfile | null> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return null;
-  const { data, error } = await client
-    .from("sponsor_profiles")
-    .select(
-      "id, user_id, organisation_name, sponsorship_type, representative_name, business_address, sponsor_level, logo_url, created_at",
-    )
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (error) {
-    logSupabaseError("fetchSponsorProfile", error);
-    throw error;
-  }
-  return data;
+  return readRoleProfile<SponsorProfile>(userId, "sponsor");
 }
 
 export async function updateProfile(
   userId: string,
   values: Partial<Pick<ProfileRow, "full_name" | "phone_number" | "avatar_url">>,
 ): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("profiles").update(values).eq("id", userId);
-  if (error) {
-    logSupabaseError("updateProfile", error);
-    throw error;
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+  if (!userId) throw new Error("Supabase is not configured.");
+
+  const body: { full_name?: string; phone_number?: string | null; avatar_url?: string | null } = {};
+  if (values.full_name !== undefined) body.full_name = values.full_name;
+  if (values.phone_number !== undefined) body.phone_number = values.phone_number;
+  if (values.avatar_url !== undefined) body.avatar_url = values.avatar_url;
+  if (Object.keys(body).length === 0) {
+    throw new Error("This profile change is not available on the API.");
   }
+
+  await apiData("/api/v1/me", { method: "PATCH", body });
 }
 
 export async function updateVolunteerProfile(
   profileId: string,
   values: Partial<Pick<VolunteerProfile, "residential_address" | "availability_status" | "preferred_area" | "avatar_url">>,
 ): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("volunteer_profiles").update(values).eq("id", profileId);
-  if (error) {
-    logSupabaseError("updateVolunteerProfile", error);
-    throw error;
-  }
+  if (!profileId) throw new Error("Supabase is not configured.");
+  await updateRoleProfile(values, ROLE_FIELDS.volunteer);
 }
 
 export async function updateBeneficiaryProfile(
   profileId: string,
   values: Partial<Pick<BeneficiaryProfile, "residential_address" | "assistance_type" | "avatar_url">>,
 ): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("beneficiary_profiles").update(values).eq("id", profileId);
-  if (error) {
-    logSupabaseError("updateBeneficiaryProfile", error);
-    throw error;
-  }
+  if (!profileId) throw new Error("Supabase is not configured.");
+  await updateRoleProfile(values, ROLE_FIELDS.beneficiary);
 }
 
 export async function updateDonorProfile(
   profileId: string,
   values: Partial<Pick<DonorProfile, "donation_preference" | "avatar_url" | "member_since">>,
 ): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("donor_profiles").update(values).eq("id", profileId);
-  if (error) {
-    logSupabaseError("updateDonorProfile", error);
-    throw error;
-  }
+  if (!profileId) throw new Error("Supabase is not configured.");
+  await updateRoleProfile(values, ROLE_FIELDS.donor);
 }
 
 export async function updateSponsorProfile(
@@ -232,11 +165,6 @@ export async function updateSponsorProfile(
     >
   >,
 ): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("sponsor_profiles").update(values).eq("id", profileId);
-  if (error) {
-    logSupabaseError("updateSponsorProfile", error);
-    throw error;
-  }
+  if (!profileId) throw new Error("Supabase is not configured.");
+  await updateRoleProfile(values, ROLE_FIELDS.sponsor);
 }

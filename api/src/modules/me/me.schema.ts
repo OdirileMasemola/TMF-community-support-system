@@ -90,6 +90,7 @@ const updateMeBodySchema = {
   properties: {
     full_name: fullName,
     phone_number: phoneNumber,
+    avatar_url: optionalUrl,
     role_profile: {
       type: 'object',
       additionalProperties: false,
@@ -176,7 +177,7 @@ export const updateMeSchema = {
   tags,
   summary: 'Update my profile',
   description:
-    'Partial update of full_name, phone_number and your role profile fields. role, account_status, email and ' +
+    'Partial update of full_name, phone_number, avatar_url and your role profile fields. role, account_status, email and ' +
     'ids cannot be changed (unknown fields are ignored). Role profile fields of another role return 400.',
   security,
   body: updateMeBodySchema,

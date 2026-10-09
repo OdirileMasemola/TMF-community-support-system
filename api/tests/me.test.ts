@@ -121,6 +121,24 @@ describe('me API', () => {
       expect(patch?.url.searchParams.get('id')).toBe(`eq.${USERS.donor.id}`);
     });
 
+    it('returns 400 for an avatar_url that is not an http(s) URL', async () => {
+      const response = await app.inject({ method: 'PATCH', url: BASE, headers: auth('donor'), payload: { avatar_url: 'not-a-url' } });
+      expectErrorShape(response, 400, 'VALIDATION_ERROR');
+      expect(db.requestsTo('profiles', 'PATCH')).toHaveLength(0);
+    });
+
+    it('updates avatar_url on the profile', async () => {
+      const response = await app.inject({
+        method: 'PATCH',
+        url: BASE,
+        headers: auth('donor'),
+        payload: { avatar_url: 'https://example.org/a.png' },
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json<{ data: { profile: Row } }>().data.profile.avatar_url).toBe('https://example.org/a.png');
+      expect(db.requestsTo('profiles', 'PATCH')[0]?.body).toEqual({ avatar_url: 'https://example.org/a.png' });
+    });
+
     it('clears phone_number with null', async () => {
       db.find('profiles', (row) => row.id === USERS.donor.id)!.phone_number = '0825550101';
       const response = await app.inject({ method: 'PATCH', url: BASE, headers: auth('donor'), payload: { phone_number: null } });

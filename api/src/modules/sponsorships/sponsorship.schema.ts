@@ -5,6 +5,7 @@ import {
   idParamsSchema,
   listResponse,
   paginationQueryProperties,
+  paginationQuerySchema,
 } from '../../shared/utils/schemas.js';
 import { CAMPAIGN_STATUSES } from '../campaigns/campaign.types.js';
 import { AMOUNT_MAX, NOTES_MAX_LENGTH } from '../donations/donation.schema.js';
@@ -181,4 +182,72 @@ export const createResponseSchema = {
     },
   },
   response: { 201: dataResponse(responseSchema), ...errorResponses(404, 409) },
+} as const;
+
+const sponsorshipWritable = {
+  amount: { type: 'number', exclusiveMinimum: 0, maximum: AMOUNT_MAX, description: 'Rand, at most two decimals' },
+  campaign_id: { type: ['string', 'null'], format: 'uuid' },
+  sponsorship_type: { type: ['string', 'null'], maxLength: 100 },
+  status: { type: 'string', enum: [...SPONSORSHIP_STATUSES] },
+  sponsorship_date: { type: 'string', format: 'date-time' },
+} as const;
+
+export const updateSponsorshipSchema = {
+  tags,
+  summary: 'Update a sponsorship (administrators)',
+  description: 'Partial update. sponsor_id cannot be changed. Only administrators can update sponsorships.',
+  security,
+  params: idParamsSchema('Sponsorship id'),
+  body: { type: 'object', additionalProperties: false, minProperties: 1, properties: sponsorshipWritable },
+  response: { 200: dataResponse(sponsorshipSchema), ...errorResponses(404) },
+} as const;
+
+const requestWritable = {
+  title: { type: 'string', minLength: 1, maxLength: 200, pattern: '\\S' },
+  requested_support: { type: 'string', minLength: 1, maxLength: 2000, pattern: '\\S' },
+  campaign_id: { type: ['string', 'null'], format: 'uuid' },
+  category: { type: ['string', 'null'], maxLength: 100 },
+  priority: { type: ['string', 'null'], maxLength: 50 },
+  deadline: { type: ['string', 'null'], format: 'date' },
+  estimated_impact: { type: ['string', 'null'], maxLength: 1000 },
+  status: { type: 'string', enum: [...REQUEST_STATUSES] },
+} as const;
+
+const requestRowSchema = {
+  type: 'object',
+  required: Object.keys(requestProperties),
+  properties: requestProperties,
+} as const;
+
+export const createRequestSchema = {
+  tags,
+  summary: 'Create a sponsorship request (administrators)',
+  description: "created_by is set from the caller's administrator profile. status defaults to open.",
+  security,
+  body: {
+    type: 'object',
+    additionalProperties: false,
+    required: ['title', 'requested_support'],
+    properties: requestWritable,
+  },
+  response: { 201: dataResponse(requestRowSchema), ...errorResponses(404) },
+} as const;
+
+export const updateRequestSchema = {
+  tags,
+  summary: 'Update a sponsorship request (administrators)',
+  description: 'Partial update. created_by cannot be changed.',
+  security,
+  params: idParamsSchema('Sponsorship request id'),
+  body: { type: 'object', additionalProperties: false, minProperties: 1, properties: requestWritable },
+  response: { 200: dataResponse(requestRowSchema), ...errorResponses(404) },
+} as const;
+
+export const listMyResponsesSchema = {
+  tags,
+  summary: 'List my sponsorship responses (sponsors)',
+  description: 'Newest first. Sponsors only see their own responses.',
+  security,
+  querystring: paginationQuerySchema,
+  response: { 200: listResponse(responseSchema), ...errorResponses() },
 } as const;

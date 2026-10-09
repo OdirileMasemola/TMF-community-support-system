@@ -92,6 +92,30 @@ export interface CreateSponsorshipBody {
   sponsorship_type?: string | null;
 }
 
+/** PATCH /sponsorships/:id. sponsor_id is never accepted. Administrators only (RLS). */
+export interface UpdateSponsorshipBody {
+  amount?: number;
+  campaign_id?: string | null;
+  sponsorship_type?: string | null;
+  status?: SponsorshipStatus;
+  sponsorship_date?: string;
+}
+
+/** POST /sponsorship-requests. created_by is set from the caller's administrator profile. */
+export interface CreateSponsorshipRequestBody {
+  title: string;
+  requested_support: string;
+  campaign_id?: string | null;
+  category?: string | null;
+  priority?: string | null;
+  deadline?: string | null;
+  estimated_impact?: string | null;
+  status?: SponsorshipRequestStatus;
+}
+
+/** PATCH /sponsorship-requests/:id. created_by is never changed. */
+export type UpdateSponsorshipRequestBody = Partial<CreateSponsorshipRequestBody>;
+
 /** POST /sponsorship-requests/:id/responses. status and sponsor_id are never accepted. */
 export interface CreateResponseBody {
   notes?: string | null;

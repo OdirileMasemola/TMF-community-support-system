@@ -40,10 +40,11 @@ function trimmedOrNull(value: string | null | undefined): string | null | undefi
   return trimmed === '' ? null : trimmed;
 }
 
-function profileChanges(body: { full_name?: string; phone_number?: string | null }): Record<string, unknown> {
+function profileChanges(body: { full_name?: string; phone_number?: string | null; avatar_url?: string | null }): Record<string, unknown> {
   const row: Record<string, unknown> = {};
   if (body.full_name !== undefined) row.full_name = body.full_name.trim();
   if (body.phone_number !== undefined) row.phone_number = trimmedOrNull(body.phone_number);
+  if (body.avatar_url !== undefined) row.avatar_url = trimmedOrNull(body.avatar_url);
   return row;
 }
 

@@ -1,6 +1,7 @@
 import type { Tables, TablesInsert, TablesUpdate } from "@/types/database.types";
+import type { UserRole } from "@/types/app.types";
+import { apiData, apiList } from "@/lib/apiClient";
 import { getSupabaseClientOrNull } from "@/lib/supabaseClient";
-import { logSupabaseError } from "@/lib/errors";
 
 export type EventRow = Tables<"events">;
 export type ReportRow = Tables<"reports">;
@@ -24,202 +25,133 @@ export type AdminDashboardStats = {
   pendingReviews: number;
 };
 
+type DashboardPayload = {
+  users: {
+    total: number;
+    pending: number;
+    suspended: number;
+    byRole: Record<UserRole, number>;
+  };
+  campaigns: { total: number; active: number };
+  donations: { total: number; successfulAmount: number; pendingProofs: number };
+  assistanceRequests: { total: number; awaitingReview: number };
+  volunteers: { pendingApplications: number };
+  sponsorships: { total: number; openRequests: number };
+  events: { scheduled: number };
+};
+
+const emptyStats: AdminDashboardStats = {
+  totalUsers: 0,
+  activeUsers: 0,
+  pendingUsers: 0,
+  activeCampaigns: 0,
+  totalDonationAmount: 0,
+  donationCount: 0,
+  volunteerApplications: 0,
+  pendingVolunteerApplications: 0,
+  sponsors: 0,
+  beneficiaryRequests: 0,
+  pendingAssistanceRequests: 0,
+  pendingDonationProofs: 0,
+  openSponsorshipRequests: 0,
+  events: 0,
+  pendingReviews: 0,
+};
+
+function toProfileRow(profile: Omit<ProfileRow, "avatar_change_count"> & { avatar_change_count?: number }): ProfileRow {
+  return { ...profile, avatar_change_count: profile.avatar_change_count ?? 0 };
+}
+
 export async function fetchAdminDashboardStats(): Promise<AdminDashboardStats> {
-  const client = getSupabaseClientOrNull();
-  if (!client) {
-    return {
-      totalUsers: 0,
-      activeUsers: 0,
-      pendingUsers: 0,
-      activeCampaigns: 0,
-      totalDonationAmount: 0,
-      donationCount: 0,
-      volunteerApplications: 0,
-      pendingVolunteerApplications: 0,
-      sponsors: 0,
-      beneficiaryRequests: 0,
-      pendingAssistanceRequests: 0,
-      pendingDonationProofs: 0,
-      openSponsorshipRequests: 0,
-      events: 0,
-      pendingReviews: 0,
-    };
-  }
+  if (!getSupabaseClientOrNull()) return emptyStats;
 
-  const [
-    profilesRes,
-    activeUsersRes,
-    pendingUsersRes,
-    campaignsRes,
-    donationsRes,
-    applicationsRes,
-    pendingAppsRes,
-    sponsorsRes,
-    assistanceRes,
-    pendingAssistanceRes,
-    pendingProofsRes,
-    openSponsorRequestsRes,
-    eventsRes,
-  ] = await Promise.all([
-    client.from("profiles").select("id", { count: "exact", head: true }),
-    client.from("profiles").select("id", { count: "exact", head: true }).eq("account_status", "active"),
-    client.from("profiles").select("id", { count: "exact", head: true }).eq("account_status", "pending"),
-    client.from("campaigns").select("id", { count: "exact", head: true }).eq("status", "active"),
-    client.from("donations").select("amount, status"),
-    client.from("campaign_applications").select("id", { count: "exact", head: true }),
-    client.from("campaign_applications").select("id", { count: "exact", head: true }).eq("status", "pending"),
-    client.from("sponsor_profiles").select("id", { count: "exact", head: true }),
-    client.from("assistance_requests").select("id", { count: "exact", head: true }),
-    client.from("assistance_requests").select("id", { count: "exact", head: true }).in("status", ["pending", "under_review"]),
-    client.from("donation_proofs").select("id", { count: "exact", head: true }).eq("verification_status", "pending"),
-    client.from("sponsorship_requests").select("id", { count: "exact", head: true }).eq("status", "open"),
-    client.from("events").select("id", { count: "exact", head: true }),
-  ]);
-
-  const errors = [
-    profilesRes.error,
-    activeUsersRes.error,
-    pendingUsersRes.error,
-    campaignsRes.error,
-    donationsRes.error,
-    applicationsRes.error,
-    pendingAppsRes.error,
-    sponsorsRes.error,
-    assistanceRes.error,
-    pendingAssistanceRes.error,
-    pendingProofsRes.error,
-    openSponsorRequestsRes.error,
-    eventsRes.error,
-  ].filter(Boolean);
-
-  if (errors.length) {
-    logSupabaseError("fetchAdminDashboardStats", errors[0]);
-    throw errors[0];
-  }
-
-  const donationRows = donationsRes.data ?? [];
-  const totalDonationAmount = donationRows
-    .filter((row) => row.status === "successful")
-    .reduce((sum, row) => sum + Number(row.amount ?? 0), 0);
-
-  const pendingVolunteerApplications = pendingAppsRes.count ?? 0;
-  const pendingAssistanceRequests = pendingAssistanceRes.count ?? 0;
-  const pendingDonationProofs = pendingProofsRes.count ?? 0;
-  const openSponsorshipRequests = openSponsorRequestsRes.count ?? 0;
+  const data = await apiData<DashboardPayload>("/api/v1/admin/dashboard");
+  const pendingVolunteerApplications = data.volunteers.pendingApplications;
+  const pendingAssistanceRequests = data.assistanceRequests.awaitingReview;
+  const pendingDonationProofs = data.donations.pendingProofs;
+  const openSponsorshipRequests = data.sponsorships.openRequests;
 
   return {
-    totalUsers: profilesRes.count ?? 0,
-    activeUsers: activeUsersRes.count ?? 0,
-    pendingUsers: pendingUsersRes.count ?? 0,
-    activeCampaigns: campaignsRes.count ?? 0,
-    totalDonationAmount,
-    donationCount: donationRows.length,
-    volunteerApplications: applicationsRes.count ?? 0,
+    totalUsers: data.users.total,
+    activeUsers: Math.max(0, data.users.total - data.users.pending - data.users.suspended),
+    pendingUsers: data.users.pending,
+    activeCampaigns: data.campaigns.active,
+    totalDonationAmount: data.donations.successfulAmount,
+    donationCount: data.donations.total,
+    volunteerApplications: pendingVolunteerApplications,
     pendingVolunteerApplications,
-    sponsors: sponsorsRes.count ?? 0,
-    beneficiaryRequests: assistanceRes.count ?? 0,
+    sponsors: data.users.byRole.sponsor,
+    beneficiaryRequests: data.assistanceRequests.total,
     pendingAssistanceRequests,
     pendingDonationProofs,
     openSponsorshipRequests,
-    events: eventsRes.count ?? 0,
+    events: data.events.scheduled,
     pendingReviews: pendingVolunteerApplications + pendingAssistanceRequests + pendingDonationProofs + openSponsorshipRequests,
   };
 }
 
 export async function fetchProfiles(): Promise<ProfileRow[]> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return [];
-
-  const { data, error } = await client
-    .from("profiles")
-    .select("id, role, full_name, email, phone_number, account_status, invited_by, invited_at, created_at, updated_at")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    logSupabaseError("fetchProfiles", error);
-    throw error;
-  }
-  return data ?? [];
+  if (!getSupabaseClientOrNull()) return [];
+  const rows = await apiList<Omit<ProfileRow, "avatar_change_count"> & { avatar_change_count?: number }>("/api/v1/admin/users");
+  return rows.map(toProfileRow);
 }
 
 export async function updateProfileAccountStatus(userId: string, accountStatus: ProfileRow["account_status"]): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("profiles").update({ account_status: accountStatus }).eq("id", userId);
-  if (error) {
-    logSupabaseError("updateProfileAccountStatus", error);
-    throw error;
-  }
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+  await apiData(`/api/v1/admin/users/${userId}/status`, {
+    method: "PATCH",
+    body: { account_status: accountStatus },
+  });
+}
+
+function eventBody(values: {
+  title?: string;
+  location?: string;
+  event_date?: string;
+  description?: string | null;
+  campaign_id?: string | null;
+  status?: string;
+}): Record<string, unknown> {
+  const body: Record<string, unknown> = {};
+  if (values.title !== undefined) body.title = values.title;
+  if (values.location !== undefined) body.location = values.location;
+  if (values.event_date !== undefined) body.event_date = values.event_date;
+  if (values.description !== undefined) body.description = values.description;
+  if (values.campaign_id !== undefined) body.campaign_id = values.campaign_id;
+  if (values.status !== undefined) body.status = values.status;
+  return body;
 }
 
 export async function fetchEvents(): Promise<EventRow[]> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return [];
-
-  const { data, error } = await client
-    .from("events")
-    .select("id, admin_id, campaign_id, title, description, location, event_date, status, created_at, updated_at")
-    .order("event_date", { ascending: true });
-
-  if (error) {
-    logSupabaseError("fetchEvents", error);
-    throw error;
-  }
-  return data ?? [];
+  if (!getSupabaseClientOrNull()) return [];
+  return apiList<EventRow>("/api/v1/events");
 }
 
 export async function createEvent(payload: TablesInsert<"events">): Promise<EventRow> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { data, error } = await client
-    .from("events")
-    .insert(payload)
-    .select("id, admin_id, campaign_id, title, description, location, event_date, status, created_at, updated_at")
-    .single();
-  if (error) {
-    logSupabaseError("createEvent", error);
-    throw error;
-  }
-  return data;
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+  return apiData<EventRow>("/api/v1/events", { method: "POST", body: eventBody(payload) });
 }
 
 export async function updateEvent(id: string, values: TablesUpdate<"events">): Promise<void> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { error } = await client.from("events").update(values).eq("id", id);
-  if (error) {
-    logSupabaseError("updateEvent", error);
-    throw error;
-  }
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+  const body = eventBody(values);
+  if (Object.keys(body).length === 0) throw new Error("At least one event field is required.");
+  await apiData(`/api/v1/events/${id}`, { method: "PATCH", body });
 }
 
 export async function fetchReports(): Promise<ReportRow[]> {
-  const client = getSupabaseClientOrNull();
-  if (!client) return [];
-
-  const { data, error } = await client
-    .from("reports")
-    .select("id, admin_id, report_name, generated_at, report_type, status, metadata, file_path")
-    .order("generated_at", { ascending: false });
-
-  if (error) {
-    logSupabaseError("fetchReports", error);
-    throw error;
-  }
-  return data ?? [];
+  if (!getSupabaseClientOrNull()) return [];
+  return apiList<ReportRow>("/api/v1/reports");
 }
 
 export async function createReport(payload: TablesInsert<"reports">): Promise<ReportRow> {
-  const client = getSupabaseClientOrNull();
-  if (!client) throw new Error("Supabase is not configured.");
-  const { data, error } = await client
-    .from("reports")
-    .insert(payload)
-    .select("id, admin_id, report_name, generated_at, report_type, status, metadata, file_path")
-    .single();
-  if (error) {
-    logSupabaseError("createReport", error);
-    throw error;
-  }
-  return data;
+  if (!getSupabaseClientOrNull()) throw new Error("Supabase is not configured.");
+  const body: Record<string, unknown> = {
+    report_name: payload.report_name,
+    report_type: payload.report_type,
+  };
+  if (payload.status !== undefined) body.status = payload.status;
+  if (payload.metadata !== undefined) body.metadata = payload.metadata;
+  if (payload.file_path !== undefined) body.file_path = payload.file_path;
+  return apiData<ReportRow>("/api/v1/reports", { method: "POST", body });
 }

@@ -62,6 +62,16 @@ export interface DonationProof {
   uploaded_at: string;
 }
 
+/** A donation in GET /donations (administrators), with its campaign and donor. */
+export interface AdminDonation extends Donation {
+  campaigns: { id: string; title: string } | null;
+  donor_profiles: {
+    id: string;
+    user_id: string;
+    profiles: { full_name: string; email: string } | null;
+  } | null;
+}
+
 /** A donation in GET /donations/me, with its campaign and proofs. */
 export interface MyDonation extends Donation {
   campaigns: { id: string; title: string } | null;
@@ -101,6 +111,12 @@ export interface CreateProofBody {
 export interface ReviewProofBody {
   verification_status: ProofDecision;
   admin_comment?: string | null;
+}
+
+export interface ListDonationsQuery {
+  status?: PaymentStatus;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface ListMyDonationsQuery {

@@ -55,7 +55,17 @@ describe('sponsorships API', () => {
           sponsorshipRequest(3, 'closed', '2026-10-02T08:00:00+00:00'),
           sponsorshipRequest(4, 'accepted', '2026-09-20T08:00:00+00:00'),
         ],
-        sponsorship_request_responses: [{ id: RS(1), request_id: Q(1), sponsor_id: ROLE_IDS.sponsor2, notes: 'Keen' }],
+        sponsorship_request_responses: [
+          {
+            id: RS(1),
+            request_id: Q(1),
+            sponsor_id: ROLE_IDS.sponsor2,
+            sponsorship_id: null,
+            status: 'interested',
+            notes: 'Keen',
+            responded_at: '2026-10-04T08:00:00+00:00',
+          },
+        ],
       }),
     );
   });
@@ -66,6 +76,10 @@ describe('sponsorships API', () => {
       ['GET', SPONSORSHIPS],
       ['GET', `${SPONSORSHIPS}/me`],
       ['GET', REQUESTS],
+      ['PATCH', `${SPONSORSHIPS}/${SP(1)}`],
+      ['POST', REQUESTS],
+      ['PATCH', `${REQUESTS}/${Q(1)}`],
+      ['GET', `${V1}/sponsorship-request-responses/me`],
       ['POST', `${REQUESTS}/${Q(1)}/responses`],
     ] as const)('%s %s without a token returns 401', async (method, url) => {
       const response = await app.inject({ method, url });
@@ -79,6 +93,11 @@ describe('sponsorships API', () => {
       ['sponsor', 'GET', SPONSORSHIPS],
       ['admin', 'GET', `${SPONSORSHIPS}/me`],
       ['volunteer', 'GET', REQUESTS],
+      ['sponsor', 'PATCH', `${SPONSORSHIPS}/${SP(1)}`],
+      ['sponsor', 'POST', REQUESTS],
+      ['donor', 'PATCH', `${REQUESTS}/${Q(1)}`],
+      ['donor', 'GET', `${V1}/sponsorship-request-responses/me`],
+      ['admin', 'GET', `${V1}/sponsorship-request-responses/me`],
       ['admin', 'POST', `${REQUESTS}/${Q(1)}/responses`],
     ] as const)('%s cannot %s %s (403)', async (user, method, url) => {
       const response = await app.inject({ method, url, headers: auth(user), payload: method === 'GET' ? undefined : {} });
@@ -277,6 +296,70 @@ describe('sponsorships API', () => {
     });
   });
 
+  describe('PATCH /sponsorships/:id', () => {
+    it('updates amount and status for an administrator', async () => {
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `${SPONSORSHIPS}/${SP(1)}`,
+        headers: auth('admin'),
+        payload: { amount: 1800, status: 'successful' },
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json<{ data: Row }>().data).toMatchObject({ id: SP(1), amount: 1800, status: 'successful', sponsor_id: ROLE_IDS.sponsor });
+    });
+
+    it('returns 404 for a missing sponsorship', async () => {
+      expectErrorShape(
+        await app.inject({ method: 'PATCH', url: `${SPONSORSHIPS}/${MISSING}`, headers: auth('admin'), payload: { status: 'cancelled' } }),
+        404,
+        'NOT_FOUND',
+      );
+    });
+  });
+
+  describe('POST /sponsorship-requests', () => {
+    it('creates a request for the caller administrator profile and ignores created_by', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: REQUESTS,
+        headers: auth('admin'),
+        payload: { title: ' School transport ', requested_support: 'A minibus', created_by: USERS.admin.id, campaign_id: C(1) },
+      });
+      expect(response.statusCode).toBe(201);
+      expect(response.json<{ data: Row }>().data).toMatchObject({
+        title: 'School transport',
+        requested_support: 'A minibus',
+        created_by: ROLE_IDS.admin,
+        campaign_id: C(1),
+        status: 'open',
+        priority: 'normal',
+      });
+    });
+  });
+
+  describe('PATCH /sponsorship-requests/:id', () => {
+    it('updates a request without changing created_by', async () => {
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `${REQUESTS}/${Q(1)}`,
+        headers: auth('admin'),
+        payload: { status: 'closed', title: 'Updated request' },
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json<{ data: Row }>().data).toMatchObject({ id: Q(1), status: 'closed', title: 'Updated request', created_by: ROLE_IDS.admin });
+    });
+  });
+
+  describe('GET /sponsorship-request-responses/me', () => {
+    it('lists only my responses', async () => {
+      const mine = await app.inject({ method: 'GET', url: `${V1}/sponsorship-request-responses/me`, headers: auth('sponsor2') });
+      expect(mine.statusCode).toBe(200);
+      expect(mine.json<{ data: Row[] }>().data).toMatchObject([{ id: RS(1), request_id: Q(1), notes: 'Keen' }]);
+      const empty = await app.inject({ method: 'GET', url: `${V1}/sponsorship-request-responses/me`, headers: auth('sponsor') });
+      expect(empty.json<{ data: Row[]; meta: { total: number } }>().meta.total).toBe(0);
+    });
+  });
+
   describe('OpenAPI docs', () => {
     it('documents the sponsorship endpoints', async () => {
       const spec = (await app.inject({ method: 'GET', url: '/docs/json' })).json<{ paths: Record<string, Record<string, { tags?: string[]; security?: unknown; responses: Record<string, unknown> }>> }>();
@@ -293,6 +376,10 @@ describe('sponsorships API', () => {
         expect(Object.keys(operation?.responses ?? {})).toEqual(expect.arrayContaining(['400', '401', '403', '500', '503']));
       }
       expect(Object.keys(operations[4]?.responses ?? {})).toEqual(expect.arrayContaining(['201', '404', '409']));
+      expect(spec.paths['/api/v1/sponsorships/{id}']?.['patch']?.tags).toEqual(['sponsorships']);
+      expect(spec.paths['/api/v1/sponsorship-requests']?.['post']?.tags).toEqual(['sponsorships']);
+      expect(spec.paths['/api/v1/sponsorship-requests/{id}']?.['patch']?.tags).toEqual(['sponsorships']);
+      expect(spec.paths['/api/v1/sponsorship-request-responses/me']?.['get']?.tags).toEqual(['sponsorships']);
     });
   });
 });
