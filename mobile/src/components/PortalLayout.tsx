@@ -39,7 +39,7 @@ export function PortalLayout() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       {/* The bar behind the clock and battery follows the theme, so the system
           icons have to be inverted against it or they vanish into it. */}
-      <StatusBar style={isDark ? "light" : "dark"} backgroundColor={colors.card} />
+      <StatusBar style={isDark ? "light" : "dark"} />
 
       <View style={styles.bar}>
         <Image source={logoImage} style={styles.logo} />

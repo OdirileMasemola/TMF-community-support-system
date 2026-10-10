@@ -168,7 +168,7 @@ const createStyles = (colors: ThemeColors) =>
       overflow: "hidden",
     },
     tabSurface: {
-      ...StyleSheet.absoluteFillObject,
+      ...StyleSheet.absoluteFill,
       backgroundColor: colors.primarySurface,
       borderRadius: radius.pill,
     },

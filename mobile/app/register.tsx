@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
+import { KeyboardAwareScreen } from "@/components/KeyboardAwareScreen";
 import { AppButton, Card, ChipSelect, Divider, GoogleButton, PageHeading, TextField } from "@/components/ui";
 import { validateRegistration, MIN_PASSWORD_LENGTH, type PublicSignupRole } from "@/lib/validation";
 import { useThemedStyles } from "@/theme/ThemeProvider";
@@ -36,6 +37,11 @@ export default function RegisterScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
+  const emailRef = useRef<TextInput>(null);
+  const phoneRef = useRef<TextInput>(null);
+  const organisationRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
 
   const isBusy = isSubmitting || isGoogleLoading;
 
@@ -99,125 +105,138 @@ export default function RegisterScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView
-        style={styles.root}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <PageHeading
-          eyebrow="Themba Molefe Foundation"
-          title="Join the community"
-          subtitle="Create your account to support campaigns, volunteer, or request assistance through the foundation."
+    <KeyboardAwareScreen style={styles.root} contentContainerStyle={styles.content}>
+      <PageHeading
+        eyebrow="Themba Molefe Foundation"
+        title="Join the community"
+        subtitle="Create your account to support campaigns, volunteer, or request assistance through the foundation."
+      />
+
+      <GoogleButton
+        label="Sign up with Google"
+        onPress={handleGoogleSignUp}
+        disabled={isBusy}
+        loading={isGoogleLoading}
+      />
+      <Text style={styles.hint}>
+        Signing up with Google creates a beneficiary account. An administrator can change your role afterwards.
+      </Text>
+
+      <Divider text="Or register with email" />
+
+      <View style={styles.form}>
+        <TextField
+          label="Full name"
+          value={fullName}
+          onChangeText={setFullName}
+          placeholder="Your full name"
+          autoComplete="name"
+          textContentType="name"
+          editable={!isBusy}
+          returnKeyType="next"
+          submitBehavior="submit"
+          onSubmitEditing={() => emailRef.current?.focus()}
+        />
+        <TextField
+          ref={emailRef}
+          label="Email address"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="you@example.com"
+          autoCapitalize="none"
+          autoComplete="email"
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          editable={!isBusy}
+          returnKeyType="next"
+          submitBehavior="submit"
+          onSubmitEditing={() => phoneRef.current?.focus()}
+        />
+        <TextField
+          ref={phoneRef}
+          label="Phone number (optional)"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+          placeholder="e.g. 072 000 0000"
+          autoComplete="tel"
+          keyboardType="phone-pad"
+          textContentType="telephoneNumber"
+          editable={!isBusy}
+          returnKeyType="next"
+          submitBehavior="submit"
+          onSubmitEditing={() => (role === "sponsor" ? organisationRef : passwordRef).current?.focus()}
         />
 
-        <GoogleButton
-          label="Sign up with Google"
-          onPress={handleGoogleSignUp}
+        <ChipSelect
+          label="I am joining as"
+          options={ROLE_OPTIONS}
+          value={role}
+          onChange={setRole}
+          hint={role ? ROLE_HINTS[role] : "Administrator accounts are created by the foundation."}
+        />
+
+        {role === "sponsor" ? (
+          <TextField
+            ref={organisationRef}
+            label="Organisation name"
+            value={organisationName}
+            onChangeText={setOrganisationName}
+            placeholder="Your business or organisation"
+            autoComplete="organization"
+            textContentType="organizationName"
+            editable={!isBusy}
+            returnKeyType="next"
+            submitBehavior="submit"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+          />
+        ) : null}
+
+        <TextField
+          ref={passwordRef}
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
+          autoCapitalize="none"
+          autoComplete="new-password"
+          textContentType="newPassword"
+          secureTextEntry
+          editable={!isBusy}
+          returnKeyType="next"
+          submitBehavior="submit"
+          onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+        />
+        <TextField
+          ref={confirmPasswordRef}
+          label="Confirm password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          placeholder="Type your password again"
+          autoCapitalize="none"
+          autoComplete="new-password"
+          textContentType="newPassword"
+          secureTextEntry
+          editable={!isBusy}
+          onSubmitEditing={handleSubmit}
+          returnKeyType="go"
+        />
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+
+        <AppButton
+          label={isSubmitting ? "Creating account…" : "Create account"}
+          onPress={handleSubmit}
           disabled={isBusy}
-          loading={isGoogleLoading}
+          loading={isSubmitting}
         />
-        <Text style={styles.hint}>
-          Signing up with Google creates a beneficiary account. An administrator can change your role afterwards.
+      </View>
+
+      <Pressable accessibilityRole="link" onPress={() => router.replace("/login")} style={styles.footer}>
+        <Text style={styles.footerText}>
+          Already have an account? <Text style={styles.link}>Sign in</Text>
         </Text>
-
-        <Divider text="Or register with email" />
-
-        <View style={styles.form}>
-          <TextField
-            label="Full name"
-            value={fullName}
-            onChangeText={setFullName}
-            placeholder="Your full name"
-            autoComplete="name"
-            textContentType="name"
-            editable={!isBusy}
-          />
-          <TextField
-            label="Email address"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="you@example.com"
-            autoCapitalize="none"
-            autoComplete="email"
-            keyboardType="email-address"
-            textContentType="emailAddress"
-            editable={!isBusy}
-          />
-          <TextField
-            label="Phone number (optional)"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            placeholder="e.g. 072 000 0000"
-            autoComplete="tel"
-            keyboardType="phone-pad"
-            textContentType="telephoneNumber"
-            editable={!isBusy}
-          />
-
-          <ChipSelect
-            label="I am joining as"
-            options={ROLE_OPTIONS}
-            value={role}
-            onChange={setRole}
-            hint={role ? ROLE_HINTS[role] : "Administrator accounts are created by the foundation."}
-          />
-
-          {role === "sponsor" ? (
-            <TextField
-              label="Organisation name"
-              value={organisationName}
-              onChangeText={setOrganisationName}
-              placeholder="Your business or organisation"
-              autoComplete="organization"
-              textContentType="organizationName"
-              editable={!isBusy}
-            />
-          ) : null}
-
-          <TextField
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
-            autoCapitalize="none"
-            autoComplete="new-password"
-            textContentType="newPassword"
-            secureTextEntry
-            editable={!isBusy}
-          />
-          <TextField
-            label="Confirm password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="Type your password again"
-            autoCapitalize="none"
-            autoComplete="new-password"
-            textContentType="newPassword"
-            secureTextEntry
-            editable={!isBusy}
-            onSubmitEditing={handleSubmit}
-            returnKeyType="go"
-          />
-
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-
-          <AppButton
-            label={isSubmitting ? "Creating account…" : "Create account"}
-            onPress={handleSubmit}
-            disabled={isBusy}
-            loading={isSubmitting}
-          />
-        </View>
-
-        <Pressable accessibilityRole="link" onPress={() => router.replace("/login")} style={styles.footer}>
-          <Text style={styles.footerText}>
-            Already have an account? <Text style={styles.link}>Sign in</Text>
-          </Text>
-        </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </Pressable>
+    </KeyboardAwareScreen>
   );
 }
 

@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { TextInput } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Megaphone, Plus } from "lucide-react-native";
 import {
@@ -39,6 +40,9 @@ export default function AdminCampaignsScreen() {
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
   const [goal, setGoal] = useState("");
+  const descriptionRef = useRef<TextInput>(null);
+  const categoryRef = useRef<TextInput>(null);
+  const goalRef = useRef<TextInput>(null);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
 
@@ -134,22 +138,50 @@ export default function AdminCampaignsScreen() {
 
       {composing ? (
         <SectionCard title="New campaign">
-          <TextField label="Title" value={title} onChangeText={setTitle} placeholder="Winter blanket drive" />
           <TextField
+            label="Title"
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Winter blanket drive"
+            returnKeyType="next"
+            submitBehavior="submit"
+            onSubmitEditing={() => descriptionRef.current?.focus()}
+          />
+          <TextField
+            ref={descriptionRef}
             label="Description"
             value={description}
             onChangeText={setDescription}
             placeholder="What is this campaign for?"
             multiline
           />
-          <TextField label="Location" value={location} onChangeText={setLocation} placeholder="e.g. Alexandra" />
-          <TextField label="Category" value={category} onChangeText={setCategory} placeholder="e.g. Food" />
           <TextField
+            label="Location"
+            value={location}
+            onChangeText={setLocation}
+            placeholder="e.g. Alexandra"
+            returnKeyType="next"
+            submitBehavior="submit"
+            onSubmitEditing={() => categoryRef.current?.focus()}
+          />
+          <TextField
+            ref={categoryRef}
+            label="Category"
+            value={category}
+            onChangeText={setCategory}
+            placeholder="e.g. Food"
+            returnKeyType="next"
+            submitBehavior="submit"
+            onSubmitEditing={() => goalRef.current?.focus()}
+          />
+          <TextField
+            ref={goalRef}
             label="Funding goal (ZAR)"
             value={goal}
             onChangeText={setGoal}
             placeholder="150000"
             keyboardType="decimal-pad"
+            returnKeyType="done"
           />
           <AppButton label="Create draft" onPress={() => create.mutate()} loading={create.isPending} />
           <AppButton label="Cancel" variant="ghost" onPress={() => setComposing(false)} />

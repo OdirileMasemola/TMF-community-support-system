@@ -89,6 +89,20 @@ describe("RegisterScreen", () => {
     });
   });
 
+  it("chains every field to the next and submits from the last one", () => {
+    renderRegister();
+    const placeholders = [
+      "Your full name",
+      "you@example.com",
+      "e.g. 072 000 0000",
+      "At least 8 characters",
+    ];
+    for (const placeholder of placeholders) {
+      expect(screen.getByPlaceholderText(placeholder).props.returnKeyType).toBe("next");
+    }
+    expect(screen.getByPlaceholderText("Type your password again").props.returnKeyType).toBe("go");
+  });
+
   it("explains the Google sign-up rule", () => {
     renderRegister();
     expect(
