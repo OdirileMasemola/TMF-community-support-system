@@ -67,7 +67,7 @@ export function KeyboardAwareScreen({
               : null,
           ]}
           keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+          keyboardDismissMode="none"
           showsVerticalScrollIndicator={showsVerticalScrollIndicator}
           refreshControl={refreshControl}
         >
