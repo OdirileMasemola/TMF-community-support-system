@@ -124,6 +124,7 @@ export default function SponsorCampaignsScreen() {
                         onChangeText={setAmount}
                         placeholder="25000"
                         keyboardType="decimal-pad"
+                        returnKeyType="done"
                       />
                       <AppButton
                         label="Confirm commitment"

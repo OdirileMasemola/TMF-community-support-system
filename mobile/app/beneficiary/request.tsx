@@ -165,6 +165,7 @@ export default function BeneficiaryRequestScreen() {
           onChangeText={setCollectionArea}
           placeholder="e.g. Diepsloot community hall"
           hint="Where it would be easiest for you to collect."
+          returnKeyType="done"
         />
 
         <AppButton

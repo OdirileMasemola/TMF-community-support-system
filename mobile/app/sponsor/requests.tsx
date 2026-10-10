@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { TextInput } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Inbox } from "lucide-react-native";
 import {
@@ -34,6 +35,7 @@ export default function SponsorRequestsScreen() {
   const [openRequestId, setOpenRequestId] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
   const [notes, setNotes] = useState("");
+  const notesRef = useRef<TextInput>(null);
   const [error, setError] = useState<string | null>(null);
   const [responded, setResponded] = useState(false);
 
@@ -157,8 +159,12 @@ export default function SponsorRequestsScreen() {
                         placeholder="25000"
                         keyboardType="decimal-pad"
                         hint="Leave this if you are declining."
+                        returnKeyType="next"
+                        submitBehavior="submit"
+                        onSubmitEditing={() => notesRef.current?.focus()}
                       />
                       <TextField
+                        ref={notesRef}
                         label="Message (optional)"
                         value={notes}
                         onChangeText={setNotes}

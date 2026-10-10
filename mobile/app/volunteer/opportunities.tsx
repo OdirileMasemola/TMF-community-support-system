@@ -116,6 +116,7 @@ export default function VolunteerOpportunitiesScreen() {
                         value={role}
                         onChangeText={setRole}
                         placeholder="e.g. Packing, driving, admin"
+                        returnKeyType="done"
                       />
                       <AppButton
                         label="Submit application"

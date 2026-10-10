@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { TextInput } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Clock4, TrendingUp } from "lucide-react-native";
 import {
@@ -31,6 +32,8 @@ export default function VolunteerHoursScreen() {
   const [hours, setHours] = useState("");
   const [workDate, setWorkDate] = useState(today);
   const [notes, setNotes] = useState("");
+  const workDateRef = useRef<TextInput>(null);
+  const notesRef = useRef<TextInput>(null);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -130,9 +133,23 @@ export default function VolunteerHoursScreen() {
           }}
           placeholder="e.g. 4.5"
           keyboardType="decimal-pad"
+          returnKeyType="next"
+          submitBehavior="submit"
+          onSubmitEditing={() => workDateRef.current?.focus()}
         />
-        <TextField label="Date" value={workDate} onChangeText={setWorkDate} placeholder="YYYY-MM-DD" autoCapitalize="none" />
         <TextField
+          ref={workDateRef}
+          label="Date"
+          value={workDate}
+          onChangeText={setWorkDate}
+          placeholder="YYYY-MM-DD"
+          autoCapitalize="none"
+          returnKeyType="next"
+          submitBehavior="submit"
+          onSubmitEditing={() => notesRef.current?.focus()}
+        />
+        <TextField
+          ref={notesRef}
           label="Notes (optional)"
           value={notes}
           onChangeText={setNotes}

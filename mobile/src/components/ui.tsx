@@ -1,10 +1,9 @@
 import { Children } from "react";
-import type { ComponentType, PropsWithChildren, ReactNode } from "react";
+import type { ComponentType, PropsWithChildren, ReactNode, Ref } from "react";
 import {
   ActivityIndicator,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -14,6 +13,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { GoogleIcon } from "@/components/GoogleIcon";
+import { KeyboardAwareScreen } from "@/components/KeyboardAwareScreen";
 import { useTheme, useThemedStyles } from "@/theme/ThemeProvider";
 import { radius, shadow, spacing, statusTone, typography, type ThemeColors } from "@/theme/tokens";
 
@@ -29,16 +29,16 @@ export function Screen({
   const { colors } = useTheme();
 
   return (
-    <ScrollView
+    <KeyboardAwareScreen
       style={styles.screen}
       contentContainerStyle={styles.screenContent}
-      showsVerticalScrollIndicator={false}
+      bottomInset={false}
       refreshControl={
         onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} /> : undefined
       }
     >
       {children}
-    </ScrollView>
+    </KeyboardAwareScreen>
   );
 }
 
@@ -363,15 +363,16 @@ export function Divider({ text }: { text?: string }) {
 export function TextField({
   label,
   hint,
+  ref,
   ...inputProps
-}: { label: string; hint?: string } & TextInputProps) {
+}: { label: string; hint?: string; ref?: Ref<TextInput> } & TextInputProps) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useTheme();
 
   return (
     <View style={styles.field}>
       <Text style={styles.fieldLabel}>{label}</Text>
-      <TextInput style={styles.input} placeholderTextColor={colors.mutedForeground} {...inputProps} />
+      <TextInput ref={ref} style={styles.input} placeholderTextColor={colors.mutedForeground} {...inputProps} />
       {hint ? <Text style={styles.fieldHint}>{hint}</Text> : null}
     </View>
   );

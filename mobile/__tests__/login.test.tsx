@@ -50,6 +50,26 @@ describe("LoginScreen", () => {
     expect(await screen.findByText("Invalid login credentials")).toBeTruthy();
   });
 
+  it("moves from email to password with the keyboard's next key", () => {
+    renderLogin();
+    const email = screen.getByPlaceholderText("you@example.com");
+    const password = screen.getByPlaceholderText("Your password");
+    expect(email.props.returnKeyType).toBe("next");
+    expect(password.props.returnKeyType).toBe("go");
+
+    fireEvent(email, "submitEditing");
+    expect(signIn).not.toHaveBeenCalled();
+  });
+
+  it("submits from the password field", async () => {
+    signIn.mockResolvedValue(undefined);
+    renderLogin();
+    fireEvent.changeText(screen.getByPlaceholderText("you@example.com"), "thandi@example.com");
+    fireEvent.changeText(screen.getByPlaceholderText("Your password"), "community123");
+    fireEvent(screen.getByPlaceholderText("Your password"), "submitEditing");
+    await waitFor(() => expect(signIn).toHaveBeenCalledWith("thandi@example.com", "community123"));
+  });
+
   it("links to registration, password reset and help", () => {
     renderLogin();
     fireEvent.press(screen.getByText("Create account"));

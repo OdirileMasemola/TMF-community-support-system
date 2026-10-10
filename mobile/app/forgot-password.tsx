@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
+import { KeyboardAwareScreen } from "@/components/KeyboardAwareScreen";
 import { AppButton, PageHeading, SuccessBanner, TextField } from "@/components/ui";
 import { validateEmail } from "@/lib/validation";
 import { useThemedStyles } from "@/theme/ThemeProvider";
@@ -37,53 +38,51 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <ScrollView style={styles.root} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <PageHeading
-          eyebrow="Account help"
-          title="Forgot your password?"
-          subtitle="Enter the email address you registered with and we will email you a reset link. The link opens the TMF website."
-        />
+    <KeyboardAwareScreen style={styles.root} contentContainerStyle={styles.content}>
+      <PageHeading
+        eyebrow="Account help"
+        title="Forgot your password?"
+        subtitle="Enter the email address you registered with and we will email you a reset link. The link opens the TMF website."
+      />
 
-        {sentTo ? (
-          <View style={styles.form}>
-            <SuccessBanner label={`If an account exists for ${sentTo}, a reset email is on its way.`} />
-            <AppButton label="Back to sign in" onPress={() => router.replace("/login")} />
-          </View>
-        ) : (
-          <View style={styles.form}>
-            <TextField
-              label="Email address"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-              editable={!isSubmitting}
-              onSubmitEditing={handleSubmit}
-              returnKeyType="send"
-            />
+      {sentTo ? (
+        <View style={styles.form}>
+          <SuccessBanner label={`If an account exists for ${sentTo}, a reset email is on its way.`} />
+          <AppButton label="Back to sign in" onPress={() => router.replace("/login")} />
+        </View>
+      ) : (
+        <View style={styles.form}>
+          <TextField
+            label="Email address"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            editable={!isSubmitting}
+            onSubmitEditing={handleSubmit}
+            returnKeyType="send"
+          />
 
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
-            <AppButton
-              label={isSubmitting ? "Sending…" : "Send reset link"}
-              onPress={handleSubmit}
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            />
-          </View>
-        )}
+          <AppButton
+            label={isSubmitting ? "Sending…" : "Send reset link"}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+            loading={isSubmitting}
+          />
+        </View>
+      )}
 
-        <Pressable accessibilityRole="link" onPress={() => router.replace("/login")}>
-          <Text style={styles.footerText}>
-            Remembered it? <Text style={styles.link}>Sign in</Text>
-          </Text>
-        </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      <Pressable accessibilityRole="link" onPress={() => router.replace("/login")}>
+        <Text style={styles.footerText}>
+          Remembered it? <Text style={styles.link}>Sign in</Text>
+        </Text>
+      </Pressable>
+    </KeyboardAwareScreen>
   );
 }
 

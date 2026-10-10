@@ -1,19 +1,10 @@
-import { useState } from "react";
-import {
-  Image,
-  ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { useRef, useState } from "react";
+import { Image, ImageBackground, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
+import { KeyboardAwareScreen } from "@/components/KeyboardAwareScreen";
 import { AppButton, Divider, GoogleButton, TextField } from "@/components/ui";
 import { useThemedStyles } from "@/theme/ThemeProvider";
 import { radius, shadow, spacing, typography, type ThemeColors } from "@/theme/tokens";
@@ -30,6 +21,7 @@ export default function LoginScreen() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const passwordRef = useRef<TextInput>(null);
 
   const isBusy = isSubmitting || isGoogleLoading;
 
@@ -84,13 +76,8 @@ export default function LoginScreen() {
         </SafeAreaView>
       </ImageBackground>
 
-      <KeyboardAvoidingView style={styles.sheetWrapper} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView
-          style={styles.sheet}
-          contentContainerStyle={styles.sheetContent}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+      <View style={styles.sheetWrapper}>
+        <KeyboardAwareScreen style={styles.sheet} contentContainerStyle={styles.sheetContent}>
           <View style={styles.headingBlock}>
             <Text style={styles.eyebrow}>Themba Molefe Foundation</Text>
             <Text style={styles.title}>
@@ -116,9 +103,13 @@ export default function LoginScreen() {
               keyboardType="email-address"
               textContentType="emailAddress"
               editable={!isBusy}
+              returnKeyType="next"
+              submitBehavior="submit"
+              onSubmitEditing={() => passwordRef.current?.focus()}
             />
 
             <TextField
+              ref={passwordRef}
               label="Password"
               value={password}
               onChangeText={setPassword}
@@ -170,8 +161,8 @@ export default function LoginScreen() {
               EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY to mobile/.env.local, then restart Expo.
             </Text>
           ) : null}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAwareScreen>
+      </View>
     </View>
   );
 }

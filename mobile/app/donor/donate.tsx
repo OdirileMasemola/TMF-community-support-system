@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
@@ -44,6 +44,8 @@ export default function DonorDonateScreen() {
   const [amount, setAmount] = useState("");
   const [reference, setReference] = useState("");
   const [paymentDate, setPaymentDate] = useState(today);
+  const referenceRef = useRef<TextInput>(null);
+  const paymentDateRef = useRef<TextInput>(null);
   const [donationId, setDonationId] = useState<string | null>(null);
   const [proof, setProof] = useState<PickedFile | null>(null);
   const [proofSubmitted, setProofSubmitted] = useState(false);
@@ -265,21 +267,30 @@ export default function DonorDonateScreen() {
             onChangeText={setAmount}
             placeholder="500"
             keyboardType="decimal-pad"
+            returnKeyType="next"
+            submitBehavior="submit"
+            onSubmitEditing={() => referenceRef.current?.focus()}
           />
           <TextField
+            ref={referenceRef}
             label="Payment reference"
             value={reference}
             onChangeText={setReference}
             placeholder="e.g. TMF-JANE-01"
             hint="Use the same reference on your EFT so we can match it."
             autoCapitalize="characters"
+            returnKeyType="next"
+            submitBehavior="submit"
+            onSubmitEditing={() => paymentDateRef.current?.focus()}
           />
           <TextField
+            ref={paymentDateRef}
             label="Payment date"
             value={paymentDate}
             onChangeText={setPaymentDate}
             placeholder="YYYY-MM-DD"
             autoCapitalize="none"
+            returnKeyType="done"
           />
 
           <AppButton
