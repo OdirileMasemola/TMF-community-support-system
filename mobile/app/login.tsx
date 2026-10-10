@@ -68,7 +68,7 @@ export default function LoginScreen() {
     <View style={styles.root}>
       {/* The hero image sits under the clock and battery here, so the system
           icons need the light treatment instead of the portals' dark one. */}
-      <StatusBar style="light" translucent backgroundColor="transparent" />
+      <StatusBar style="light" />
 
       {/* Mobile counterpart of the web auth page's side image panel. */}
       <ImageBackground source={authImage} style={styles.hero} imageStyle={styles.heroImage}>

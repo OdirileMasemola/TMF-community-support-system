@@ -52,7 +52,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Expo SDK 54 / React Native 0.81 need Node.js 20.19.4 or newer (same as the CI workflow).
+      # Expo SDK 57 / React Native 0.86 need Node.js 22.13 or newer (same as the CI workflow).
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -60,7 +60,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: mobile/package-lock.json
 
-      # React Native 0.81 builds with JDK 17.
+      # React Native 0.86 builds with JDK 17.
       - name: Setup Java
         uses: actions/setup-java@v4
         with:

@@ -7,14 +7,14 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "androidStatusBar": {
       "barStyle": "dark-content",
       "backgroundColor": "#ffffff"
     },
     "plugins": [
       "expo-router",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-status-bar"
     ],
     "ios": {
       "supportsTablet": true,
