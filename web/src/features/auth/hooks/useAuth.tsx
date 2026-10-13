@@ -100,7 +100,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setIsLoading(false);
     });
 
-    const { data: listener } = client.auth.onAuthStateChange(async (event, nextSession) => {
+    // Keep this callback synchronous: supabase-js holds its auth lock while it runs,
+    // and loadProfile calls getSession() via the API client, which would deadlock.
+    const { data: listener } = client.auth.onAuthStateChange((event, nextSession) => {
       setSession(nextSession);
 
       if (!nextSession?.user.id) {
@@ -114,13 +116,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
         return;
       }
 
-      try {
-        await loadProfile(nextSession.user.id);
-      } catch {
-        setProfile(null);
-      } finally {
-        setIsLoading(false);
-      }
+      const userId = nextSession.user.id;
+      setTimeout(() => {
+        loadProfile(userId)
+          .catch(() => setProfile(null))
+          .finally(() => setIsLoading(false));
+      }, 0);
     });
 
     return () => listener.subscription.unsubscribe();
