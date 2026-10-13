@@ -51,6 +51,7 @@ import {
 } from "@/services/donations";
 import { fetchDonorProfile, updateProfile, type DonorProfile } from "@/services/profiles";
 import { getSignedFileUrl, uploadUserFile } from "@/services/storage";
+import { NotificationInbox } from "@/components/shared/NotificationInbox";
 
 function asDonorProfile(value: unknown): DonorProfile | null {
   if (!value || typeof value !== "object") return null;
@@ -657,38 +658,7 @@ export function DonorNotificationsPage() {
             errorMessage="Could not load notifications."
             loadingMessage="Loading notifications..."
           >
-            <ul className="divide-y divide-border">
-              {notifications.map((notification) => {
-                const unread = notificationIsUnread(notification.status);
-                return (
-                  <li
-                    key={notification.id}
-                    className="flex cursor-pointer items-start gap-4 py-5 first:pt-0 last:pb-0"
-                    onClick={() => {
-                      if (!unread || markRead.isPending) return;
-                      markRead.mutate(notification.id, {
-                        onError: () => toast.error(toUserMessage("Could not mark as read.")),
-                      });
-                    }}
-                  >
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
-                      <Bell className="size-5" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className={cn("font-medium text-foreground", unread && "text-primary")}>{notification.title ?? "Notification"}</p>
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                          {notification.notification_type ?? "Update"}
-                        </span>
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{notification.message}</p>
-                      <p className="mt-2 text-xs text-muted-foreground">{formatRelativeTime(notification.notification_date)}</p>
-                    </div>
-                    {unread ? <span className="mt-2 size-2 rounded-full bg-primary" aria-label="Unread" /> : null}
-                  </li>
-                );
-              })}
-            </ul>
+            <NotificationInbox notifications={notifications} markRead={markRead} />
           </DataState>
         </CardContent>
       </DashboardCard>

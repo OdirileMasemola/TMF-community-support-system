@@ -52,6 +52,8 @@ import {
   type BeneficiaryProfile,
 } from "@/services/profiles";
 import { uploadUserFile } from "@/services/storage";
+import { NotificationInbox } from "@/components/shared/NotificationInbox";
+import { DetailDrawer, DetailList } from "@/components/shared/DetailDrawer";
 
 function AssistanceStatusBadge({ status }: { status: string }) {
   const tone =
@@ -240,6 +242,8 @@ export function BeneficiaryRequestsPage() {
     queryFn: () => fetchBeneficiaryRequests(roleProfileId!),
   });
   const requests = requestsQuery.data ?? [];
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = requests.find((request) => request.id === selectedId) ?? null;
 
   return (
     <AdminPageShell
@@ -284,7 +288,7 @@ export function BeneficiaryRequestsPage() {
                   <PriorityBadge priority={request.priority ?? "medium"} />
                 </td>
                 <td className={tableCellClass}>
-                  <Button variant="ghost" size="sm">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setSelectedId(request.id)}>
                     View details
                   </Button>
                 </td>
@@ -293,6 +297,47 @@ export function BeneficiaryRequestsPage() {
           </tbody>
         </BeneficiaryTable>
       </DataState>
+      <DetailDrawer
+        open={Boolean(selected)}
+        onClose={() => setSelectedId(null)}
+        eyebrow="Assistance request"
+        title={selected ? `REQ-${selected.id.slice(0, 8).toUpperCase()} · ${selected.request_type}` : ""}
+        description={selected ? `Submitted ${formatShortDate(selected.request_date)}` : null}
+        footer={
+          <>
+            <Button to="/beneficiary/help" variant="outline">
+              Collection schedule
+            </Button>
+            <Button type="button" onClick={() => setSelectedId(null)}>
+              Done
+            </Button>
+          </>
+        }
+      >
+        {selected ? (
+          <div className="space-y-6">
+            <DetailList
+              items={[
+                { label: "Type", value: selected.request_type },
+                { label: "Status", value: <AssistanceStatusBadge status={requestStatusLabel(selected.status)} /> },
+                { label: "Priority", value: <PriorityBadge priority={selected.priority ?? "medium"} /> },
+                { label: "Collection area", value: selected.preferred_collection_area ?? "—" },
+                { label: "Reviewed", value: formatShortDate(selected.reviewed_at) },
+              ]}
+            />
+            <div className="rounded-lg border border-border bg-muted/40 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Your description</p>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-foreground">{selected.description}</p>
+            </div>
+            {selected.admin_notes ? (
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary">Note from the foundation</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-foreground">{selected.admin_notes}</p>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </DetailDrawer>
     </AdminPageShell>
   );
 }
@@ -502,34 +547,7 @@ export function BeneficiaryNotificationsPage() {
               isEmpty={notifications.length === 0}
               emptyMessage="No notifications yet."
             >
-              <ul className="divide-y divide-border">
-                {notifications.map((notification) => {
-                  const unread = notificationIsUnread(notification.status);
-                  return (
-                    <li
-                      key={notification.id}
-                      className="flex cursor-pointer items-start gap-4 py-5 first:pt-0 last:pb-0"
-                      onClick={() => {
-                        if (unread) markRead.mutate(notification.id);
-                      }}
-                    >
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
-                        <Bell className="size-5" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className={cn("font-medium text-foreground", unread && "text-primary")}>
-                          {notification.title ?? "Notification"}
-                        </p>
-                        <p className="mt-1 text-sm text-muted-foreground">{notification.message}</p>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          {formatRelativeTime(notification.notification_date)}
-                        </p>
-                      </div>
-                      {unread && <span className="mt-2 size-2 rounded-full bg-primary" aria-label="Unread" />}
-                    </li>
-                  );
-                })}
-              </ul>
+              <NotificationInbox notifications={notifications} markRead={markRead} />
             </DataState>
           </CardContent>
         </DashboardCard>

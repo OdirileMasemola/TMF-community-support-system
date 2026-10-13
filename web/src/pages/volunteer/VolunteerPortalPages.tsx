@@ -50,6 +50,8 @@ import {
   fetchVolunteerAssignments,
   fetchVolunteerHours,
 } from "@/services/volunteers";
+import { NotificationInbox } from "@/components/shared/NotificationInbox";
+import { DetailDrawer, DetailList } from "@/components/shared/DetailDrawer";
 
 function ApplicationStatusBadge({ status }: { status: string }) {
   const tone =
@@ -203,6 +205,8 @@ export function VolunteerApplicationsPage() {
     queryFn: () => fetchVolunteerApplications(roleProfileId!),
   });
   const applications = applicationsQuery.data ?? [];
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = applications.find((application) => application.id === selectedId) ?? null;
 
   return (
     <AdminPageShell
@@ -245,7 +249,7 @@ export function VolunteerApplicationsPage() {
                   <ApplicationStatusBadge status={applicationStatusLabel(application.status)} />
                 </td>
                 <td className={tableCellClass}>
-                  <Button variant="ghost" size="sm">
+                  <Button type="button" variant="ghost" size="sm" onClick={() => setSelectedId(application.id)}>
                     View details
                   </Button>
                 </td>
@@ -254,6 +258,37 @@ export function VolunteerApplicationsPage() {
           </tbody>
         </VolunteerTable>
       </DataState>
+      <DetailDrawer
+        open={Boolean(selected)}
+        onClose={() => setSelectedId(null)}
+        eyebrow="Application"
+        title={selected?.campaigns?.title ?? "Campaign application"}
+        description={selected ? `Applied ${formatShortDate(selected.application_date)}` : null}
+        footer={
+          <>
+            <Button to="/volunteer/assignments" variant="outline">
+              My assignments
+            </Button>
+            <Button type="button" onClick={() => setSelectedId(null)}>
+              Done
+            </Button>
+          </>
+        }
+      >
+        {selected ? (
+          <DetailList
+            items={[
+              { label: "Reference", value: selected.id.slice(0, 8).toUpperCase() },
+              { label: "Campaign", value: selected.campaigns?.title ?? "—" },
+              { label: "Category", value: selected.campaigns?.category ?? "—" },
+              { label: "Location", value: selected.campaigns?.location ?? "—" },
+              { label: "Role", value: selected.participation_role ?? "Volunteer" },
+              { label: "Applied", value: formatShortDate(selected.application_date) },
+              { label: "Status", value: <ApplicationStatusBadge status={applicationStatusLabel(selected.status)} /> },
+            ]}
+          />
+        ) : null}
+      </DetailDrawer>
     </AdminPageShell>
   );
 }
@@ -548,41 +583,7 @@ export function VolunteerNotificationsPage() {
             isEmpty={notifications.length === 0}
             emptyMessage="No notifications yet."
           >
-            <ul className="divide-y divide-border">
-              {notifications.map((notification) => {
-                const unread = notificationIsUnread(notification.status);
-                return (
-                  <li
-                    key={notification.id}
-                    className="flex cursor-pointer items-start gap-4 py-5 first:pt-0 last:pb-0"
-                    onClick={() => {
-                      if (unread) markRead.mutate(notification.id);
-                    }}
-                  >
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary">
-                      <Bell className="size-5" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className={cn("font-medium text-foreground", unread && "text-primary")}>
-                          {notification.title ?? "Notification"}
-                        </p>
-                        {notification.notification_type ? (
-                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                            {formatStatusLabel(notification.notification_type)}
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{notification.message}</p>
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        {formatRelativeTime(notification.notification_date)}
-                      </p>
-                    </div>
-                    {unread && <span className="mt-2 size-2 rounded-full bg-primary" aria-label="Unread" />}
-                  </li>
-                );
-              })}
-            </ul>
+            <NotificationInbox notifications={notifications} markRead={markRead} />
           </DataState>
         </CardContent>
       </DashboardCard>
