@@ -68,7 +68,6 @@ export function AdminSponsorsPage() {
 
   const isLoading = sponsorshipsQuery.isLoading || requestsQuery.isLoading;
   const isError = sponsorshipsQuery.isError || requestsQuery.isError;
-  const error = sponsorshipsQuery.error ?? requestsQuery.error;
 
   return (
     <AdminPageShell

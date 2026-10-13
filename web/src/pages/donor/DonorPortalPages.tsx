@@ -1,5 +1,4 @@
 import {
-  Bell,
   CheckCircle2,
   Download,
   Eye,
@@ -34,7 +33,6 @@ import {
   campaignProgress,
   formatCurrency,
   formatMonthYear,
-  formatRelativeTime,
   formatShortDate,
   notificationIsUnread,
   paymentStatusLabel,
@@ -127,6 +125,7 @@ export function DonorDonatePage() {
 
   useEffect(() => {
     if (!campaignId && campaigns[0]?.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
       setCampaignId(campaigns[0].id);
     }
   }, [campaignId, campaigns]);
@@ -466,6 +465,7 @@ export function DonorProofOfPaymentPage() {
 
   useEffect(() => {
     if (!donationId && donations[0]?.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
       setDonationId(donations[0].id);
     }
   }, [donationId, donations]);
@@ -679,6 +679,7 @@ export function DonorProfilePage() {
   const [donationPreference, setDonationPreference] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setFullName(profile?.full_name ?? "");
     setPhone(profile?.phone_number ?? "");
   }, [profile?.full_name, profile?.phone_number]);
@@ -692,6 +693,7 @@ export function DonorProfilePage() {
   const donorProfile = donorProfileQuery.data ?? asDonorProfile(roleProfile);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setDonationPreference(donorProfile?.donation_preference ?? "");
   }, [donorProfile?.donation_preference]);
 
@@ -841,11 +843,13 @@ export function DonorSettingsPage() {
   const donorProfile = donorProfileQuery.data ?? asDonorProfile(roleProfile);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setPhone(profile?.phone_number ?? "");
     setFullName(profile?.full_name ?? "");
   }, [profile?.full_name, profile?.phone_number]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setDonationPreference(donorProfile?.donation_preference ?? "");
   }, [donorProfile?.donation_preference]);
 

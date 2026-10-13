@@ -1,5 +1,4 @@
 import {
-  Bell,
   CheckCircle2,
   Clock3,
   HandHeart,
@@ -32,7 +31,6 @@ import { useRoleProfile } from "@/hooks/useRoleProfile";
 import {
   campaignStatusLabel,
   formatMonthYear,
-  formatRelativeTime,
   formatShortDate,
   formatStatusLabel,
   notificationIsUnread,
@@ -117,6 +115,7 @@ export function BeneficiaryRequestPage() {
   const [documentFile, setDocumentFile] = useState<File | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setCollectionArea(beneficiaryRole?.residential_address ?? "");
   }, [beneficiaryRole?.residential_address]);
 
@@ -648,6 +647,7 @@ export function BeneficiarySettingsPage() {
 
   useEffect(() => {
     if (!profile) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setFullName(profile.full_name ?? "");
     setPhone(profile.phone_number ?? "");
     setResidentialAddress(beneficiaryRole?.residential_address ?? "");

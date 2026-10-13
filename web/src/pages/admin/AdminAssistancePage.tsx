@@ -35,6 +35,7 @@ export function AdminAssistancePage() {
 
   useEffect(() => {
     if (!selected) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setStatus(selected.status);
     setNotes(selected.admin_notes ?? "");
   }, [selected]);

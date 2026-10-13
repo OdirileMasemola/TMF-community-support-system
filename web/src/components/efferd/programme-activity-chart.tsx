@@ -60,7 +60,7 @@ export function ProgrammeActivityChart({ className }: { className?: string }) {
   const chartUid = useId().replace(/:/g, "");
   const idLineGlow = `programme-line-glow-${chartUid}`;
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-programme-activity"],
     enabled: isSupabaseConfigured(),
     queryFn: async () => {

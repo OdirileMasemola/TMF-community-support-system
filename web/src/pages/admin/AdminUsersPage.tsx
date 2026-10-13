@@ -26,7 +26,7 @@ async function copyRegistrationLink() {
 
 export function AdminUsersPage() {
   const queryClient = useQueryClient();
-  const { data: users = [], isLoading, isError, error } = useQuery({
+  const { data: users = [], isLoading, isError } = useQuery({
     queryKey: ["admin-profiles"],
     enabled: isSupabaseConfigured(),
     queryFn: fetchProfiles,

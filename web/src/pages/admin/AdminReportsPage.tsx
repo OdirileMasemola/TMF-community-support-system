@@ -14,7 +14,7 @@ export function AdminReportsPage() {
   const queryClient = useQueryClient();
   const { roleProfileId } = useRoleProfile();
 
-  const { data: reports = [], isLoading, isError, error } = useQuery({
+  const { data: reports = [], isLoading, isError } = useQuery({
     queryKey: ["admin-reports"],
     enabled: isSupabaseConfigured(),
     queryFn: fetchReports,

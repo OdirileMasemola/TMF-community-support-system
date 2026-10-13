@@ -27,7 +27,7 @@ export function AdminEventsPage() {
   const [eventDate, setEventDate] = useState("");
   const [description, setDescription] = useState("");
 
-  const { data: events = [], isLoading, isError, error } = useQuery({
+  const { data: events = [], isLoading, isError } = useQuery({
     queryKey: ["admin-events"],
     enabled: isSupabaseConfigured(),
     queryFn: fetchEvents,

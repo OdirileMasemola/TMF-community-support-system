@@ -8,7 +8,7 @@ import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { fetchAdminDashboardStats } from "@/services/admin";
 
 export function DashboardStats() {
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["admin-dashboard-stats"],
     enabled: isSupabaseConfigured(),
     queryFn: fetchAdminDashboardStats,

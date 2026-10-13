@@ -18,7 +18,7 @@ type ActivityItem = {
 };
 
 export function DashboardActivity({ className }: { className?: string }) {
-  const { data: activities = [], isLoading, isError, error } = useQuery({
+  const { data: activities = [], isLoading, isError } = useQuery({
     queryKey: ["admin-dashboard-activity"],
     enabled: isSupabaseConfigured(),
     queryFn: async (): Promise<ActivityItem[]> => {

@@ -1,5 +1,4 @@
 import {
-  Bell,
   Building2,
   CheckCircle2,
   ClipboardList,
@@ -47,12 +46,10 @@ import {
   campaignStatusLabel,
   formatCurrency,
   formatMonthYear,
-  formatRelativeTime,
   formatShortDate,
   formatStatusLabel,
   notificationIsUnread,
 } from "@/lib/display";
-import { cn } from "@/lib/utils";
 import { getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { fetchCampaigns } from "@/services/campaigns";
 import { updateProfile, type SponsorProfile } from "@/services/profiles";
@@ -495,6 +492,7 @@ function useSponsorAccountForm() {
   const [sponsorshipType, setSponsorshipType] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncs editable form state from loaded server data; refactoring to keyed remounts risks losing in-progress edits
     setOrganisationName(sponsorProfile?.organisation_name ?? "");
     setRepresentative(sponsorProfile?.representative_name ?? profile?.full_name ?? "");
     setEmail(profile?.email ?? "");

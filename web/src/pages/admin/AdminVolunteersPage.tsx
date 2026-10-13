@@ -20,7 +20,7 @@ import {
 
 export function AdminVolunteersPage() {
   const queryClient = useQueryClient();
-  const { data: applications = [], isLoading, isError, error } = useQuery({
+  const { data: applications = [], isLoading, isError } = useQuery({
     queryKey: ["admin-volunteer-applications"],
     enabled: isSupabaseConfigured(),
     queryFn: () => fetchAllApplications(100),
@@ -59,7 +59,8 @@ export function AdminVolunteersPage() {
   const totalApplications = applications.length;
   const pendingReview = applications.filter((application) => application.status === "pending").length;
   const approved = applications.filter((application) => application.status === "approved").length;
-  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const [renderedAt] = useState(() => Date.now());
+  const weekAgo = renderedAt - 7 * 24 * 60 * 60 * 1000;
   const thisWeek = applications.filter((application) => {
     const submitted = new Date(application.application_date).getTime();
     return !Number.isNaN(submitted) && submitted >= weekAgo;

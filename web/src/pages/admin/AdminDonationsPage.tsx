@@ -107,7 +107,6 @@ export function AdminDonationsPage() {
 
   const isLoading = donationsQuery.isLoading || proofsQuery.isLoading;
   const isError = donationsQuery.isError || proofsQuery.isError;
-  const error = donationsQuery.error ?? proofsQuery.error;
 
   return (
     <AdminPageShell

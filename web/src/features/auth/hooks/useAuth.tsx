@@ -49,7 +49,7 @@ function toProfile(data: NonNullable<Awaited<ReturnType<typeof fetchProfile>>>):
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => isSupabaseConfigured());
   const navigate = useNavigateSafe();
   const queryClient = useQueryClient();
 
@@ -82,7 +82,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      setIsLoading(false);
       return;
     }
 
@@ -205,6 +204,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     if (error) throw error;
   }, []);
 
+  const sessionUserId = session?.user.id;
+  const sessionUserEmail = session?.user.email;
+
   const completeProfile = useCallback(
     async (values: { fullName: string; phoneNumber: string; role: UserRole; organisationName?: string }) => {
       if (!isPublicSignupRole(values.role)) {
@@ -212,20 +214,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
       }
 
       const supabase = getSupabaseClientOrNull();
-      if (!supabase || !session?.user.id) {
+      if (!supabase || !sessionUserId) {
         throw new Error("You must be signed in to complete your profile.");
       }
 
-      const existing = await fetchProfile(session.user.id);
+      const existing = await fetchProfile(sessionUserId);
       if (existing?.role) {
         navigate(roleHomePath(existing.role));
         return;
       }
 
       const { error } = await supabase.from("profiles").upsert({
-        id: session.user.id,
+        id: sessionUserId,
         full_name: values.fullName,
-        email: session.user.email ?? "",
+        email: sessionUserEmail ?? "",
         phone_number: values.phoneNumber || null,
         role: values.role,
         account_status: "pending",
@@ -233,19 +235,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
       if (error) throw error;
 
-      await ensureRoleProfile(session.user.id, values.role, values.organisationName);
-      queryClient.removeQueries({ queryKey: ["profile", session.user.id] });
-      await loadProfile(session.user.id);
+      await ensureRoleProfile(sessionUserId, values.role, values.organisationName);
+      queryClient.removeQueries({ queryKey: ["profile", sessionUserId] });
+      await loadProfile(sessionUserId);
       navigate(roleHomePath(values.role));
     },
-    [loadProfile, navigate, queryClient, session?.user.email, session?.user.id],
+    [loadProfile, navigate, queryClient, sessionUserEmail, sessionUserId],
   );
 
   const refreshProfile = useCallback(async () => {
-    if (!session?.user.id) return;
-    queryClient.removeQueries({ queryKey: ["profile", session.user.id] });
-    await loadProfile(session.user.id);
-  }, [loadProfile, queryClient, session?.user.id]);
+    if (!sessionUserId) return;
+    queryClient.removeQueries({ queryKey: ["profile", sessionUserId] });
+    await loadProfile(sessionUserId);
+  }, [loadProfile, queryClient, sessionUserId]);
 
   const signOut = useCallback(async () => {
     const supabase = getSupabaseClientOrNull();

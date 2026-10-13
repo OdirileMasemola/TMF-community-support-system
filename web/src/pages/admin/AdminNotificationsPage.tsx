@@ -4,12 +4,10 @@ import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
 import { useNotifications } from "@/hooks/useNotifications";
-import { formatRelativeTime, formatStatusLabel, notificationIsUnread } from "@/lib/display";
-import { cn } from "@/lib/utils";
 import { NotificationInbox } from "@/components/shared/NotificationInbox";
 
 export function AdminNotificationsPage() {
-  const { notifications, isLoading, isError, error, markAllRead, markRead } = useNotifications();
+  const { notifications, isLoading, isError, markAllRead, markRead } = useNotifications();
 
   return (
     <AdminPageShell
