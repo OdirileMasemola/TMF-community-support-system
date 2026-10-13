@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -7,6 +8,7 @@ import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
+import { DetailDrawer, DetailList } from "@/components/shared/DetailDrawer";
 import { applicationStatusLabel, formatShortDate } from "@/lib/display";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import {
@@ -51,6 +53,9 @@ export function AdminVolunteersPage() {
     onError: (mutationError: Error) => toast.error(mutationError.message || "Could not update application"),
   });
 
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = applications.find((application) => application.id === selectedId) ?? null;
+
   const totalApplications = applications.length;
   const pendingReview = applications.filter((application) => application.status === "pending").length;
   const approved = applications.filter((application) => application.status === "approved").length;
@@ -66,7 +71,11 @@ export function AdminVolunteersPage() {
       title="Volunteer Management"
       description="Review volunteer applications, approve assignments, and monitor volunteer participation."
       actions={
-        <Button type="button" variant="outline">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => document.getElementById("volunteer-applications")?.scrollIntoView({ behavior: "smooth" })}
+        >
           View all applications
         </Button>
       }
@@ -106,7 +115,7 @@ export function AdminVolunteersPage() {
         </DashboardCard>
       </div>
 
-      <DashboardCard>
+      <DashboardCard id="volunteer-applications" className="scroll-mt-20">
         <CardHeader>
           <CardTitle>Volunteer applications</CardTitle>
         </CardHeader>
@@ -168,7 +177,7 @@ export function AdminVolunteersPage() {
                             </Button>
                           </div>
                         ) : (
-                          <Button type="button" variant="outline" size="sm" disabled>
+                          <Button type="button" variant="outline" size="sm" onClick={() => setSelectedId(application.id)}>
                             View
                           </Button>
                         )}
@@ -181,6 +190,38 @@ export function AdminVolunteersPage() {
           </DataState>
         </CardContent>
       </DashboardCard>
+
+      <DetailDrawer
+        open={Boolean(selected)}
+        onClose={() => setSelectedId(null)}
+        eyebrow="Volunteer application"
+        title={
+          selected?.volunteer_profiles?.profiles?.full_name?.trim() ||
+          selected?.volunteer_profiles?.profiles?.email ||
+          "Volunteer"
+        }
+        description={selected?.campaigns?.title ?? null}
+        footer={
+          selected?.volunteer_profiles?.profiles?.email ? (
+            <Button asChild variant="outline">
+              <a href={`mailto:${selected.volunteer_profiles.profiles.email}`}>Email volunteer</a>
+            </Button>
+          ) : null
+        }
+      >
+        {selected ? (
+          <DetailList
+            items={[
+              { label: "Reference", value: selected.id.slice(0, 8) },
+              { label: "Email", value: selected.volunteer_profiles?.profiles?.email ?? "—" },
+              { label: "Campaign", value: selected.campaigns?.title ?? "—" },
+              { label: "Role", value: selected.participation_role ?? "Volunteer" },
+              { label: "Submitted", value: formatShortDate(selected.application_date) },
+              { label: "Status", value: <AdminStatusBadge status={applicationStatusLabel(selected.status)} /> },
+            ]}
+          />
+        ) : null}
+      </DetailDrawer>
     </AdminPageShell>
   );
 }

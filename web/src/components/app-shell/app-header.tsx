@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Send } from "lucide-react";
+import { Bell, Mail } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/separator";
@@ -16,6 +16,8 @@ type AppHeaderProps = {
 
 export function AppHeader({ navLinks = adminNavLinks }: AppHeaderProps) {
   const { pathname } = useLocation();
+  const portalBase = `/${pathname.split("/")[1] ?? "admin"}`;
+  const notificationsPath = portalBase === "/donor" ? "/donor/dashboard/notifications" : `${portalBase}/notifications`;
   const activeItem = navLinks.find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
 
   return (
@@ -30,10 +32,12 @@ export function AppHeader({ navLinks = adminNavLinks }: AppHeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button type="button" variant="ghost" size="icon" aria-label="Send update">
-          <Send className="size-4" aria-hidden="true" />
-        </Button>
-        <Button type="button" variant="ghost" size="icon" aria-label="Notifications">
+        {portalBase === "/admin" ? (
+          <Button to="/admin/messages" variant="ghost" size="icon" aria-label="Messages">
+            <Mail className="size-4" aria-hidden="true" />
+          </Button>
+        ) : null}
+        <Button to={notificationsPath} variant="ghost" size="icon" aria-label="Notifications">
           <Bell className="size-4" aria-hidden="true" />
         </Button>
         <ThemeSelector className="size-10 rounded-md border-0 bg-transparent hover:bg-accent" />

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -7,10 +8,42 @@ import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
+import { DetailDrawer, DetailList } from "@/components/shared/DetailDrawer";
 import { useRoleProfile } from "@/hooks/useRoleProfile";
 import { formatCurrency, formatShortDate, paymentStatusLabel, verificationStatusLabel } from "@/lib/display";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
-import { fetchAllDonations, fetchPendingProofs, updateDonation, updateDonationProof } from "@/services/donations";
+import {
+  fetchAllDonations,
+  fetchPendingProofs,
+  updateDonation,
+  updateDonationProof,
+  type DonationWithDonor,
+} from "@/services/donations";
+
+function csvCell(value: unknown): string {
+  const text = value == null ? "" : String(value);
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function exportDonationsCsv(donations: DonationWithDonor[]) {
+  const header = ["Reference", "Donor", "Email", "Campaign", "Amount", "Status", "Date"];
+  const rows = donations.map((donation) => [
+    donation.payment_reference || donation.receipt_number || donation.id.slice(0, 8),
+    donation.donor_profiles?.profiles?.full_name ?? "",
+    donation.donor_profiles?.profiles?.email ?? "",
+    donation.campaigns?.title ?? "",
+    donation.amount,
+    donation.status,
+    donation.donation_date,
+  ]);
+  const csv = [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `tmf-donations-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 export function AdminDonationsPage() {
   const queryClient = useQueryClient();
@@ -29,6 +62,8 @@ export function AdminDonationsPage() {
   });
 
   const donations = donationsQuery.data ?? [];
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = donations.find((donation) => donation.id === selectedId) ?? null;
   const pendingProofs = proofsQuery.data ?? [];
 
   const updateDonationMutation = useMutation({
@@ -80,7 +115,12 @@ export function AdminDonationsPage() {
       title="Donation Management"
       description="Review donation records, verify payment proofs, and track contribution history across campaigns."
       actions={
-        <Button type="button" variant="outline">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={donations.length === 0}
+          onClick={() => exportDonationsCsv(donations)}
+        >
           Export list
         </Button>
       }
@@ -187,8 +227,8 @@ export function AdminDonationsPage() {
                               </Button>
                             </>
                           ) : (
-                            <Button type="button" variant="outline" size="sm" disabled>
-                              Review
+                            <Button type="button" variant="outline" size="sm" onClick={() => setSelectedId(donation.id)}>
+                              View
                             </Button>
                           )}
                         </div>
@@ -264,6 +304,35 @@ export function AdminDonationsPage() {
           </DataState>
         </CardContent>
       </DashboardCard>
+
+      <DetailDrawer
+        open={Boolean(selected)}
+        onClose={() => setSelectedId(null)}
+        eyebrow="Donation"
+        title={selected ? formatCurrency(selected.amount) : ""}
+        description={
+          selected
+            ? `${selected.donor_profiles?.profiles?.full_name?.trim() || "Unknown donor"} · ${formatShortDate(selected.donation_date)}`
+            : null
+        }
+      >
+        {selected ? (
+          <DetailList
+            items={[
+              {
+                label: "Reference",
+                value: selected.payment_reference || selected.receipt_number || selected.id.slice(0, 8),
+              },
+              { label: "Donor", value: selected.donor_profiles?.profiles?.full_name ?? "—" },
+              { label: "Email", value: selected.donor_profiles?.profiles?.email ?? "—" },
+              { label: "Campaign", value: selected.campaigns?.title ?? "General fund" },
+              { label: "Amount", value: formatCurrency(selected.amount) },
+              { label: "Status", value: <AdminStatusBadge status={paymentStatusLabel(selected.status)} /> },
+              { label: "Date", value: formatShortDate(selected.donation_date) },
+            ]}
+          />
+        ) : null}
+      </DetailDrawer>
     </AdminPageShell>
   );
 }

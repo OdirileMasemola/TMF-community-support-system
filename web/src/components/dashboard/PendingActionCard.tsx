@@ -7,6 +7,7 @@ type PendingActionCardProps = {
   title: string;
   count: number;
   priority: Priority;
+  route: string;
 };
 
 const priorityStyles: Record<Priority, string> = {
@@ -15,7 +16,7 @@ const priorityStyles: Record<Priority, string> = {
   Low: "border-border bg-accent text-accent-foreground",
 };
 
-export function PendingActionCard({ title, count, priority }: PendingActionCardProps) {
+export function PendingActionCard({ title, count, priority, route }: PendingActionCardProps) {
   return (
     <Card className="flex h-full flex-col bg-card/70 backdrop-blur-xl">
       <div className="flex items-start justify-between gap-3">
@@ -34,7 +35,7 @@ export function PendingActionCard({ title, count, priority }: PendingActionCardP
       <p className="mt-1 text-sm text-muted-foreground">Pending items</p>
 
       <div className="mt-auto pt-5">
-        <Button type="button" variant="outline" size="sm" className="w-full" aria-label={`Open ${title}`}>
+        <Button to={route} variant="outline" size="sm" className="w-full" aria-label={`Open ${title}`}>
           Open
         </Button>
       </div>

@@ -8,10 +8,15 @@ import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
+import { DetailDrawer } from "@/components/shared/DetailDrawer";
+import { Textarea } from "@/components/ui/textarea";
 import { useRoleProfile } from "@/hooks/useRoleProfile";
 import { formatShortDate, formatStatusLabel } from "@/lib/display";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
-import { createEvent, fetchEvents } from "@/services/admin";
+import { createEvent, fetchEvents, updateEvent, type EventRow } from "@/services/admin";
+import type { EventStatus } from "@/types/database.types";
+
+const eventStatuses: EventStatus[] = ["draft", "scheduled", "completed", "cancelled"];
 
 export function AdminEventsPage() {
   const queryClient = useQueryClient();
@@ -26,6 +31,43 @@ export function AdminEventsPage() {
     queryKey: ["admin-events"],
     enabled: isSupabaseConfigured(),
     queryFn: fetchEvents,
+  });
+
+  const [editing, setEditing] = useState<EventRow | null>(null);
+  const [draft, setDraft] = useState({ title: "", location: "", event_date: "", description: "", status: "scheduled" as EventStatus });
+
+  const openEvent = (event: EventRow) => {
+    setEditing(event);
+    setDraft({
+      title: event.title,
+      location: event.location,
+      event_date: event.event_date.slice(0, 10),
+      description: event.description ?? "",
+      status: event.status,
+    });
+  };
+
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      if (!editing) return;
+      if (!draft.title.trim() || !draft.location.trim() || !draft.event_date) {
+        throw new Error("Title, location, and event date are required.");
+      }
+      await updateEvent(editing.id, {
+        title: draft.title.trim(),
+        location: draft.location.trim(),
+        event_date: draft.event_date,
+        description: draft.description.trim() || null,
+        status: draft.status,
+      });
+    },
+    onSuccess: async () => {
+      toast.success("Event updated");
+      setEditing(null);
+      await queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
+    },
+    onError: (mutationError: Error) => toast.error(mutationError.message || "Could not update event"),
   });
 
   const createMutation = useMutation({
@@ -116,7 +158,7 @@ export function AdminEventsPage() {
                 <p>{formatShortDate(event.event_date)}</p>
                 <p>{event.location}</p>
                 <p>{event.description?.trim() || "No description provided."}</p>
-                <Button type="button" variant="outline" size="sm" className="mt-3">
+                <Button type="button" variant="outline" size="sm" className="mt-3" onClick={() => openEvent(event)}>
                   Manage event
                 </Button>
               </CardContent>
@@ -124,6 +166,61 @@ export function AdminEventsPage() {
           ))}
         </div>
       </DataState>
+
+      <DetailDrawer
+        open={Boolean(editing)}
+        onClose={() => setEditing(null)}
+        eyebrow="Manage event"
+        title={editing?.title ?? ""}
+        description={editing ? `${formatShortDate(editing.event_date)} · ${editing.location}` : null}
+        footer={
+          <>
+            <Button type="button" variant="outline" onClick={() => setEditing(null)}>
+              Cancel
+            </Button>
+            <Button type="button" disabled={updateMutation.isPending} onClick={() => updateMutation.mutate()}>
+              {updateMutation.isPending ? "Saving..." : "Save changes"}
+            </Button>
+          </>
+        }
+      >
+        <div className="grid gap-4">
+          <Input label="Title" value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} />
+          <Input
+            label="Location"
+            value={draft.location}
+            onChange={(event) => setDraft({ ...draft, location: event.target.value })}
+          />
+          <Input
+            label="Event date"
+            type="date"
+            value={draft.event_date}
+            onChange={(event) => setDraft({ ...draft, event_date: event.target.value })}
+          />
+          <label className="block space-y-2 text-sm font-medium text-foreground">
+            <span>Status</span>
+            <select
+              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+              value={draft.status}
+              onChange={(event) => setDraft({ ...draft, status: event.target.value as EventStatus })}
+            >
+              {eventStatuses.map((value) => (
+                <option key={value} value={value}>
+                  {formatStatusLabel(value)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block space-y-2 text-sm font-medium text-foreground">
+            <span>Description</span>
+            <Textarea
+              rows={4}
+              value={draft.description}
+              onChange={(event) => setDraft({ ...draft, description: event.target.value })}
+            />
+          </label>
+        </div>
+      </DetailDrawer>
     </AdminPageShell>
   );
 }

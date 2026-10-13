@@ -6,6 +6,7 @@ import {
   HandCoins,
   HeartHandshake,
   LayoutGrid,
+  LifeBuoy,
   Mail,
   Megaphone,
   Settings,
@@ -72,6 +73,11 @@ export const navGroups: SidebarNavGroup[] = [
         title: "Users",
         path: "/admin/users",
         icon: <Users className="size-4" aria-hidden="true" />,
+      },
+      {
+        title: "Assistance",
+        path: "/admin/assistance",
+        icon: <LifeBuoy className="size-4" aria-hidden="true" />,
       },
       {
         title: "Events",

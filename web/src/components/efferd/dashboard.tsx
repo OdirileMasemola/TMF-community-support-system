@@ -24,24 +24,28 @@ export function Dashboard() {
   const pendingActions: PendingAction[] = [
     {
       id: "pending-volunteers",
+      route: "/admin/volunteers",
       title: "Pending Volunteer Applications",
       count: stats?.pendingVolunteerApplications ?? 0,
       priority: "High",
     },
     {
       id: "pending-donations",
+      route: "/admin/donations",
       title: "Pending Donation Verifications",
       count: stats?.pendingDonationProofs ?? 0,
       priority: "High",
     },
     {
       id: "pending-sponsors",
+      route: "/admin/sponsors",
       title: "Pending Sponsor Requests",
       count: stats?.openSponsorshipRequests ?? 0,
       priority: "Medium",
     },
     {
       id: "pending-assistance",
+      route: "/admin/assistance",
       title: "Pending Assistance Requests",
       count: stats?.pendingAssistanceRequests ?? 0,
       priority: "High",
@@ -81,7 +85,7 @@ export function Dashboard() {
               loadingMessage="Loading pending items..."
             >
               {pendingActions.map((action) => (
-                <PendingActionCard key={action.id} title={action.title} count={action.count} priority={action.priority} />
+                <PendingActionCard key={action.id} title={action.title} count={action.count} priority={action.priority} route={action.route ?? "/admin/dashboard"} />
               ))}
             </DataState>
           </CardContent>

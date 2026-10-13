@@ -50,6 +50,7 @@ export interface PendingAction {
   title: string;
   count: number;
   priority: Priority;
+  route?: string;
 }
 
 export interface QuickAction {

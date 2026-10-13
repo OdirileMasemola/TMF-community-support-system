@@ -1,4 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -6,11 +8,29 @@ import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
-import { formatCurrency, formatStatusLabel, paymentStatusLabel } from "@/lib/display";
+import { DetailDrawer, DetailList } from "@/components/shared/DetailDrawer";
+import { formatCurrency, formatShortDate, formatStatusLabel, paymentStatusLabel } from "@/lib/display";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
-import { fetchAllSponsorshipRequests, fetchAllSponsorships } from "@/services/sponsorships";
+import { fetchAllSponsorshipRequests, fetchAllSponsorships, updateSponsorship } from "@/services/sponsorships";
+import type { PaymentStatus } from "@/types/database.types";
+
+const sponsorshipStatuses: PaymentStatus[] = ["pending", "successful", "failed", "cancelled"];
+
+async function copyRegistrationLink() {
+  const link = `${window.location.origin}/register`;
+  try {
+    await navigator.clipboard.writeText(link);
+    toast.success("Registration link copied. Share it with the person you want to invite.");
+  } catch {
+    toast.info(`Share this registration link: ${link}`);
+  }
+}
+
 
 export function AdminSponsorsPage() {
+  const queryClient = useQueryClient();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [status, setStatus] = useState<PaymentStatus>("pending");
   const sponsorshipsQuery = useQuery({
     queryKey: ["admin-sponsorships"],
     enabled: isSupabaseConfigured(),
@@ -24,6 +44,18 @@ export function AdminSponsorsPage() {
   });
 
   const sponsorships = sponsorshipsQuery.data ?? [];
+  const selected = sponsorships.find((item) => item.id === selectedId) ?? null;
+
+  const statusMutation = useMutation({
+    mutationFn: () => updateSponsorship(selectedId!, { status }),
+    onSuccess: async () => {
+      toast.success("Sponsorship updated");
+      setSelectedId(null);
+      await queryClient.invalidateQueries({ queryKey: ["admin-sponsorships"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin-dashboard-stats"] });
+    },
+    onError: (mutationError: Error) => toast.error(mutationError.message || "Could not update sponsorship"),
+  });
   const requests = requestsQuery.data ?? [];
 
   const activeSponsors = new Set(
@@ -43,7 +75,11 @@ export function AdminSponsorsPage() {
       label="Operations"
       title="Sponsor Management"
       description="Review sponsor applications, manage partnerships, and track sponsored campaign contributions."
-      actions={<Button type="button">Add sponsor</Button>}
+      actions={
+        <Button type="button" onClick={() => void copyRegistrationLink()}>
+          Invite sponsor
+        </Button>
+      }
     >
       <div className="grid grid-cols-2 gap-px bg-border lg:grid-cols-3">
         <DashboardCard>
@@ -113,7 +149,15 @@ export function AdminSponsorsPage() {
                       <AdminStatusBadge status={paymentStatusLabel(sponsor.status)} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button type="button" variant="outline" size="sm">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedId(sponsor.id);
+                          setStatus(sponsor.status);
+                        }}
+                      >
                         Manage
                       </Button>
                     </TableCell>
@@ -164,6 +208,72 @@ export function AdminSponsorsPage() {
           </DataState>
         </CardContent>
       </DashboardCard>
+
+      <DetailDrawer
+        open={Boolean(selected)}
+        onClose={() => setSelectedId(null)}
+        eyebrow="Manage sponsorship"
+        title={selected?.sponsor_profiles?.organisation_name ?? "Sponsorship"}
+        description={selected ? `${formatCurrency(selected.amount)} · ${selected.campaigns?.title ?? "No campaign"}` : null}
+        footer={
+          <>
+            <Button type="button" variant="outline" onClick={() => setSelectedId(null)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              disabled={statusMutation.isPending || status === selected?.status}
+              onClick={() => statusMutation.mutate()}
+            >
+              {statusMutation.isPending ? "Saving..." : "Save status"}
+            </Button>
+          </>
+        }
+      >
+        {selected ? (
+          <div className="space-y-6">
+            <DetailList
+              items={[
+                { label: "Reference", value: selected.id.slice(0, 8) },
+                { label: "Organisation", value: selected.sponsor_profiles?.organisation_name ?? "—" },
+                {
+                  label: "Contact",
+                  value: selected.sponsor_profiles?.profiles?.email ? (
+                    <a className="text-primary hover:underline" href={`mailto:${selected.sponsor_profiles.profiles.email}`}>
+                      {selected.sponsor_profiles.profiles.email}
+                    </a>
+                  ) : (
+                    "—"
+                  ),
+                },
+                {
+                  label: "Type",
+                  value: formatStatusLabel(selected.sponsorship_type || selected.sponsor_profiles?.sponsorship_type),
+                },
+                { label: "Level", value: formatStatusLabel(selected.sponsor_profiles?.sponsor_level) },
+                { label: "Campaign", value: selected.campaigns?.title ?? "—" },
+                { label: "Contribution", value: formatCurrency(selected.amount) },
+                { label: "Date", value: formatShortDate(selected.sponsorship_date) },
+                { label: "Status", value: <AdminStatusBadge status={paymentStatusLabel(selected.status)} /> },
+              ]}
+            />
+            <label className="block space-y-2 text-sm font-medium text-foreground">
+              <span>Update status</span>
+              <select
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
+                value={status}
+                onChange={(event) => setStatus(event.target.value as PaymentStatus)}
+              >
+                {sponsorshipStatuses.map((value) => (
+                  <option key={value} value={value}>
+                    {paymentStatusLabel(value)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        ) : null}
+      </DetailDrawer>
     </AdminPageShell>
   );
 }
