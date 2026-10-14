@@ -1,8 +1,8 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Stack, useRouter, useSegments } from "expo-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
 import { AppButton, Card, LoadingState } from "@/components/ui";
@@ -13,7 +13,7 @@ import { spacing, typography, type ThemeColors } from "@/theme/tokens";
 
 const PORTAL_SEGMENTS = ["admin", "donor", "volunteer", "beneficiary", "sponsor"] as const;
 /** Screens for people who are not signed in; a signed-in user is sent on to their portal. */
-const SIGNED_OUT_SEGMENTS = ["login", "register", "forgot-password", "auth"];
+const SIGNED_OUT_SEGMENTS = ["welcome", "login", "register", "forgot-password", "auth"];
 /** Screens anyone may open without a session. */
 const PUBLIC_SEGMENTS = [...SIGNED_OUT_SEGMENTS, "help"];
 
@@ -56,7 +56,25 @@ function RootNavigator() {
   const segments = useSegments();
   const router = useRouter();
   const { colors: themeColors } = useTheme();
+  const queryClient = useQueryClient();
+  const hadSession = useRef(false);
   useAccountThemeSync();
+
+  // Signing out: drop every cached query so the next user never sees the last
+  // user's data, and reset the root stack to the welcome screen so the back
+  // button has no protected screen to return to.
+  useEffect(() => {
+    if (isLoading) return;
+    if (session) {
+      hadSession.current = true;
+      return;
+    }
+    if (!hadSession.current) return;
+    hadSession.current = false;
+    queryClient.clear();
+    if (router.canDismiss()) router.dismissAll();
+    router.replace("/welcome");
+  }, [isLoading, session, queryClient, router]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -65,7 +83,7 @@ function RootNavigator() {
     const isAuthScreen = SIGNED_OUT_SEGMENTS.includes(current ?? "");
 
     if (!session) {
-      if (!PUBLIC_SEGMENTS.includes(current ?? "")) router.replace("/login");
+      if (!PUBLIC_SEGMENTS.includes(current ?? "")) router.replace("/welcome");
       return;
     }
 
@@ -110,6 +128,7 @@ function RootNavigator() {
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="welcome" options={{ headerShown: false }} />
       <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="register" options={{ title: "Create account" }} />
       <Stack.Screen name="forgot-password" options={{ title: "Reset password" }} />
