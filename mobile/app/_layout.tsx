@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Stack, useRouter, useSegments } from "expo-router";
-import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "@/auth/AuthProvider";
-import { AppButton, Card, LoadingState } from "@/components/ui";
+import { SessionSplash } from "@/components/SessionSplash";
+import { AppButton, Card } from "@/components/ui";
 import { useAccountThemeSync } from "@/hooks/useUserSettings";
 import { roleHomePath } from "@/lib/display";
+import { useLogoutReset } from "@/navigation/useLogoutReset";
 import { ThemeProvider, useTheme, useThemedStyles } from "@/theme/ThemeProvider";
 import { spacing, typography, type ThemeColors } from "@/theme/tokens";
 
@@ -56,30 +58,16 @@ function RootNavigator() {
   const segments = useSegments();
   const router = useRouter();
   const { colors: themeColors } = useTheme();
-  const queryClient = useQueryClient();
-  const hadSession = useRef(false);
   useAccountThemeSync();
-
-  // Signing out: drop every cached query so the next user never sees the last
-  // user's data, and reset the root stack to the welcome screen so the back
-  // button has no protected screen to return to.
-  useEffect(() => {
-    if (isLoading) return;
-    if (session) {
-      hadSession.current = true;
-      return;
-    }
-    if (!hadSession.current) return;
-    hadSession.current = false;
-    queryClient.clear();
-    if (router.canDismiss()) router.dismissAll();
-    router.replace("/welcome");
-  }, [isLoading, session, queryClient, router]);
+  useLogoutReset(session, isLoading, PUBLIC_SEGMENTS.includes(segments[0] ?? ""));
 
   useEffect(() => {
     if (isLoading) return;
 
     const current = segments[0];
+    // The launch route (app/index) picks the first screen itself; redirecting
+    // from here as well would navigate twice.
+    if (current === undefined) return;
     const isAuthScreen = SIGNED_OUT_SEGMENTS.includes(current ?? "");
 
     if (!session) {
@@ -112,7 +100,7 @@ function RootNavigator() {
   }, [isLoading, session, profile, profileError, segments, router]);
 
   if (isLoading) {
-    return <LoadingState label="Checking your session…" />;
+    return <SessionSplash />;
   }
 
   if (session && profileError) {

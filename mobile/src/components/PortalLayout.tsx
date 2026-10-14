@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { Bell, CircleHelp, LogOut, Settings } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/auth/AuthProvider";
+import { useSignOut } from "@/auth/useSignOut";
 import { BottomNavBar } from "@/components/BottomNavBar";
 import { OverflowMenu } from "@/components/OverflowMenu";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -20,7 +21,8 @@ const logoImage = require("../../assets/brand/logo.jpeg");
  * account shortcuts, the routed screen, and the docked tab bar.
  */
 export function PortalLayout() {
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
+  const signOut = useSignOut();
   const { unreadCount } = useNotifications();
   const router = useRouter();
   const pathname = usePathname();

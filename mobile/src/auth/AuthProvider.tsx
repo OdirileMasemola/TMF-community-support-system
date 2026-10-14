@@ -276,7 +276,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const client = getSupabaseClientOrNull();
     if (!client) return;
 
-    await client.auth.signOut();
+    const { error } = await client.auth.signOut();
+    // Keep the session (and the user on their screen) when sign-out fails.
+    if (error) throw error;
     setSession(null);
     setProfile(null);
     setProfileError(null);

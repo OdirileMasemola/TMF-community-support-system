@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Monitor, Moon, Sun } from "lucide-react-native";
 import { useAuth } from "@/auth/AuthProvider";
+import { useSignOut } from "@/auth/useSignOut";
 import { AppButton, Badge, PageHeading, Screen, SectionCard } from "@/components/ui";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { formatStatusLabel } from "@/lib/display";
@@ -36,7 +37,8 @@ const NOTIFICATION_OPTIONS: Array<{ field: NotificationField; label: string; hin
 
 /** Appearance, notification and account settings, shared by all five portals. */
 export function SettingsScreen() {
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
+  const signOut = useSignOut();
   const router = useRouter();
   const { mode, setMode, colors } = useTheme();
   const styles = useThemedStyles(createStyles);
