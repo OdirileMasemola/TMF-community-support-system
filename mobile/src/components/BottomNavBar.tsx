@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 import { usePathname, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -33,10 +33,26 @@ export function BottomNavBar({ tabs }: { tabs: PortalTab[] }) {
     }).start();
   }, [entrance]);
 
-  const activeRoute = useMemo(() => {
+  // The tab that was just tapped, highlighted straight away so the pill
+  // starts moving on the tap rather than after the next screen has mounted.
+  const [pendingRoute, setPendingRoute] = useState<string | null>(null);
+  useEffect(() => setPendingRoute(null), [pathname]);
+
+  const currentRoute = useMemo(() => {
     const match = tabs.find((tab) => pathname === tab.route || pathname.startsWith(`${tab.route}/`));
     return match?.route ?? null;
   }, [pathname, tabs]);
+  const activeRoute = pendingRoute ?? currentRoute;
+
+  const openTab = (route: string) => {
+    // Re-tapping the tab you are on would replace the screen with itself and
+    // replay the transition, which reads as a flicker.
+    if (route === currentRoute || route === pendingRoute) return;
+    setPendingRoute(route);
+    // replace() keeps the portal a flat set of tabs rather than a growing
+    // back stack the user has to unwind.
+    router.replace(route as never);
+  };
 
   return (
     <Animated.View
@@ -58,9 +74,7 @@ export function BottomNavBar({ tabs }: { tabs: PortalTab[] }) {
             key={tab.route}
             tab={tab}
             active={activeRoute === tab.route}
-            // replace() keeps the portal a flat set of tabs rather than a
-            // growing back stack the user has to unwind.
-            onPress={() => router.replace(tab.route as never)}
+            onPress={() => openTab(tab.route)}
           />
         ))}
       </View>

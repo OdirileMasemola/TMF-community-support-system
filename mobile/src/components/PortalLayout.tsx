@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Stack, usePathname, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -10,6 +11,7 @@ import { OverflowMenu } from "@/components/OverflowMenu";
 import { useNotifications } from "@/hooks/useNotifications";
 import { getInitials } from "@/lib/display";
 import { portalNameFor, portalSegmentFor, portalTabs } from "@/navigation/portalTabs";
+import { pushTransition, swapTransition } from "@/navigation/transitions";
 import type { UserRole } from "@/types/app.types";
 import { useTheme, useThemedStyles } from "@/theme/ThemeProvider";
 import { radius, spacing, typography, type ThemeColors } from "@/theme/tokens";
@@ -36,6 +38,22 @@ export function PortalLayout() {
   const notificationsRoute = segment ? `/${segment}/notifications` : null;
   const profileRoute = segment ? `/${segment}/profile` : null;
   const settingsRoute = segment ? `/${segment}/settings` : null;
+
+  // Tab screens are swapped with replace(), so they cross-fade in place;
+  // everything else in the portal (notifications, profile, settings) is a
+  // page opened on top and slides in like any other push.
+  const tabScreenNames = useMemo(
+    () => new Set((tabs ?? []).map((tab) => tab.route.split("/").pop() ?? "")),
+    [tabs],
+  );
+  const screenOptions = useCallback(
+    ({ route }: { route: { name: string } }) => ({
+      ...(tabScreenNames.has(route.name) ? swapTransition : pushTransition),
+      headerShown: false,
+      contentStyle: { backgroundColor: colors.muted },
+    }),
+    [tabScreenNames, colors.muted],
+  );
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -109,12 +127,7 @@ export function PortalLayout() {
 
       {/* The bar above replaces the native header inside a portal. */}
       <View style={styles.body}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.muted },
-          }}
-        />
+        <Stack screenOptions={screenOptions} />
         {tabs ? <BottomNavBar tabs={tabs} /> : null}
       </View>
     </SafeAreaView>
@@ -129,6 +142,8 @@ const createStyles = (colors: ThemeColors) =>
     },
     body: {
       flex: 1,
+      // Shows through while screens cross-fade, so match their background.
+      backgroundColor: colors.muted,
     },
     bar: {
       flexDirection: "row",
