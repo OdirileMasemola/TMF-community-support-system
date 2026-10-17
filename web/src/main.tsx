@@ -7,6 +7,7 @@ import { ScrollToTop } from "@/components/shared/ScrollToTop";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import { AuthProvider } from "@/features/auth/hooks/useAuth";
 import App from "./App";
+import { GlobalLoadingBar } from "@/components/shared/GlobalLoadingBar";
 import "./styles/globals.css";
 
 const queryClient = new QueryClient({
@@ -35,6 +36,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <ScrollToTop />
+            <GlobalLoadingBar />
             <App />
             <Toaster richColors position="top-right" />
           </AuthProvider>

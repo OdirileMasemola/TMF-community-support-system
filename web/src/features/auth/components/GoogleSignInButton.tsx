@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/Spinner";
 
 type GoogleSignInButtonProps = {
   onClick: () => void;
   disabled?: boolean;
+  loading?: boolean;
   label?: string;
   className?: string;
 };
@@ -35,6 +37,7 @@ function GoogleIcon() {
 export function GoogleSignInButton({
   onClick,
   disabled,
+  loading = false,
   label = "Continue with Google",
   className,
 }: GoogleSignInButtonProps) {
@@ -42,12 +45,13 @@ export function GoogleSignInButton({
     <Button
       type="button"
       variant="outline"
-      disabled={disabled}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       onClick={onClick}
       className={cn("h-9 w-full gap-3", className)}
     >
-      <GoogleIcon />
-      {label}
+      {loading ? <Spinner size="md" className="size-5" /> : <GoogleIcon />}
+      {loading ? "Connecting to Google…" : label}
     </Button>
   );
 }

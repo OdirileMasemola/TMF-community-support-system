@@ -133,7 +133,7 @@ export function AdminAssistancePage() {
             <Button type="button" variant="outline" onClick={() => setSelectedId(null)}>
               Cancel
             </Button>
-            <Button type="button" disabled={reviewMutation.isPending} onClick={() => reviewMutation.mutate()}>
+            <Button type="button" disabled={reviewMutation.isPending} loading={reviewMutation.isPending} onClick={() => reviewMutation.mutate()}>
               {reviewMutation.isPending ? "Saving..." : "Save review"}
             </Button>
           </>

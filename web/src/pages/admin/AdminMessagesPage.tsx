@@ -118,7 +118,7 @@ export function AdminMessagesPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={setStatus.isPending}
+                  disabled={setStatus.isPending} loading={setStatus.isPending}
                   onClick={() =>
                     setStatus.mutate(
                       { id: selected.id, status: "archived" },
@@ -133,7 +133,7 @@ export function AdminMessagesPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={setStatus.isPending}
+                  disabled={setStatus.isPending} loading={setStatus.isPending}
                   onClick={() => {
                     setStatus.mutate({ id: selected.id, status: "unread" });
                     setSelectedId(null);

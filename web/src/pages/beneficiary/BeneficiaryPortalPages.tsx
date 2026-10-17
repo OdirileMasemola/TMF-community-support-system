@@ -221,7 +221,7 @@ export function BeneficiaryRequestPage() {
                   onChange={(event) => setDocumentFile(event.target.files?.[0] ?? null)}
                 />
               </label>
-              <Button type="submit" disabled={submitMutation.isPending}>
+              <Button type="submit" disabled={submitMutation.isPending} loading={submitMutation.isPending}>
                 <HandHeart className="mr-2 size-4" />
                 Submit request
               </Button>
@@ -522,7 +522,7 @@ export function BeneficiaryNotificationsPage() {
         <Button
           type="button"
           variant="outline"
-          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))}
+          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))} loading={markAllRead.isPending}
           onClick={() =>
             markAllRead.mutate(undefined, {
               onSuccess: () => toast.success("All notifications marked as read"),
@@ -711,7 +711,7 @@ export function BeneficiarySettingsPage() {
                   onChange={(event) => setAssistanceType(event.target.value)}
                   placeholder="e.g. Food Support"
                 />
-                <Button type="submit" disabled={saveMutation.isPending}>
+                <Button type="submit" disabled={saveMutation.isPending} loading={saveMutation.isPending}>
                   Save changes
                 </Button>
               </form>

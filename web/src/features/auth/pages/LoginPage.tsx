@@ -58,7 +58,7 @@ export function LoginPage() {
         </p>
       }
     >
-      <GoogleSignInButton onClick={handleGoogleSignIn} disabled={isBusy} />
+      <GoogleSignInButton onClick={handleGoogleSignIn} disabled={isBusy} loading={isGoogleLoading} />
 
       <AuthDivider text="Or sign in with email" />
 
@@ -79,7 +79,7 @@ export function LoginPage() {
           onChange={(event) => setPassword(event.target.value)}
           required
         />
-        <Button type="submit" disabled={isBusy} className="w-full">
+        <Button type="submit" disabled={isBusy} loading={isSubmitting} className="w-full">
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
       </form>

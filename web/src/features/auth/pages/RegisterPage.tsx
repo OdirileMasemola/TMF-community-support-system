@@ -76,6 +76,7 @@ export function RegisterPage() {
       <GoogleSignInButton
         onClick={handleGoogleSignUp}
         disabled={isBusy}
+        loading={isGoogleLoading}
         label="Sign up with Google"
       />
 
@@ -133,7 +134,7 @@ export function RegisterPage() {
           minLength={8}
         />
 
-        <Button type="submit" disabled={isBusy} className="w-full">
+        <Button type="submit" disabled={isBusy} loading={isSubmitting} className="w-full">
           {isSubmitting ? "Creating account..." : "Create account"}
         </Button>
       </form>

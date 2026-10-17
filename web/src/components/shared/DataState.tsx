@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LoadingState, TopProgressBar } from "@/components/ui/Spinner";
 
 type DataStateProps = {
   isLoading?: boolean;
@@ -21,7 +22,7 @@ export function DataState({
   children,
 }: DataStateProps) {
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">{loadingMessage}</p>;
+    return <LoadingState message={loadingMessage} />;
   }
 
   if (isError) {
@@ -38,8 +39,9 @@ export function DataState({
 /** Lightweight route-level fallback used with React.lazy. */
 export function PageFallback() {
   return (
-    <div className="flex min-h-[40vh] items-center justify-center p-8" role="status" aria-live="polite">
-      <p className="text-sm text-muted-foreground">Loading…</p>
-    </div>
+    <>
+      <TopProgressBar active delay={0} />
+      <LoadingState variant="page" message="Loading page…" />
+    </>
   );
 }

@@ -8,9 +8,13 @@ import {
 } from "@/services/donations";
 
 /** Opens a proof of payment in the in-app browser using a short-lived signed URL. */
-export async function openDonationProof(proof: Pick<ProofWithDonation, "id" | "file_path" | "signed_url">): Promise<void> {
+export async function openDonationProof(
+  proof: Pick<ProofWithDonation, "id" | "file_path" | "signed_url">,
+  options: { onUrlReady?: () => void } = {},
+): Promise<void> {
   try {
     const url = await getDonationProofUrl(proof);
+    options.onUrlReady?.();
     await WebBrowser.openBrowserAsync(url);
   } catch (error) {
     const message =

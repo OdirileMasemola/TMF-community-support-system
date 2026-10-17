@@ -179,7 +179,7 @@ export function VolunteerOpportunitiesPage() {
                   <Button
                     type="button"
                     className="mt-5 w-full"
-                    disabled={!roleProfileId || alreadyApplied || applyMutation.isPending}
+                    disabled={!roleProfileId || alreadyApplied || applyMutation.isPending} loading={applyMutation.isPending}
                     onClick={() => applyMutation.mutate(opportunity.id)}
                   >
                     <Search className="mr-2 size-4" />
@@ -505,7 +505,7 @@ export function VolunteerHoursPage() {
                 required
               />
               <Input label="Notes" value={notes} onChange={(event) => setNotes(event.target.value)} />
-              <Button type="submit" disabled={!roleProfileId || createHoursMutation.isPending}>
+              <Button type="submit" disabled={!roleProfileId || createHoursMutation.isPending} loading={createHoursMutation.isPending}>
                 Save hours
               </Button>
             </form>
@@ -561,7 +561,7 @@ export function VolunteerNotificationsPage() {
         <Button
           type="button"
           variant="outline"
-          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))}
+          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))} loading={markAllRead.isPending}
           onClick={() =>
             markAllRead.mutate(undefined, {
               onSuccess: () => toast.success("All notifications marked as read"),
@@ -741,7 +741,7 @@ export function VolunteerSettingsPage() {
                   onChange={(event) => setAvailabilityStatus(event.target.value)}
                   placeholder="e.g. Available weekends"
                 />
-                <Button type="submit" disabled={saveMutation.isPending}>
+                <Button type="submit" disabled={saveMutation.isPending} loading={saveMutation.isPending}>
                   Save changes
                 </Button>
               </form>

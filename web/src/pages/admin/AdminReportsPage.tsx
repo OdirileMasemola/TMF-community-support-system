@@ -45,7 +45,7 @@ export function AdminReportsPage() {
       title="Reports"
       description="Generate and export operational reports for users, campaigns, donations, volunteers, and system summaries."
       actions={
-        <Button type="button" disabled={generateMutation.isPending} onClick={() => generateMutation.mutate()}>
+        <Button type="button" disabled={generateMutation.isPending} loading={generateMutation.isPending} onClick={() => generateMutation.mutate()}>
           {generateMutation.isPending ? "Generating..." : "Generate report"}
         </Button>
       }

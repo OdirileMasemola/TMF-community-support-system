@@ -9,6 +9,7 @@ import { roleHomePath } from "@/lib/display";
 import { toAuthUserMessage } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types/app.types";
+import { LoadingState } from "@/components/ui/Spinner";
  // this is the roles array that is used to display the roles in the select dropdown
 const roles: { value: UserRole; label: string }[] = [
   { value: "volunteer", label: "Volunteer" },
@@ -31,7 +32,7 @@ export function CompleteProfilePage() {
   if (isLoading) {
     return (
       <div className="grid min-h-[100dvh] place-items-center bg-background px-6">
-        <p className="text-sm text-muted-foreground">Loading your account...</p>
+        <LoadingState message="Loading your account…" />
       </div>
     );
   }
@@ -116,7 +117,7 @@ export function CompleteProfilePage() {
           />
         ) : null}
 
-        <Button type="submit" disabled={isSubmitting} className="w-full">
+        <Button type="submit" disabled={isSubmitting} loading={isSubmitting} className="w-full">
           {isSubmitting ? "Saving..." : "Continue to dashboard"}
         </Button>
       </form>

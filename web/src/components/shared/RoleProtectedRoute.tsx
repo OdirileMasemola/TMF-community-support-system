@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import type { UserRole } from "@/types/app.types";
+import { LoadingState } from "@/components/ui/Spinner";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { roleHomePath } from "@/lib/display";
 
@@ -11,11 +12,7 @@ export function RoleProtectedRoute({ allowedRoles }: RoleProtectedRouteProps) {
   const { session, profile, isLoading } = useAuth();
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center p-8" role="status" aria-live="polite">
-        <p className="text-sm text-muted-foreground">Checking your account…</p>
-      </div>
-    );
+    return <LoadingState variant="page" message="Checking your account…" />;
   }
 
   if (!session) {

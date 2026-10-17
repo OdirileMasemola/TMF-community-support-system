@@ -130,7 +130,7 @@ export function AdminEventsPage() {
               onChange={(event) => setDescription(event.target.value)}
             />
             <div className="sm:col-span-2">
-              <Button type="button" disabled={createMutation.isPending} onClick={() => createMutation.mutate()}>
+              <Button type="button" disabled={createMutation.isPending} loading={createMutation.isPending} onClick={() => createMutation.mutate()}>
                 {createMutation.isPending ? "Saving..." : "Save event"}
               </Button>
             </div>
@@ -178,7 +178,7 @@ export function AdminEventsPage() {
             <Button type="button" variant="outline" onClick={() => setEditing(null)}>
               Cancel
             </Button>
-            <Button type="button" disabled={updateMutation.isPending} onClick={() => updateMutation.mutate()}>
+            <Button type="button" disabled={updateMutation.isPending} loading={updateMutation.isPending} onClick={() => updateMutation.mutate()}>
               {updateMutation.isPending ? "Saving..." : "Save changes"}
             </Button>
           </>

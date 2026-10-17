@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Link } from "react-router-dom";
 
 import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/Spinner";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium antialiased ring-offset-background transition-[box-shadow,transform,filter,background-color,border-color,color] duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
@@ -62,16 +63,18 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   to?: string;
   asChild?: boolean;
+  /** Shows an inline spinner and disables the button while an action is in progress. */
+  loading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, to, asChild = false, children, ...props }, ref) => {
+  ({ className, variant, size, to, asChild = false, loading = false, children, disabled, ...props }, ref) => {
     const classNames = cn(buttonVariants({ variant, size, className }));
 
     if (asChild) {
       const Comp = Slot;
       return (
-        <Comp className={classNames} ref={ref} {...props}>
+        <Comp className={classNames} ref={ref} {...{ ...props, disabled }}>
           {children}
         </Comp>
       );
@@ -94,7 +97,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     return (
-      <button className={classNames} ref={ref} {...props}>
+      <button
+        className={cn(classNames, loading && "gap-2 disabled:opacity-80")}
+        ref={ref}
+        disabled={disabled || loading}
+        aria-busy={loading || undefined}
+        {...props}
+      >
+        {loading ? <Spinner size="sm" /> : null}
         {children}
       </button>
     );

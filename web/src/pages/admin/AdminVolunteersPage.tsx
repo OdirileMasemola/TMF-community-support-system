@@ -17,6 +17,7 @@ import {
   updateCampaignApplication,
   type ApplicationWithVolunteer,
 } from "@/services/volunteers";
+import { Skeleton } from "@/components/ui/Spinner";
 
 export function AdminVolunteersPage() {
   const queryClient = useQueryClient();
@@ -87,7 +88,7 @@ export function AdminVolunteersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total applications</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : totalApplications}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : totalApplications}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -95,7 +96,7 @@ export function AdminVolunteersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending review</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : pendingReview}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : pendingReview}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -103,7 +104,7 @@ export function AdminVolunteersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Active volunteers</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : approved}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : approved}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -111,7 +112,7 @@ export function AdminVolunteersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">This week</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : `+${thisWeek}`}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : `+${thisWeek}`}</p>
           </CardContent>
         </DashboardCard>
       </div>
@@ -162,7 +163,7 @@ export function AdminVolunteersPage() {
                               type="button"
                               variant="outline"
                               size="sm"
-                              disabled={reviewMutation.isPending}
+                              disabled={reviewMutation.isPending} loading={reviewMutation.isPending && reviewMutation.variables?.application.id === application.id && reviewMutation.variables?.status === "approved"}
                               onClick={() => reviewMutation.mutate({ application, status: "approved" })}
                             >
                               Approve
@@ -171,7 +172,7 @@ export function AdminVolunteersPage() {
                               type="button"
                               variant="outline"
                               size="sm"
-                              disabled={reviewMutation.isPending}
+                              disabled={reviewMutation.isPending} loading={reviewMutation.isPending && reviewMutation.variables?.application.id === application.id && reviewMutation.variables?.status === "rejected"}
                               onClick={() => reviewMutation.mutate({ application, status: "rejected" })}
                             >
                               Reject

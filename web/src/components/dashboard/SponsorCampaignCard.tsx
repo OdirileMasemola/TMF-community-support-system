@@ -35,7 +35,7 @@ export function SponsorCampaignCard({ campaign, onSponsor, isSponsoring }: Spons
           type="button"
           size="sm"
           className="w-full"
-          disabled={isSponsoring || !onSponsor}
+          disabled={isSponsoring || !onSponsor} loading={isSponsoring}
           onClick={() => onSponsor?.(campaign)}
         >
           {isSponsoring ? "Submitting..." : "Sponsor this campaign"}

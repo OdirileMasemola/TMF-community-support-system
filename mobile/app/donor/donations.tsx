@@ -20,12 +20,13 @@ import {
 import { useRoleProfile } from "@/hooks/useRoleProfile";
 import { formatCurrency, formatShortDate, paymentStatusLabel, verificationStatusLabel } from "@/lib/display";
 import { fetchDonorDonations, fetchDonorProofs } from "@/services/donations";
-import { openDonationProof } from "@/lib/proofs";
+import { useProofViewer } from "@/hooks/useProofViewer";
 
 type Filter = "all" | "successful" | "pending";
 
 export default function DonorDonationsScreen() {
   const { roleProfileId, isLoading: profileLoading } = useRoleProfile();
+  const proofViewer = useProofViewer();
   const [filter, setFilter] = useState<Filter>("all");
 
   const donations = useQuery({
@@ -135,7 +136,12 @@ export default function DonorDonationsScreen() {
               last={index === shown.length - 1}
               footer={
                 <ButtonRow>
-                  <AppButton label="View proof" variant="outline" onPress={() => void openDonationProof(proof)} />
+                  <AppButton
+                    label="View proof"
+                    variant="outline"
+                    onPress={() => void proofViewer.open(proof)}
+                    loading={proofViewer.openingId === proof.id}
+                  />
                 </ButtonRow>
               }
             />

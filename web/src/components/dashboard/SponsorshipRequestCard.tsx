@@ -61,7 +61,7 @@ export function SponsorshipRequestCard({
           variant="outline"
           size="sm"
           className="w-full"
-          disabled={isResponding || hasResponded || !onRespond}
+          disabled={isResponding || hasResponded || !onRespond} loading={isResponding}
           onClick={() => onRespond?.(request)}
         >
           {hasResponded ? "Response submitted" : isResponding ? "Submitting..." : "Express interest"}

@@ -111,12 +111,14 @@ export default function AdminUsersScreen() {
                     label="Activate"
                     onPress={() => setStatus.mutate({ userId: row.id, status: "active" })}
                     disabled={setStatus.isPending || row.account_status === "active"}
+                    loading={setStatus.isPending && setStatus.variables?.userId === row.id && setStatus.variables?.status === "active"}
                   />
                   <AppButton
                     label="Suspend"
                     variant="outline"
                     onPress={() => setStatus.mutate({ userId: row.id, status: "suspended" })}
                     disabled={setStatus.isPending || row.account_status === "suspended"}
+                    loading={setStatus.isPending && setStatus.variables?.userId === row.id && setStatus.variables?.status === "suspended"}
                   />
                 </ButtonRow>
               }

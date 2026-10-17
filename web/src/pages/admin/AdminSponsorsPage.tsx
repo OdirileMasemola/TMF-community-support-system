@@ -13,6 +13,7 @@ import { formatCurrency, formatShortDate, formatStatusLabel, paymentStatusLabel 
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { fetchAllSponsorshipRequests, fetchAllSponsorships, updateSponsorship } from "@/services/sponsorships";
 import type { PaymentStatus } from "@/types/database.types";
+import { Skeleton } from "@/components/ui/Spinner";
 
 const sponsorshipStatuses: PaymentStatus[] = ["pending", "successful", "failed", "cancelled"];
 
@@ -86,7 +87,7 @@ export function AdminSponsorsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Active sponsors</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : activeSponsors}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : activeSponsors}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -94,7 +95,7 @@ export function AdminSponsorsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending requests</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : pendingRequests}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : pendingRequests}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -102,7 +103,7 @@ export function AdminSponsorsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total sponsorship value</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : formatCurrency(totalValue)}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : formatCurrency(totalValue)}</p>
           </CardContent>
         </DashboardCard>
       </div>
@@ -221,7 +222,7 @@ export function AdminSponsorsPage() {
             </Button>
             <Button
               type="button"
-              disabled={statusMutation.isPending || status === selected?.status}
+              disabled={statusMutation.isPending || status === selected?.status} loading={statusMutation.isPending}
               onClick={() => statusMutation.mutate()}
             >
               {statusMutation.isPending ? "Saving..." : "Save status"}

@@ -16,6 +16,7 @@ import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { cn } from "@/lib/utils";
 import { fetchCampaigns } from "@/services/campaigns";
 import type { Campaign, CampaignStatus } from "@/types/public";
+import { LoadingState } from "@/components/ui/Spinner";
 
 const sectionClassName = "relative bg-transparent py-16 md:py-20";
 
@@ -163,7 +164,7 @@ export function SupportCampaignsSection() {
 
         <div className="mt-12">
           {campaignsQuery.isLoading ? (
-            <p className="text-center text-sm text-muted-foreground">Loading campaigns...</p>
+            <LoadingState message="Loading campaigns…" />
           ) : campaignsQuery.isError ? (
             <CampaignEmptyState />
           ) : campaigns.length === 0 ? (

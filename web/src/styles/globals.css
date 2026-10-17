@@ -130,3 +130,23 @@ a.border-foreground.bg-foreground {
 .social-icon.linkedin:hover .icon-container {
   box-shadow: 0 0 30px rgba(0,119,181,0.25), 0 0 60px rgba(0,119,181,0.12);
 }
+
+/* Indeterminate top progress bar used while pages and data load. */
+@keyframes tmf-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+.tmf-progress-bar {
+  animation: tmf-progress 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tmf-progress-bar {
+    animation-duration: 2.4s;
+  }
+}

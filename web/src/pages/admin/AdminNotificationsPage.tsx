@@ -18,7 +18,7 @@ export function AdminNotificationsPage() {
         <Button
           type="button"
           variant="outline"
-          disabled={markAllRead.isPending || notifications.length === 0}
+          disabled={markAllRead.isPending || notifications.length === 0} loading={markAllRead.isPending}
           onClick={() => markAllRead.mutate()}
         >
           Mark all read

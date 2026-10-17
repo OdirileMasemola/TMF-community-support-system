@@ -449,7 +449,7 @@ export function SponsorNotificationsPage() {
         <Button
           type="button"
           variant="outline"
-          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))}
+          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))} loading={markAllRead.isPending}
           onClick={() =>
             markAllRead.mutate(undefined, {
               onSuccess: () => toast.success("All notifications marked as read"),
@@ -666,7 +666,7 @@ export function SponsorSettingsPage() {
               />
               <Button
                 type="button"
-                disabled={form.saveMutation.isPending}
+                disabled={form.saveMutation.isPending} loading={form.saveMutation.isPending}
                 onClick={() => form.saveMutation.mutate()}
               >
                 {form.saveMutation.isPending ? "Saving..." : "Save changes"}

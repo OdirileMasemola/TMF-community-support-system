@@ -12,6 +12,7 @@ import { DetailDrawer, DetailList } from "@/components/shared/DetailDrawer";
 import { formatShortDate, formatStatusLabel } from "@/lib/display";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { fetchProfiles, updateProfileAccountStatus, type ProfileRow } from "@/services/admin";
+import { Skeleton } from "@/components/ui/Spinner";
 
 async function copyRegistrationLink() {
   const link = `${window.location.origin}/register`;
@@ -80,7 +81,7 @@ export function AdminUsersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total users</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : totalUsers}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : totalUsers}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -88,7 +89,7 @@ export function AdminUsersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Administrators</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : administrators}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : administrators}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -96,7 +97,7 @@ export function AdminUsersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Volunteers</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : volunteers}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : volunteers}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -104,7 +105,7 @@ export function AdminUsersPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending accounts</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : pendingAccounts}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : pendingAccounts}</p>
           </CardContent>
         </DashboardCard>
       </div>
@@ -148,7 +149,7 @@ export function AdminUsersPage() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          disabled={activateMutation.isPending}
+                          disabled={activateMutation.isPending} loading={activateMutation.isPending && activateMutation.variables === user.id}
                           onClick={() => activateMutation.mutate(user.id)}
                         >
                           Activate
@@ -183,7 +184,7 @@ export function AdminUsersPage() {
                 <Button
                   type="button"
                   variant="danger"
-                  disabled={statusMutation.isPending}
+                  disabled={statusMutation.isPending} loading={statusMutation.isPending}
                   onClick={() => statusMutation.mutate({ userId: selected.id, status: "suspended" })}
                 >
                   Suspend account
@@ -191,7 +192,7 @@ export function AdminUsersPage() {
               ) : (
                 <Button
                   type="button"
-                  disabled={statusMutation.isPending}
+                  disabled={statusMutation.isPending} loading={statusMutation.isPending}
                   onClick={() => statusMutation.mutate({ userId: selected.id, status: "active" })}
                 >
                   Activate account

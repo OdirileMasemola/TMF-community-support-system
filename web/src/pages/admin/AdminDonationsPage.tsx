@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { showLoadingInTab } from "@/lib/loadingTab";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
@@ -23,6 +24,7 @@ import {
   type DonationWithDonor,
   type ProofWithDonation,
 } from "@/services/donations";
+import { Skeleton } from "@/components/ui/Spinner";
 
 function csvCell(value: unknown): string {
   const text = value == null ? "" : String(value);
@@ -53,6 +55,7 @@ async function openProofFile(proof: ProofWithDonation) {
   // Open the tab during the click so the browser does not block it as a popup.
   const tab = window.open("", "_blank");
   if (tab) tab.opener = null;
+  showLoadingInTab(tab, "Opening proof of payment…");
   try {
     const url = await getDonationProofUrl(proof);
     if (tab) tab.location.href = url;
@@ -81,6 +84,16 @@ export function AdminDonationsPage() {
 
   const donations = donationsQuery.data ?? [];
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [openingProofId, setOpeningProofId] = useState<string | null>(null);
+
+  async function viewProof(proof: ProofWithDonation) {
+    setOpeningProofId(proof.id);
+    try {
+      await openProofFile(proof);
+    } finally {
+      setOpeningProofId(null);
+    }
+  }
   const selected = donations.find((donation) => donation.id === selectedId) ?? null;
   const pendingProofs = proofsQuery.data ?? [];
 
@@ -148,7 +161,7 @@ export function AdminDonationsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total donations</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : formatCurrency(totalAmount)}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : formatCurrency(totalAmount)}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -156,7 +169,7 @@ export function AdminDonationsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending verification</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : pendingVerification}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : pendingVerification}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -164,7 +177,7 @@ export function AdminDonationsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Verified today</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : verifiedToday}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : verifiedToday}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -172,7 +185,7 @@ export function AdminDonationsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">This month</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : formatCurrency(thisMonthAmount)}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : formatCurrency(thisMonthAmount)}</p>
           </CardContent>
         </DashboardCard>
       </div>
@@ -228,7 +241,7 @@ export function AdminDonationsPage() {
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                disabled={updateDonationMutation.isPending}
+                                disabled={updateDonationMutation.isPending} loading={updateDonationMutation.isPending && updateDonationMutation.variables?.id === donation.id && updateDonationMutation.variables?.status === "successful"}
                                 onClick={() => updateDonationMutation.mutate({ id: donation.id, status: "successful" })}
                               >
                                 Verify
@@ -237,7 +250,7 @@ export function AdminDonationsPage() {
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                disabled={updateDonationMutation.isPending}
+                                disabled={updateDonationMutation.isPending} loading={updateDonationMutation.isPending && updateDonationMutation.variables?.id === donation.id && updateDonationMutation.variables?.status === "failed"}
                                 onClick={() => updateDonationMutation.mutate({ id: donation.id, status: "failed" })}
                               >
                                 Reject
@@ -299,7 +312,8 @@ export function AdminDonationsPage() {
                           variant="outline"
                           size="sm"
                           aria-label={`View proof ${proof.file_name || ""}`.trim()}
-                          onClick={() => void openProofFile(proof)}
+                          loading={openingProofId === proof.id}
+                          onClick={() => void viewProof(proof)}
                         >
                           View
                         </Button>
@@ -307,7 +321,7 @@ export function AdminDonationsPage() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          disabled={updateProofMutation.isPending}
+                          disabled={updateProofMutation.isPending} loading={updateProofMutation.isPending && updateProofMutation.variables?.id === proof.id && updateProofMutation.variables?.status === "approved"}
                           onClick={() => updateProofMutation.mutate({ id: proof.id, status: "approved" })}
                         >
                           Approve
@@ -316,7 +330,7 @@ export function AdminDonationsPage() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          disabled={updateProofMutation.isPending}
+                          disabled={updateProofMutation.isPending} loading={updateProofMutation.isPending && updateProofMutation.variables?.id === proof.id && updateProofMutation.variables?.status === "rejected"}
                           onClick={() => updateProofMutation.mutate({ id: proof.id, status: "rejected" })}
                         >
                           Reject

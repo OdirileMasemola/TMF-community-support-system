@@ -14,6 +14,8 @@ import {
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { showLoadingInTab } from "@/lib/loadingTab";
+import { Spinner } from "@/components/ui/Spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
@@ -264,7 +266,7 @@ export function DonorDonatePage() {
                   onChange={(event) => setPaymentDate(event.target.value)}
                 />
                 <div className="flex items-end">
-                  <Button type="submit" className="w-full" disabled={createDonationMutation.isPending || !roleProfileId}>
+                  <Button type="submit" className="w-full" disabled={createDonationMutation.isPending || !roleProfileId} loading={createDonationMutation.isPending}>
                     {createDonationMutation.isPending ? "Saving..." : "Record donation"}
                   </Button>
                 </div>
@@ -285,7 +287,7 @@ export function DonorDonatePage() {
                   <Button
                     type="button"
                     variant="outline"
-                    disabled={uploadProofMutation.isPending || !proofFile}
+                    disabled={uploadProofMutation.isPending || !proofFile} loading={uploadProofMutation.isPending}
                     onClick={() => uploadProofMutation.mutate()}
                   >
                     <FileUp className="mr-2 size-4" />
@@ -506,11 +508,15 @@ export function DonorProofOfPaymentPage() {
     },
   });
 
+  const [openingProofId, setOpeningProofId] = useState<string | null>(null);
+
   async function openProof(proof: ProofWithDonation) {
     // Open the tab during the click so mobile browsers do not block it as a popup, then point it at the
     // signed URL once it is ready.
     const tab = window.open("", "_blank");
     if (tab) tab.opener = null;
+    showLoadingInTab(tab, "Opening proof of payment…");
+    setOpeningProofId(proof.id);
     try {
       const url = await getDonationProofUrl(proof);
       if (tab) tab.location.href = url;
@@ -518,6 +524,8 @@ export function DonorProofOfPaymentPage() {
     } catch (error) {
       tab?.close();
       toast.error(error instanceof Error && error.message === PROOF_FILE_MISSING_MESSAGE ? PROOF_FILE_MISSING_MESSAGE : PROOF_FILE_ERROR_MESSAGE);
+    } finally {
+      setOpeningProofId(null);
     }
   }
 
@@ -570,7 +578,7 @@ export function DonorProofOfPaymentPage() {
               onChange={(event) => setProofFile(event.target.files?.[0] ?? null)}
             />
             <div className="sm:col-span-2">
-              <Button type="button" disabled={uploadMutation.isPending || !donationId || !proofFile} onClick={() => uploadMutation.mutate()}>
+              <Button type="button" disabled={uploadMutation.isPending || !donationId || !proofFile} loading={uploadMutation.isPending} onClick={() => uploadMutation.mutate()}>
                 {uploadMutation.isPending ? "Uploading..." : "Upload proof"}
               </Button>
             </div>
@@ -616,10 +624,10 @@ export function DonorProofOfPaymentPage() {
                 </td>
                 <td className={tableCellClass}>
                   <div className="flex">
-                    <Button variant="ghost" size="icon" aria-label="View proof" type="button" onClick={() => openProof(proof)}>
-                      <Eye className="size-4" />
+                    <Button variant="ghost" size="icon" aria-label="View proof" type="button" disabled={openingProofId === proof.id} aria-busy={openingProofId === proof.id || undefined} onClick={() => openProof(proof)}>
+                      {openingProofId === proof.id ? <Spinner size="sm" /> : <Eye className="size-4" />}
                     </Button>
-                    <Button variant="ghost" size="icon" aria-label="Download proof" type="button" onClick={() => openProof(proof)}>
+                    <Button variant="ghost" size="icon" aria-label="Download proof" type="button" disabled={openingProofId === proof.id} onClick={() => openProof(proof)}>
                       <Download className="size-4" />
                     </Button>
                   </div>
@@ -645,7 +653,7 @@ export function DonorNotificationsPage() {
         <Button
           variant="outline"
           type="button"
-          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))}
+          disabled={markAllRead.isPending || notifications.every((item) => !notificationIsUnread(item.status))} loading={markAllRead.isPending}
           onClick={() => {
             markAllRead.mutate(undefined, {
               onSuccess: () => toast.success("All notifications marked as read."),
@@ -805,7 +813,7 @@ export function DonorProfilePage() {
                     placeholder="e.g. Campaign support"
                   />
                   <div className="sm:col-span-2">
-                    <Button type="submit" disabled={saveMutation.isPending}>
+                    <Button type="submit" disabled={saveMutation.isPending} loading={saveMutation.isPending}>
                       {saveMutation.isPending ? "Saving..." : "Save profile"}
                     </Button>
                   </div>
@@ -918,7 +926,7 @@ export function DonorSettingsPage() {
                 onChange={(event) => setDonationPreference(event.target.value)}
                 placeholder="e.g. Campaign support"
               />
-              <Button type="submit" disabled={saveMutation.isPending || !roleProfileId}>
+              <Button type="submit" disabled={saveMutation.isPending || !roleProfileId} loading={saveMutation.isPending}>
                 {saveMutation.isPending ? "Saving..." : "Save changes"}
               </Button>
             </form>

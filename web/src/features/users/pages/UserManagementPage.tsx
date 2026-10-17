@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/Card";
 import { getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
+import { LoadingState } from "@/components/ui/Spinner";
 
 export function UserManagementPage() {
   const supabaseReady = isSupabaseConfigured();
@@ -44,7 +45,7 @@ export function UserManagementPage() {
       {supabaseReady ? (
         <Card className="mt-6 overflow-x-auto">
           {isLoading ? (
-            <p>Loading users...</p>
+            <LoadingState message="Loading users…" />
           ) : (
             <table className="w-full text-left text-sm">
               <thead>

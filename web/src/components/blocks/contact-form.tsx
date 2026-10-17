@@ -140,7 +140,7 @@ export function ContactSection({
           </div>
 
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+            <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting} loading={isSubmitting}>
               {isSubmitting ? "Sending..." : "Send Message"}
             </Button>
             {statusMessage ? <p className="text-sm font-medium text-primary">{statusMessage}</p> : null}

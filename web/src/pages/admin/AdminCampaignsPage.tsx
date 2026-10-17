@@ -16,6 +16,7 @@ import { toUserMessage } from "@/lib/errors";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { createCampaign, fetchCampaigns } from "@/services/campaigns";
 import { uploadPublicImage } from "@/services/storage";
+import { Skeleton } from "@/components/ui/Spinner";
 
 export function AdminCampaignsPage() {
   const queryClient = useQueryClient();
@@ -163,7 +164,7 @@ export function AdminCampaignsPage() {
                 Publish on the website now
               </label>
               <div className="md:col-span-2">
-                <Button type="submit" disabled={createMutation.isPending}>
+                <Button type="submit" disabled={createMutation.isPending} loading={createMutation.isPending}>
                   {createMutation.isPending ? "Creating..." : "Save campaign"}
                 </Button>
               </div>
@@ -178,7 +179,7 @@ export function AdminCampaignsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Active campaigns</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : activeCampaigns}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : activeCampaigns}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -186,7 +187,7 @@ export function AdminCampaignsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending review</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : pendingReview}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : pendingReview}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -194,7 +195,7 @@ export function AdminCampaignsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : completed}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : completed}</p>
           </CardContent>
         </DashboardCard>
         <DashboardCard>
@@ -202,7 +203,7 @@ export function AdminCampaignsPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Total raised</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">{isLoading ? "—" : formatCurrency(totalRaised)}</p>
+            <p className="text-3xl font-semibold">{isLoading ? <Skeleton className="mt-1 h-9 w-20" /> : formatCurrency(totalRaised)}</p>
           </CardContent>
         </DashboardCard>
       </div>

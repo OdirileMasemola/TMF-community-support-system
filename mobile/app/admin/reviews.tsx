@@ -21,7 +21,7 @@ import { useRoleProfile } from "@/hooks/useRoleProfile";
 import { formatCurrency, formatShortDate, formatStatusLabel } from "@/lib/display";
 import { fetchAllAssistanceRequests, updateAssistanceRequest } from "@/services/assistance";
 import { fetchPendingProofs, updateDonationProof } from "@/services/donations";
-import { openDonationProof } from "@/lib/proofs";
+import { useProofViewer } from "@/hooks/useProofViewer";
 import { fetchAllApplications, updateCampaignApplication } from "@/services/volunteers";
 
 type Queue = "volunteers" | "assistance" | "proofs";
@@ -31,6 +31,7 @@ export default function AdminReviewsScreen() {
   const queryClient = useQueryClient();
   const [queue, setQueue] = useState<Queue>("volunteers");
   const [error, setError] = useState<string | null>(null);
+  const proofViewer = useProofViewer();
 
   const applications = useQuery({
     queryKey: ["admin", "applications"],
@@ -98,6 +99,13 @@ export default function AdminReviewsScreen() {
 
   const busy = reviewApplication.isPending || reviewRequest.isPending || reviewProof.isPending;
 
+  /** True only for the button whose decision is currently being saved. */
+  const savingDecision = (
+    mutation: { isPending: boolean; variables?: { id: string; status: string } },
+    id: string,
+    status: string,
+  ) => mutation.isPending && mutation.variables?.id === id && mutation.variables?.status === status;
+
   return (
     <Screen
       onRefresh={() => {
@@ -156,12 +164,14 @@ export default function AdminReviewsScreen() {
                       label="Approve"
                       onPress={() => reviewApplication.mutate({ id: application.id, status: "approved" })}
                       disabled={busy}
+                      loading={savingDecision(reviewApplication, application.id, "approved")}
                     />
                     <AppButton
                       label="Reject"
                       variant="outline"
                       onPress={() => reviewApplication.mutate({ id: application.id, status: "rejected" })}
                       disabled={busy}
+                      loading={savingDecision(reviewApplication, application.id, "rejected")}
                     />
                   </ButtonRow>
                 }
@@ -199,12 +209,14 @@ export default function AdminReviewsScreen() {
                       label="Approve"
                       onPress={() => reviewRequest.mutate({ id: request.id, status: "approved" })}
                       disabled={busy}
+                      loading={savingDecision(reviewRequest, request.id, "approved")}
                     />
                     <AppButton
                       label="Reject"
                       variant="outline"
                       onPress={() => reviewRequest.mutate({ id: request.id, status: "rejected" })}
                       disabled={busy}
+                      loading={savingDecision(reviewRequest, request.id, "rejected")}
                     />
                   </ButtonRow>
                 }
@@ -236,17 +248,24 @@ export default function AdminReviewsScreen() {
                 last={index === pendingProofs.length - 1}
                 footer={
                   <ButtonRow>
-                    <AppButton label="View" variant="outline" onPress={() => void openDonationProof(proof)} />
+                    <AppButton
+                      label="View"
+                      variant="outline"
+                      onPress={() => void proofViewer.open(proof)}
+                      loading={proofViewer.openingId === proof.id}
+                    />
                     <AppButton
                       label="Verify"
                       onPress={() => reviewProof.mutate({ id: proof.id, status: "approved" })}
                       disabled={busy}
+                      loading={savingDecision(reviewProof, proof.id, "approved")}
                     />
                     <AppButton
                       label="Reject"
                       variant="outline"
                       onPress={() => reviewProof.mutate({ id: proof.id, status: "rejected" })}
                       disabled={busy}
+                      loading={savingDecision(reviewProof, proof.id, "rejected")}
                     />
                   </ButtonRow>
                 }

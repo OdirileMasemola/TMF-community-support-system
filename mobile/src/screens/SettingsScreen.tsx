@@ -4,7 +4,8 @@ import { useRouter } from "expo-router";
 import { Monitor, Moon, Sun } from "lucide-react-native";
 import { useAuth } from "@/auth/AuthProvider";
 import { useSignOut } from "@/auth/useSignOut";
-import { AppButton, Badge, PageHeading, Screen, SectionCard } from "@/components/ui";
+import { AppButton, Badge, LoadingState, PageHeading, Screen, SectionCard } from "@/components/ui";
+import { usePendingAction } from "@/hooks/usePendingAction";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { formatStatusLabel } from "@/lib/display";
 import type { SettingsPatch } from "@/services/settings";
@@ -38,7 +39,7 @@ const NOTIFICATION_OPTIONS: Array<{ field: NotificationField; label: string; hin
 /** Appearance, notification and account settings, shared by all five portals. */
 export function SettingsScreen() {
   const { profile } = useAuth();
-  const signOut = useSignOut();
+  const [signOut, signingOut] = usePendingAction(useSignOut());
   const router = useRouter();
   const { mode, setMode, colors } = useTheme();
   const styles = useThemedStyles(createStyles);
@@ -109,6 +110,8 @@ export function SettingsScreen() {
       <SectionCard title="Notifications">
         <Text style={styles.sectionHint}>Choose which updates you want to hear about. Saved to your account.</Text>
 
+        {query.isLoading ? <LoadingState label="Loading your settings…" /> : null}
+
         {NOTIFICATION_OPTIONS.map((option) => (
           <View key={option.field} style={styles.switchRow}>
             <View style={styles.optionText}>
@@ -159,7 +162,7 @@ export function SettingsScreen() {
         />
       </SectionCard>
 
-      <AppButton label="Sign out" variant="outline" onPress={signOut} />
+      <AppButton label="Sign out" variant="outline" onPress={() => void signOut()} loading={signingOut} />
     </Screen>
   );
 }

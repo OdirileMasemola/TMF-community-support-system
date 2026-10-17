@@ -87,7 +87,7 @@ export function ProfilePictureEditor() {
         variant="outline"
         size="sm"
         className="mt-4"
-        disabled={locked || isUploading}
+        disabled={locked || isUploading} loading={isUploading}
         onClick={() => inputRef.current?.click()}
       >
         {isUploading ? "Uploading..." : avatarUrl ? "Change photo" : "Add photo"}

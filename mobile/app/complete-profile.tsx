@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useAuth } from "@/auth/AuthProvider";
 import { AppButton, Card } from "@/components/ui";
+import { usePendingAction } from "@/hooks/usePendingAction";
 import { useThemedStyles } from "@/theme/ThemeProvider";
 import { spacing, typography, type ThemeColors } from "@/theme/tokens";
 
@@ -10,6 +11,8 @@ import { spacing, typography, type ThemeColors } from "@/theme/tokens";
  */
 export default function CompleteProfileScreen() {
   const { signOut, refreshProfile } = useAuth();
+  const [refresh, refreshing] = usePendingAction(refreshProfile);
+  const [leave, leaving] = usePendingAction(signOut);
   const styles = useThemedStyles(createStyles);
 
   return (
@@ -21,8 +24,8 @@ export default function CompleteProfileScreen() {
           Your account does not have a role yet. Complete your profile on the TMF web dashboard, then come
           back and refresh.
         </Text>
-        <AppButton label="I have completed it — refresh" onPress={refreshProfile} />
-        <AppButton label="Sign out" variant="outline" onPress={signOut} />
+        <AppButton label="I have completed it — refresh" onPress={() => void refresh()} loading={refreshing} disabled={leaving} />
+        <AppButton label="Sign out" variant="outline" onPress={() => void leave()} loading={leaving} disabled={refreshing} />
       </Card>
     </View>
   );

@@ -232,12 +232,14 @@ export default function AdminCampaignsScreen() {
                     label="Publish"
                     onPress={() => setStatus.mutate({ id: campaign.id, status: "active" })}
                     disabled={setStatus.isPending || campaign.status === "active"}
+                    loading={setStatus.isPending && setStatus.variables?.id === campaign.id && setStatus.variables?.status === "active"}
                   />
                   <AppButton
                     label="Close"
                     variant="outline"
                     onPress={() => setStatus.mutate({ id: campaign.id, status: "closed" })}
                     disabled={setStatus.isPending || campaign.status === "closed"}
+                    loading={setStatus.isPending && setStatus.variables?.id === campaign.id && setStatus.variables?.status === "closed"}
                   />
                 </ButtonRow>
               }

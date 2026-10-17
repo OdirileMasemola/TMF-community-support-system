@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { LoadingState } from "@/components/ui/Spinner";
 
 export function CampaignListPage() {
   const { profile } = useAuth();
@@ -56,7 +57,7 @@ export function CampaignListPage() {
       ) : null}
 
       <div className="card-grid mt-6">
-        {supabaseReady && isLoading && <p>Loading campaigns...</p>}
+        {supabaseReady && isLoading && <LoadingState className="col-span-full" message="Loading campaigns…" />}
         {supabaseReady && !isLoading && campaigns.length === 0 && <Card>No campaigns yet.</Card>}
         {campaigns.map((campaign) => (
           <Card key={campaign.id}>

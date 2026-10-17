@@ -1,7 +1,8 @@
-import { Children } from "react";
+import { Children, useEffect, useRef } from "react";
 import type { ComponentType, PropsWithChildren, ReactNode, Ref } from "react";
 import {
   ActivityIndicator,
+  Animated,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -312,14 +313,18 @@ export function AppButton({
         (disabled || loading) && styles.buttonDisabled,
       ]}
     >
-      {loading ? (
-        <ActivityIndicator color={isPrimary ? colors.primaryForeground : colors.primary} />
-      ) : (
-        <View style={styles.buttonInner}>
-          {icon}
-          <Text style={[styles.buttonText, { color: textColor }]}>{label}</Text>
-        </View>
-      )}
+      <View style={styles.buttonInner}>
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color={isPrimary ? colors.primaryForeground : colors.primary}
+            accessibilityLabel={`${label} in progress`}
+          />
+        ) : (
+          icon
+        )}
+        <Text style={[styles.buttonText, { color: textColor }]}>{label}</Text>
+      </View>
     </Pressable>
   );
 }
@@ -378,14 +383,40 @@ export function TextField({
   );
 }
 
-export function LoadingState({ label = "Loading…" }: { label?: string }) {
+/**
+ * Spinner + label shown while a screen or section loads. It fades in after a short delay so
+ * quick loads do not flash a spinner.
+ */
+export function LoadingState({ label = "Loading…", delay = 150 }: { label?: string; delay?: number }) {
   const styles = useThemedStyles(createStyles);
   const { colors } = useTheme();
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.sequence([
+      Animated.delay(delay),
+      Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }),
+    ]);
+    animation.start();
+    return () => animation.stop();
+  }, [delay, opacity]);
 
   return (
-    <View style={styles.centred}>
-      <ActivityIndicator color={colors.primary} />
-      <Text style={styles.centredText}>{label}</Text>
+    <View style={styles.centred} accessible accessibilityRole="progressbar" accessibilityLabel={label} accessibilityState={{ busy: true }}>
+      <Animated.View style={[styles.loadingInner, { opacity }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.centredText}>{label}</Text>
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Full-screen loading view for screens that have nothing to show until their first load finishes. */
+export function ScreenLoader({ label = "Loading…" }: { label?: string }) {
+  const styles = useThemedStyles(createStyles);
+  return (
+    <View style={styles.screenLoader}>
+      <LoadingState label={label} />
     </View>
   );
 }
@@ -680,6 +711,16 @@ const createStyles = (colors: ThemeColors) =>
       color: colors.foreground,
       backgroundColor: colors.card,
       ...typography.body,
+    },
+    loadingInner: {
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    screenLoader: {
+      flex: 1,
+      justifyContent: "center",
+      padding: spacing.lg,
+      backgroundColor: colors.background,
     },
     centred: {
       flex: 1,
