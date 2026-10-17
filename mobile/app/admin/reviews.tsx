@@ -21,6 +21,7 @@ import { useRoleProfile } from "@/hooks/useRoleProfile";
 import { formatCurrency, formatShortDate, formatStatusLabel } from "@/lib/display";
 import { fetchAllAssistanceRequests, updateAssistanceRequest } from "@/services/assistance";
 import { fetchPendingProofs, updateDonationProof } from "@/services/donations";
+import { openDonationProof } from "@/lib/proofs";
 import { fetchAllApplications, updateCampaignApplication } from "@/services/volunteers";
 
 type Queue = "volunteers" | "assistance" | "proofs";
@@ -235,6 +236,7 @@ export default function AdminReviewsScreen() {
                 last={index === pendingProofs.length - 1}
                 footer={
                   <ButtonRow>
+                    <AppButton label="View" variant="outline" onPress={() => void openDonationProof(proof)} />
                     <AppButton
                       label="Verify"
                       onPress={() => reviewProof.mutate({ id: proof.id, status: "approved" })}

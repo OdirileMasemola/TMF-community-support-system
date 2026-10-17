@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FileCheck2, HandCoins } from "lucide-react-native";
 import {
+  AppButton,
   Badge,
+  ButtonRow,
   ChipSelect,
   EmptyRow,
   EmptyState,
@@ -18,6 +20,7 @@ import {
 import { useRoleProfile } from "@/hooks/useRoleProfile";
 import { formatCurrency, formatShortDate, paymentStatusLabel, verificationStatusLabel } from "@/lib/display";
 import { fetchDonorDonations, fetchDonorProofs } from "@/services/donations";
+import { openDonationProof } from "@/lib/proofs";
 
 type Filter = "all" | "successful" | "pending";
 
@@ -130,6 +133,11 @@ export default function DonorDonationsScreen() {
               value={[formatShortDate(proof.uploaded_at), proof.admin_comment ?? undefined].filter(Boolean).join(" · ")}
               right={<Badge label={verificationStatusLabel(proof.verification_status)} status={proof.verification_status} />}
               last={index === shown.length - 1}
+              footer={
+                <ButtonRow>
+                  <AppButton label="View proof" variant="outline" onPress={() => void openDonationProof(proof)} />
+                </ButtonRow>
+              }
             />
           ))
         ) : (

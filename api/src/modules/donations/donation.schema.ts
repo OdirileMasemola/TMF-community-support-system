@@ -70,6 +70,11 @@ const myDonationSchema = {
         type: 'object',
         properties: {
           id: { type: 'string', format: 'uuid' },
+          file_path: { type: 'string', description: 'Path of my file in the donation-proofs bucket; sign it to view the file' },
+          file_name: nullableText,
+          payment_reference: nullableText,
+          payment_date: { type: ['string', 'null'], format: 'date' },
+          admin_comment: nullableText,
           verification_status: { type: 'string', enum: [...VERIFICATION_STATUSES] },
           uploaded_at: { type: 'string', format: 'date-time' },
         },

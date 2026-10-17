@@ -11,6 +11,7 @@ import { trimmedOrNull } from '../../shared/utils/text.js';
 import {
   DONATION_COLUMNS,
   DONATION_PROOFS_BUCKET,
+  MY_PROOF_COLUMNS,
   PROOF_ACCEPTING_STATUSES,
   PROOF_COLUMNS,
   SIGNED_URL_TTL_SECONDS,
@@ -42,7 +43,7 @@ export interface DonationService {
 
 const ADMIN_DONATION_SELECT =
   `${DONATION_COLUMNS}, campaigns(id, title), donor_profiles(id, user_id, profiles(full_name, email))`;
-const MY_DONATION_SELECT = `${DONATION_COLUMNS}, campaigns(id, title), donation_proofs(id, verification_status, uploaded_at)`;
+const MY_DONATION_SELECT = `${DONATION_COLUMNS}, campaigns(id, title), donation_proofs(${MY_PROOF_COLUMNS})`;
 const REVIEW_PROOF_SELECT =
   `${PROOF_COLUMNS}, donations(id, donor_id, campaign_id, amount, donation_kind, payment_reference, donation_date, status, campaigns(id, title))`;
 

@@ -273,7 +273,18 @@ describe('donations API', () => {
       expect(body.meta).toEqual({ page: 1, pageSize: 20, total: 4, totalPages: 1 });
       const first = body.data.find((row) => row.id === D(1));
       expect(first?.campaigns).toEqual({ id: C(1), title: 'Campaign 1' });
-      expect(first?.donation_proofs).toEqual([{ id: P(1), verification_status: 'pending', uploaded_at: '2026-10-01T09:00:00+00:00' }]);
+      expect(first?.donation_proofs).toEqual([
+        expect.objectContaining({
+          id: P(1),
+          file_path: `${USERS.donor.id}/proof-1.pdf`,
+          file_name: 'proof-1.pdf',
+          verification_status: 'pending',
+          uploaded_at: '2026-10-01T09:00:00+00:00',
+        }),
+      ]);
+      // file_path lets the donor sign their own file; the review columns stay admin-only.
+      expect(first?.donation_proofs?.[0]).not.toHaveProperty('reviewed_by');
+      expect(first?.donation_proofs?.[0]).not.toHaveProperty('reviewed_at');
       // A closed campaign is hidden from donors by RLS, so it embeds as null.
       expect(body.data.find((row) => row.id === D(5))?.campaigns).toBeNull();
       expect(body.data.find((row) => row.id === D(3))?.donation_proofs).toHaveLength(2);

@@ -75,8 +75,26 @@ export interface AdminDonation extends Donation {
 /** A donation in GET /donations/me, with its campaign and proofs. */
 export interface MyDonation extends Donation {
   campaigns: { id: string; title: string } | null;
-  donation_proofs: Array<Pick<DonationProof, 'id' | 'verification_status' | 'uploaded_at'>>;
+  donation_proofs: Array<Pick<DonationProof, MyProofColumn>>;
 }
+
+/**
+ * Proof columns embedded in GET /donations/me. file_path is included so the donor can create a signed
+ * URL for their own file (storage policy "Users read their own donation proofs"); the review columns
+ * (reviewed_by, reviewed_at) stay admin-only.
+ */
+export const MY_PROOF_COLUMN_LIST = [
+  'id',
+  'file_path',
+  'file_name',
+  'payment_reference',
+  'payment_date',
+  'admin_comment',
+  'verification_status',
+  'uploaded_at',
+] as const;
+export type MyProofColumn = (typeof MY_PROOF_COLUMN_LIST)[number];
+export const MY_PROOF_COLUMNS = MY_PROOF_COLUMN_LIST.join(', ');
 
 /** A proof in the admin endpoints, with its donation and a short-lived signed file URL. */
 export interface ReviewProof extends DonationProof {

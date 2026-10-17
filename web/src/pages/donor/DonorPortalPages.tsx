@@ -46,9 +46,13 @@ import {
   createDonationProof,
   fetchDonorDonations,
   fetchDonorProofs,
+  getDonationProofUrl,
+  PROOF_FILE_ERROR_MESSAGE,
+  PROOF_FILE_MISSING_MESSAGE,
+  type ProofWithDonation,
 } from "@/services/donations";
 import { fetchDonorProfile, updateProfile, type DonorProfile } from "@/services/profiles";
-import { getSignedFileUrl, uploadUserFile } from "@/services/storage";
+import { uploadUserFile } from "@/services/storage";
 import { NotificationInbox } from "@/components/shared/NotificationInbox";
 
 function asDonorProfile(value: unknown): DonorProfile | null {
@@ -502,13 +506,18 @@ export function DonorProofOfPaymentPage() {
     },
   });
 
-  async function openProof(filePath: string) {
+  async function openProof(proof: ProofWithDonation) {
+    // Open the tab during the click so mobile browsers do not block it as a popup, then point it at the
+    // signed URL once it is ready.
+    const tab = window.open("", "_blank");
+    if (tab) tab.opener = null;
     try {
-      const url = await getSignedFileUrl("donation-proofs", filePath);
-      if (!url) throw new Error("Could not open proof file.");
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch {
-      toast.error(toUserMessage("Could not open proof file."));
+      const url = await getDonationProofUrl(proof);
+      if (tab) tab.location.href = url;
+      else window.location.assign(url);
+    } catch (error) {
+      tab?.close();
+      toast.error(error instanceof Error && error.message === PROOF_FILE_MISSING_MESSAGE ? PROOF_FILE_MISSING_MESSAGE : PROOF_FILE_ERROR_MESSAGE);
     }
   }
 
@@ -607,10 +616,10 @@ export function DonorProofOfPaymentPage() {
                 </td>
                 <td className={tableCellClass}>
                   <div className="flex">
-                    <Button variant="ghost" size="icon" aria-label="View proof" type="button" onClick={() => openProof(proof.file_path)}>
+                    <Button variant="ghost" size="icon" aria-label="View proof" type="button" onClick={() => openProof(proof)}>
                       <Eye className="size-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" aria-label="Download proof" type="button" onClick={() => openProof(proof.file_path)}>
+                    <Button variant="ghost" size="icon" aria-label="Download proof" type="button" onClick={() => openProof(proof)}>
                       <Download className="size-4" />
                     </Button>
                   </div>

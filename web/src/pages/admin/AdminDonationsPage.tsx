@@ -15,9 +15,13 @@ import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import {
   fetchAllDonations,
   fetchPendingProofs,
+  getDonationProofUrl,
+  PROOF_FILE_ERROR_MESSAGE,
+  PROOF_FILE_MISSING_MESSAGE,
   updateDonation,
   updateDonationProof,
   type DonationWithDonor,
+  type ProofWithDonation,
 } from "@/services/donations";
 
 function csvCell(value: unknown): string {
@@ -43,6 +47,20 @@ function exportDonationsCsv(donations: DonationWithDonor[]) {
   link.download = `tmf-donations-${new Date().toISOString().slice(0, 10)}.csv`;
   link.click();
   URL.revokeObjectURL(url);
+}
+
+async function openProofFile(proof: ProofWithDonation) {
+  // Open the tab during the click so the browser does not block it as a popup.
+  const tab = window.open("", "_blank");
+  if (tab) tab.opener = null;
+  try {
+    const url = await getDonationProofUrl(proof);
+    if (tab) tab.location.href = url;
+    else window.location.assign(url);
+  } catch (error) {
+    tab?.close();
+    toast.error(error instanceof Error && error.message === PROOF_FILE_MISSING_MESSAGE ? PROOF_FILE_MISSING_MESSAGE : PROOF_FILE_ERROR_MESSAGE);
+  }
 }
 
 export function AdminDonationsPage() {
@@ -276,6 +294,15 @@ export function AdminDonationsPage() {
                     <TableCell>{formatShortDate(proof.uploaded_at)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          aria-label={`View proof ${proof.file_name || ""}`.trim()}
+                          onClick={() => void openProofFile(proof)}
+                        >
+                          View
+                        </Button>
                         <Button
                           type="button"
                           variant="outline"

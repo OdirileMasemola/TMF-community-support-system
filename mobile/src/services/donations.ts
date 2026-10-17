@@ -1,6 +1,7 @@
 import type { Tables, TablesInsert, TablesUpdate } from "@/types/database.types";
 import { apiData, apiList } from "@/lib/apiClient";
 import { getSupabaseClientOrNull } from "@/lib/supabaseClient";
+import { logSupabaseError } from "@/lib/errors";
 
 export type DonationRow = Tables<"donations">;
 export type DonationProofRow = Tables<"donation_proofs">;
@@ -19,6 +20,8 @@ export type DonationWithDonor = DonationRow & {
 };
 
 export type ProofWithDonation = DonationProofRow & {
+  /** Short-lived signed URL from the admin review endpoint, when the API provided one. */
+  signed_url?: string | null;
   donations:
     | (Pick<DonationRow, "id" | "amount" | "payment_reference" | "donation_date" | "status"> & {
         campaigns: Pick<Tables<"campaigns">, "title"> | null;
@@ -28,10 +31,15 @@ export type ProofWithDonation = DonationProofRow & {
 
 type MyDonation = DonationRow & {
   campaigns: { id: string; title: string } | null;
-  donation_proofs: Array<Pick<DonationProofRow, "id" | "verification_status" | "uploaded_at">>;
+  // file_path and the other details are returned by newer API builds; older ones only send the first three.
+  donation_proofs: Array<
+    Pick<DonationProofRow, "id" | "verification_status" | "uploaded_at"> &
+      Partial<Pick<DonationProofRow, "file_path" | "file_name" | "payment_reference" | "payment_date" | "admin_comment">>
+  >;
 };
 
 type ReviewProof = DonationProofRow & {
+  signed_url?: string | null;
   donations:
     | (Pick<DonationRow, "id" | "amount" | "payment_reference" | "donation_date" | "status"> & {
         campaigns: { id: string; title: string } | null;
@@ -64,11 +72,11 @@ function proofFromMine(donation: MyDonation, proof: MyDonation["donation_proofs"
   return {
     id: proof.id,
     donation_id: donation.id,
-    file_path: "",
-    file_name: null,
-    payment_reference: donation.payment_reference,
-    payment_date: null,
-    admin_comment: null,
+    file_path: proof.file_path ?? "",
+    file_name: proof.file_name ?? null,
+    payment_reference: proof.payment_reference ?? donation.payment_reference,
+    payment_date: proof.payment_date ?? null,
+    admin_comment: proof.admin_comment ?? null,
     verification_status: proof.verification_status,
     reviewed_by: null,
     reviewed_at: null,
@@ -151,6 +159,7 @@ export async function fetchPendingProofs(limit = 100): Promise<ProofWithDonation
     reviewed_by: proof.reviewed_by,
     reviewed_at: proof.reviewed_at,
     uploaded_at: proof.uploaded_at,
+    signed_url: proof.signed_url ?? null,
     donations: proof.donations
       ? {
           id: proof.donations.id,
@@ -188,4 +197,51 @@ export async function updateDonationProof(id: string, values: TablesUpdate<"dona
   };
   if (values.admin_comment !== undefined) body.admin_comment = values.admin_comment;
   await apiData(`/api/v1/admin/donation-proofs/${id}`, { method: "PATCH", body });
+}
+
+const DONATION_PROOFS_BUCKET = "donation-proofs";
+const PROOF_URL_TTL_SECONDS = 5 * 60;
+
+export const PROOF_FILE_MISSING_MESSAGE = "This proof file could not be found. Please upload it again.";
+export const PROOF_FILE_ERROR_MESSAGE = "Could not open proof file.";
+
+function isStorageNotFound(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const { statusCode, status, message } = error as { statusCode?: unknown; status?: unknown; message?: unknown };
+  return String(statusCode) === "404" || status === 404 || (typeof message === "string" && /not found/i.test(message));
+}
+
+/**
+ * Returns a short-lived signed URL for a proof of payment. The donation-proofs bucket is private, so a
+ * public URL never works: the file is signed with the caller's own session, and storage RLS only allows
+ * the uploader (first folder = their auth id) or an administrator. When the list did not include the
+ * stored path, it is read from donation_proofs, which RLS limits to the donor's own proofs and admins.
+ */
+export async function getDonationProofUrl(proof: Pick<ProofWithDonation, "id" | "file_path" | "signed_url">): Promise<string> {
+  // A signed URL from the list may have expired, so a fresh one is made whenever the path is known.
+  if (!proof.file_path && proof.signed_url) return proof.signed_url;
+  const client = getSupabaseClientOrNull();
+  if (!client) throw new Error(PROOF_FILE_ERROR_MESSAGE);
+
+  let path = proof.file_path;
+  if (!path) {
+    const { data, error } = await client
+      .from("donation_proofs")
+      .select("file_path")
+      .eq("id", proof.id)
+      .maybeSingle<{ file_path: string }>();
+    if (error) {
+      logSupabaseError("getDonationProofUrl.lookup", error);
+      throw new Error(PROOF_FILE_ERROR_MESSAGE);
+    }
+    path = data?.file_path ?? "";
+  }
+  if (!path || path.includes("..")) throw new Error(PROOF_FILE_MISSING_MESSAGE);
+
+  const { data, error } = await client.storage.from(DONATION_PROOFS_BUCKET).createSignedUrl(path, PROOF_URL_TTL_SECONDS);
+  if (error || !data?.signedUrl) {
+    logSupabaseError("getDonationProofUrl.sign", error);
+    throw new Error(isStorageNotFound(error) ? PROOF_FILE_MISSING_MESSAGE : PROOF_FILE_ERROR_MESSAGE);
+  }
+  return data.signedUrl;
 }
