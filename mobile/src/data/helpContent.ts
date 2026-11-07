@@ -54,7 +54,7 @@ export const helpSections: HelpSection[] = [
       {
         question: "I forgot my password. What now?",
         answer:
-          "Tap Forgot your password? on the sign-in screen and enter your email address. The reset email opens the TMF website.",
+          "Tap Forgot your password? on the sign-in screen and enter your email address. Open the link in the email on this phone: it brings you back to the app to choose a new password, then sign in with it.",
       },
       {
         question: "Can I change my role myself?",

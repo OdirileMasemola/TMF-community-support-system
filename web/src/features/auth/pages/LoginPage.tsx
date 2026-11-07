@@ -79,6 +79,11 @@ export function LoginPage() {
           onChange={(event) => setPassword(event.target.value)}
           required
         />
+        <div className="-mt-1 flex justify-end">
+          <Link className="text-xs font-semibold text-primary hover:underline" to="/forgot-password">
+            Forgot password?
+          </Link>
+        </div>
         <Button type="submit" disabled={isBusy} loading={isSubmitting} className="w-full">
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>

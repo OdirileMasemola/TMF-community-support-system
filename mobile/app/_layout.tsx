@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, useRouter, useSegments } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { AuthProvider, useAuth } from "@/auth/AuthProvider";
+import { AuthProvider, PASSWORD_RESET_ROUTE, useAuth } from "@/auth/AuthProvider";
 import { SessionSplash } from "@/components/SessionSplash";
 import { AppButton, Card } from "@/components/ui";
 import { useAccountThemeSync } from "@/hooks/useUserSettings";
@@ -17,8 +17,13 @@ import { spacing, typography, type ThemeColors } from "@/theme/tokens";
 const PORTAL_SEGMENTS = ["admin", "donor", "volunteer", "beneficiary", "sponsor"] as const;
 /** Screens for people who are not signed in; a signed-in user is sent on to their portal. */
 const SIGNED_OUT_SEGMENTS = ["welcome", "login", "register", "forgot-password", "auth"];
-/** Screens anyone may open without a session. */
-const PUBLIC_SEGMENTS = [...SIGNED_OUT_SEGMENTS, "help"];
+/**
+ * Screens anyone may open without a session. The reset-password screen is
+ * public (the emailed link opens it with no session) but deliberately not a
+ * signed-out screen: the link signs the user in so the password can be
+ * changed, and they must stay here until that is done.
+ */
+const PUBLIC_SEGMENTS = [...SIGNED_OUT_SEGMENTS, "help", PASSWORD_RESET_ROUTE];
 
 export default function RootLayout() {
   const queryClient = useMemo(
@@ -79,7 +84,15 @@ function RootNavigator() {
       },
     };
   }, [isDark, themeColors]);
-  useLogoutReset(session, isLoading, PUBLIC_SEGMENTS.includes(segments[0] ?? ""));
+  const currentSegment = segments[0] ?? "";
+  useLogoutReset(
+    session,
+    isLoading,
+    PUBLIC_SEGMENTS.includes(currentSegment),
+    // After a password reset the recovery session is ended on purpose; land on
+    // sign-in so the new password can be used straight away.
+    currentSegment === PASSWORD_RESET_ROUTE ? "/login" : "/welcome",
+  );
 
   useEffect(() => {
     if (isLoading) return;
@@ -97,6 +110,9 @@ function RootNavigator() {
 
     // A failed read is not the same as a missing row, so do not route on it.
     if (profileError) return;
+
+    // Changing a password does not need a profile; leave the reset screen alone.
+    if (current === PASSWORD_RESET_ROUTE) return;
 
     // Signed in but no profile row: role is unknown, so no portal can be chosen.
     if (!profile) {
@@ -123,7 +139,8 @@ function RootNavigator() {
     return <SessionSplash />;
   }
 
-  if (session && profileError) {
+  // A password reset only needs the recovery session, not the profile row.
+  if (session && profileError && currentSegment !== PASSWORD_RESET_ROUTE) {
     return <ProfileErrorScreen message={profileError} />;
   }
 
@@ -145,6 +162,8 @@ function RootNavigator() {
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="register" options={{ title: "Create account" }} />
           <Stack.Screen name="forgot-password" options={{ title: "Reset password" }} />
+          {/* Opened from the emailed link, so there is no screen to swipe back to. */}
+          <Stack.Screen name="reset-password" options={{ title: "New password", ...swapTransition }} />
           <Stack.Screen name="auth/callback" options={{ headerShown: false, ...swapTransition }} />
           <Stack.Screen name="help" options={{ title: "Help & FAQ" }} />
           <Stack.Screen name="complete-profile" options={{ title: "Complete your profile", ...swapTransition }} />

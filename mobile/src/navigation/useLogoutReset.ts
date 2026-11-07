@@ -13,8 +13,16 @@ export function isUserSpecificQuery(query: Pick<Query, "queryKey">): boolean {
  * session), remove the previous user's cached data and replace the whole
  * navigation stack with the welcome screen so Back cannot return to a portal.
  * Must be called before the root gate's effect so dismissAll runs first.
+ *
+ * `destination` is where a public screen lands afterwards; the password-reset
+ * screen passes "/login" so people can sign in with their new password.
  */
-export function useLogoutReset(session: Session | null, isLoading: boolean, onPublicScreen: boolean) {
+export function useLogoutReset(
+  session: Session | null,
+  isLoading: boolean,
+  onPublicScreen: boolean,
+  destination: "/welcome" | "/login" = "/welcome",
+) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const hadSession = useRef(false);
@@ -32,6 +40,6 @@ export function useLogoutReset(session: Session | null, isLoading: boolean, onPu
     if (router.canDismiss()) router.dismissAll();
     // On a protected screen the root gate performs the single replace to
     // /welcome; only a public screen (e.g. Help) needs it done here.
-    if (onPublicScreen) router.replace("/welcome");
-  }, [isLoading, session, onPublicScreen, queryClient, router]);
+    if (onPublicScreen) router.replace(destination);
+  }, [isLoading, session, onPublicScreen, destination, queryClient, router]);
 }

@@ -69,10 +69,14 @@ describe("useLogoutReset", () => {
     client.setQueryData(["notifications", "u-1"], [1]);
     client.setQueryData(["campaigns", "public"], [1]);
     const wrapper = ({ children }: PropsWithChildren) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
-    const hook = renderHook(({ s, loading, pub }: { s: never; loading: boolean; pub: boolean }) => useLogoutReset(s, loading, pub), {
-      wrapper,
-      initialProps: { s: null as never, loading: true, pub: false },
-    });
+    const hook = renderHook(
+      ({ s, loading, pub, dest }: { s: never; loading: boolean; pub: boolean; dest?: "/welcome" | "/login" }) =>
+        useLogoutReset(s, loading, pub, dest),
+      {
+        wrapper,
+        initialProps: { s: null as never, loading: true, pub: false, dest: undefined },
+      },
+    );
     return { client, hook };
   }
 
@@ -101,6 +105,14 @@ describe("useLogoutReset", () => {
     hook.rerender({ s: null as never, loading: false, pub: true });
     expect(mockReplace).toHaveBeenCalledTimes(1);
     expect(mockReplace).toHaveBeenCalledWith("/welcome");
+  });
+
+  it("lands on sign-in instead when the password-reset screen ends its recovery session", () => {
+    const { hook } = setup();
+    hook.rerender({ s: session, loading: false, pub: true, dest: "/login" });
+    hook.rerender({ s: null as never, loading: false, pub: true, dest: "/login" });
+    expect(mockReplace).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith("/login");
   });
 
   it("keeps public campaign lists only", () => {

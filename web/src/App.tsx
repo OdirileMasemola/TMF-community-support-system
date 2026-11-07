@@ -6,8 +6,10 @@ import { RoleProtectedRoute } from "@/components/shared/RoleProtectedRoute";
 import { PageFallback } from "@/components/shared/DataState";
 import { AuthCallbackPage } from "@/features/auth/pages/AuthCallbackPage";
 import { CompleteProfilePage } from "@/features/auth/pages/CompleteProfilePage";
+import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { RegisterPage } from "@/pages/auth/RegisterPage";
+import { ResetPasswordPage } from "@/pages/auth/ResetPasswordPage";
 import { HomePage } from "@/pages/public/HomePage";
 
 const AppLayout = lazy(() => import("@/components/layout/AppLayout").then((module) => ({ default: module.AppLayout })));
@@ -173,6 +175,8 @@ export default function App() {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/register/complete-profile" element={<CompleteProfilePage />} />
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
+import { describeRecoveryFailure } from "@/auth/recoveryLink";
 import { KeyboardAwareScreen } from "@/components/KeyboardAwareScreen";
 import { AppButton, PageHeading, SuccessBanner, TextField } from "@/components/ui";
 import { validateEmail } from "@/lib/validation";
@@ -18,6 +19,7 @@ export default function ForgotPasswordScreen() {
   const [sentTo, setSentTo] = useState<string | null>(null);
 
   async function handleSubmit() {
+    if (isSubmitting) return;
     setError(null);
 
     const problem = validateEmail(email);
@@ -31,7 +33,7 @@ export default function ForgotPasswordScreen() {
       await resetPassword(email);
       setSentTo(email.trim());
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Could not send the reset email. Please try again.");
+      setError(describeRecoveryFailure(submitError, "Could not send the reset email. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
@@ -42,13 +44,18 @@ export default function ForgotPasswordScreen() {
       <PageHeading
         eyebrow="Account help"
         title="Forgot your password?"
-        subtitle="Enter the email address you registered with and we will email you a reset link. The link opens the TMF website."
+        subtitle="Enter the email address you registered with and we will email you a link to choose a new password. Open it on this phone to come back to the app."
       />
 
       {sentTo ? (
         <View style={styles.form}>
           <SuccessBanner label={`If an account exists for ${sentTo}, a reset email is on its way.`} />
+          <Text style={styles.hint}>
+            Open the link on this phone to choose your new password. It expires after a short while and can only be
+            used once. Nothing arrived? Check your spam folder and make sure the address is the one you registered with.
+          </Text>
           <AppButton label="Back to sign in" onPress={() => router.replace("/login")} />
+          <AppButton label="Try a different email" variant="outline" onPress={() => setSentTo(null)} />
         </View>
       ) : (
         <View style={styles.form}>
@@ -102,6 +109,11 @@ const createStyles = (colors: ThemeColors) =>
     error: {
       ...typography.caption,
       color: colors.destructive,
+    },
+    hint: {
+      ...typography.caption,
+      color: colors.mutedForeground,
+      lineHeight: 18,
     },
     footerText: {
       ...typography.caption,

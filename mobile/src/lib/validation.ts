@@ -41,6 +41,17 @@ export function validateEmail(email: string): string | null {
   return null;
 }
 
+/** Returns the first problem with a new password and its confirmation, or null when it can be saved. */
+export function validateNewPassword(password: string, confirmPassword: string): string | null {
+  if (!password) return "Enter a new password.";
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return `Use a password of at least ${MIN_PASSWORD_LENGTH} characters.`;
+  }
+  if (!confirmPassword) return "Confirm your new password.";
+  if (password !== confirmPassword) return "The passwords do not match.";
+  return null;
+}
+
 /** Returns the first problem with the registration form, or null when it can be submitted. */
 export function validateRegistration(values: RegistrationValues): string | null {
   if (!values.fullName.trim()) return "Enter your full name.";

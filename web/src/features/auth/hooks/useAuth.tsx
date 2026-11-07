@@ -1,7 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type PropsWithChildren } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, type NavigateFunction } from "react-router-dom";
 import { createClient, getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { roleHomePath } from "@/lib/display";
 import { ensureRoleProfile, fetchProfile } from "@/services/profiles";
@@ -27,9 +27,16 @@ type AuthContextValue = {
   signUp: (values: { fullName: string; email: string; phoneNumber: string; password: string; role: UserRole }) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   completeProfile: (values: { fullName: string; phoneNumber: string; role: UserRole; organisationName?: string }) => Promise<void>;
+  /** Asks Supabase to email a password-reset link. Resolves the same way whether or not the address is registered. */
+  requestPasswordReset: (email: string) => Promise<void>;
+  /** Sets a new password for the current (recovery) session. */
+  updatePassword: (newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
+
+/** Where Supabase sends the user after they click the reset link in their email. */
+export const PASSWORD_RESET_PATH = "/reset-password";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -52,6 +59,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [isLoading, setIsLoading] = useState(() => isSupabaseConfigured());
   const navigate = useNavigateSafe();
   const queryClient = useQueryClient();
+  // The auth listener below is subscribed once; it reads the latest navigate
+  // through this ref so a route change does not re-subscribe it.
+  const navigateRef = useRef(navigate);
+  useEffect(() => {
+    navigateRef.current = navigate;
+  }, [navigate]);
 
   const loadProfile = useCallback(
     async (userId: string): Promise<Profile | null> => {
@@ -103,6 +116,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     // and loadProfile calls getSession() via the API client, which would deadlock.
     const { data: listener } = client.auth.onAuthStateChange((event, nextSession) => {
       setSession(nextSession);
+
+      // The reset email may land on the Site URL (e.g. "/") rather than the
+      // reset page when the redirect is not allow-listed. supabase-js still
+      // reads the tokens from the URL and tells us it was a recovery link, so
+      // move the user on to the page where they can set a new password.
+      if (event === "PASSWORD_RECOVERY" && window.location.pathname !== PASSWORD_RESET_PATH) {
+        navigateRef.current(PASSWORD_RESET_PATH, { replace: true });
+      }
 
       if (!nextSession?.user.id) {
         setProfile(null);
@@ -249,6 +270,39 @@ export function AuthProvider({ children }: PropsWithChildren) {
     await loadProfile(sessionUserId);
   }, [loadProfile, queryClient, sessionUserId]);
 
+  /**
+   * Supabase sends the email and verifies the link; the app never sees a
+   * token until the user lands on the reset page. The same success response
+   * is returned for unknown addresses, so nothing here reveals whether an
+   * account exists.
+   */
+  const requestPasswordReset = useCallback(async (email: string) => {
+    const supabase = getSupabaseClientOrNull();
+    if (!supabase) {
+      throw new Error("Password reset is temporarily unavailable. Please try again later.");
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}${PASSWORD_RESET_PATH}`,
+    });
+    if (error) throw error;
+  }, []);
+
+  /**
+   * Only works while a session exists: the recovery link signs the user in
+   * for exactly this purpose. The reset page signs the user out afterwards so
+   * the next sign-in has to use the new password.
+   */
+  const updatePassword = useCallback(async (newPassword: string) => {
+    const supabase = getSupabaseClientOrNull();
+    if (!supabase) {
+      throw new Error("Password reset is temporarily unavailable. Please try again later.");
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  }, []);
+
   const signOut = useCallback(async () => {
     const supabase = getSupabaseClientOrNull();
     if (!supabase) return;
@@ -261,8 +315,32 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [navigate, queryClient]);
 
   const value = useMemo(
-    () => ({ session, profile, isLoading, signIn, signUp, signInWithGoogle, completeProfile, signOut, refreshProfile }),
-    [session, profile, isLoading, signIn, signUp, signInWithGoogle, completeProfile, signOut, refreshProfile],
+    () => ({
+      session,
+      profile,
+      isLoading,
+      signIn,
+      signUp,
+      signInWithGoogle,
+      completeProfile,
+      requestPasswordReset,
+      updatePassword,
+      signOut,
+      refreshProfile,
+    }),
+    [
+      session,
+      profile,
+      isLoading,
+      signIn,
+      signUp,
+      signInWithGoogle,
+      completeProfile,
+      requestPasswordReset,
+      updatePassword,
+      signOut,
+      refreshProfile,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -276,10 +354,10 @@ export function useAuth() {
   return context;
 }
 
-function useNavigateSafe() {
+function useNavigateSafe(): NavigateFunction {
   try {
     return useNavigate();
   } catch {
-    return () => undefined;
+    return (() => undefined) as NavigateFunction;
   }
 }

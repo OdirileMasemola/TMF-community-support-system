@@ -3,7 +3,6 @@ import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import type { Session } from "@supabase/supabase-js";
 import { createClient, getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
-import { WEB_APP_URL } from "@/lib/links";
 import { isPublicSignupRole, type PublicSignupRole } from "@/lib/validation";
 import { fetchProfile } from "@/services/profiles";
 import type { UserRole } from "@/types/app.types";
@@ -42,10 +41,18 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signUp: (values: SignUpValues) => Promise<SignUpResult>;
+  /** Emails a password-reset link that deep-links back into this app. */
   resetPassword: (email: string) => Promise<void>;
+  /** Turns the tokens from a reset deep link into a session so the password can be changed. */
+  restoreRecoverySession: (tokens: { accessToken: string; refreshToken: string }) => Promise<void>;
+  /** Sets a new password for the current (recovery) session. */
+  updatePassword: (newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
+
+/** Route (and deep-link path) that handles the emailed reset link. */
+export const PASSWORD_RESET_ROUTE = "reset-password";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
@@ -192,8 +199,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
   );
 
   /**
-   * The web app has no "set a new password" page yet, so the reset link opens
-   * the website's sign-in page rather than a screen in this app.
+   * The reset email links back into this app (tmfdashboard://reset-password,
+   * or the exp:// equivalent in development) so the new password is chosen on
+   * the phone. Supabase only honours redirects on its allow list; if this one
+   * is missing it falls back to the project's Site URL, where the website's
+   * own reset page completes the flow instead. Supabase answers the same way
+   * for unknown addresses, so nothing here reveals who is registered.
    */
   const resetPassword = useCallback(async (email: string) => {
     const client = getSupabaseClientOrNull();
@@ -202,8 +213,36 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
 
     const { error } = await client.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${WEB_APP_URL}/login`,
+      redirectTo: Linking.createURL(PASSWORD_RESET_ROUTE),
     });
+    if (error) throw error;
+  }, []);
+
+  /**
+   * The client has detectSessionInUrl off (there is no page URL on native), so
+   * the reset screen hands the tokens from the deep link over here. The auth
+   * listener then loads the profile like any other sign-in.
+   */
+  const restoreRecoverySession = useCallback(async (tokens: { accessToken: string; refreshToken: string }) => {
+    const client = getSupabaseClientOrNull();
+    if (!client) {
+      throw new Error("Supabase is not configured. Add your credentials to mobile/.env.local and restart Expo.");
+    }
+
+    const { error } = await client.auth.setSession({
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+    });
+    if (error) throw error;
+  }, []);
+
+  const updatePassword = useCallback(async (newPassword: string) => {
+    const client = getSupabaseClientOrNull();
+    if (!client) {
+      throw new Error("Supabase is not configured. Add your credentials to mobile/.env.local and restart Expo.");
+    }
+
+    const { error } = await client.auth.updateUser({ password: newPassword });
     if (error) throw error;
   }, []);
 
@@ -301,6 +340,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       signInWithGoogle,
       signUp,
       resetPassword,
+      restoreRecoverySession,
+      updatePassword,
       signOut,
       refreshProfile,
     }),
@@ -314,6 +355,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
       signInWithGoogle,
       signUp,
       resetPassword,
+      restoreRecoverySession,
+      updatePassword,
       signOut,
       refreshProfile,
     ],
