@@ -43,12 +43,13 @@ export function SettingsScreen() {
   const router = useRouter();
   const { mode, setMode, colors } = useTheme();
   const styles = useThemedStyles(createStyles);
-  const { settings, query, save } = useUserSettings();
+  const { settings, query, save, isSaving } = useUserSettings();
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const segment = portalSegmentFor(profile?.role);
 
   async function saveSetting(patch: SettingsPatch, failureMessage: string) {
+    if (isSaving) return;
     setSaveError(null);
     try {
       await save(patch);
@@ -121,7 +122,7 @@ export function SettingsScreen() {
             <Switch
               accessibilityLabel={option.label}
               value={settings?.[option.field] ?? true}
-              disabled={!settings}
+              disabled={!settings || isSaving}
               onValueChange={(value) =>
                 void saveSetting({ [option.field]: value }, "Your notification choice could not be saved. Please try again.")
               }

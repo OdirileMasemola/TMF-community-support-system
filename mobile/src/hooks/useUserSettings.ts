@@ -6,7 +6,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 
 const settingsKey = (userId: string | undefined) => ["user-settings", userId] as const;
 
-/** The signed-in user's saved settings, with an optimistic save. */
+/** The signed-in user's saved settings. A failed save rolls the toggle back. */
 export function useUserSettings() {
   const { session } = useAuth();
   const userId = session?.user.id;

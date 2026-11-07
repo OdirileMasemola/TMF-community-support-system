@@ -3,6 +3,7 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from "@/component
 import { Input } from "@/components/ui/Input";
 import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
+import { NotificationPreferencesPanel } from "@/components/shared/NotificationPreferencesPanel";
 import { ProfilePictureEditor } from "@/components/shared/ProfilePictureEditor";
 
 export function AdminSettingsPage() {
@@ -37,19 +38,7 @@ export function AdminSettingsPage() {
           </CardContent>
         </DashboardCard>
 
-        <DashboardCard>
-          <CardHeader>
-            <CardTitle>Notification preferences</CardTitle>
-            <CardDescription>Control administrator alerts for operational activity.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
-            <p>Email alerts for new donations, volunteer applications, and assistance requests.</p>
-            <p>In-app notifications for campaign deadlines and sponsor review requests.</p>
-            <Button type="button" variant="outline">
-              Configure alerts
-            </Button>
-          </CardContent>
-        </DashboardCard>
+        <NotificationPreferencesPanel />
       </div>
     </AdminPageShell>
   );

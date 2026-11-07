@@ -21,6 +21,7 @@ import { AdminPageShell } from "@/components/admin/admin-page-shell";
 import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { DataState } from "@/components/shared/DataState";
+import { NotificationPreferencesPanel } from "@/components/shared/NotificationPreferencesPanel";
 import { ProfilePictureEditor } from "@/components/shared/ProfilePictureEditor";
 import { AnimatedGlowingSearchBar } from "@/components/ui/AnimatedGlowingSearchBar";
 import { Button } from "@/components/ui/Button";
@@ -718,20 +719,7 @@ export function BeneficiarySettingsPage() {
             </DataState>
           </CardContent>
         </DashboardCard>
-        <DashboardCard>
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>Choose the updates you would like to receive.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {["Request status updates", "Collection reminders", "Foundation announcements"].map((label) => (
-              <label key={label} className="flex items-center justify-between gap-4 text-sm font-medium text-foreground">
-                <span>{label}</span>
-                <input type="checkbox" defaultChecked className="size-4 accent-primary" />
-              </label>
-            ))}
-          </CardContent>
-        </DashboardCard>
+        <NotificationPreferencesPanel />
         <DashboardCard>
           <CardHeader>
             <CardTitle>Appearance</CardTitle>

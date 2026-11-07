@@ -199,12 +199,36 @@ function denied(message: string): { status: number; body: PgErrorBody } {
   return { status: 403, body: { code: '42501', message, details: null, hint: null } };
 }
 
+const NOTIFICATION_PREFERENCE_BY_TYPE: Record<string, keyof Row> = {
+  donation: 'notify_donation_updates',
+  application: 'notify_request_updates',
+  assistance: 'notify_request_updates',
+  campaign: 'notify_campaign_updates',
+  contact: 'notify_request_updates',
+};
+
+/** Mirrors public.user_notification_delivery_enabled() in the live database. */
+export function userNotificationDeliveryEnabled(
+  userId: string,
+  notificationType: string,
+  settingsRows: Row[],
+): boolean {
+  const preferenceKey = NOTIFICATION_PREFERENCE_BY_TYPE[notificationType];
+  if (preferenceKey === undefined) return true;
+
+  const settings = settingsRows.find((row) => row.user_id === userId);
+  if (settings === undefined) return true;
+
+  return settings[preferenceKey] !== false;
+}
+
 /** notify_*_status_change(): SECURITY DEFINER, inserts a notification for the owner on status change. */
 function notifyOwner(profileTable: string, profileColumn: string, type: string, entityType: string) {
   return (oldRow: Row, newRow: Row, db: FakeSupabase): void => {
     if (oldRow.status === newRow.status) return;
     const owner = db.rows(profileTable).find((p) => p.id === newRow[profileColumn]);
     if (owner === undefined) return;
+    if (!userNotificationDeliveryEnabled(String(owner.user_id), type, db.rows('user_settings'))) return;
     db.seed('notifications', {
       user_id: owner.user_id,
       title: `Status ${String(newRow.status)}`,

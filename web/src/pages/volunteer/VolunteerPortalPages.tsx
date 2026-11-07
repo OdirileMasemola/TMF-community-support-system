@@ -20,6 +20,7 @@ import { AdminStatusBadge } from "@/components/admin/admin-status-badge";
 import { DashboardCard } from "@/components/efferd/dashboard-card";
 import { ProfilePictureEditor } from "@/components/shared/ProfilePictureEditor";
 import { DataState } from "@/components/shared/DataState";
+import { NotificationPreferencesPanel } from "@/components/shared/NotificationPreferencesPanel";
 import { AnimatedGlowingSearchBar } from "@/components/ui/AnimatedGlowingSearchBar";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -748,20 +749,7 @@ export function VolunteerSettingsPage() {
             </DataState>
           </CardContent>
         </DashboardCard>
-        <DashboardCard>
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>Choose the updates you would like to receive.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {["Application status updates", "Assignment reminders", "Foundation announcements"].map((label) => (
-              <label key={label} className="flex items-center justify-between gap-4 text-sm font-medium text-foreground">
-                <span>{label}</span>
-                <input type="checkbox" defaultChecked className="size-4 accent-primary" />
-              </label>
-            ))}
-          </CardContent>
-        </DashboardCard>
+        <NotificationPreferencesPanel />
         <DashboardCard>
           <CardHeader>
             <CardTitle>Appearance</CardTitle>
