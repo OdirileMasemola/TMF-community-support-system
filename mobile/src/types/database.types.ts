@@ -571,6 +571,7 @@ export type Database = {
     Functions: {
       current_user_role: { Args: Record<string, never>; Returns: UserRole };
       is_admin: { Args: Record<string, never>; Returns: boolean };
+      delete_own_account: { Args: Record<string, never>; Returns: undefined };
     };
     Enums: {
       user_role: UserRole;
