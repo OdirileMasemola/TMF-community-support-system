@@ -1,14 +1,10 @@
-<p align="center"><img src="../../web/public/tmf-logo.png" width="160" alt="TMF logo"></p>
+<p align="center"><img src="../../docs/images/tmf-logo.png" width="160" alt="TMF logo"></p>
 
 # TMF Database Seed Data
 
 This folder supplies controlled sample data for the Themba Molefe Foundation Community Support System. It supports testing of all five roles: administrator, donor, volunteer, beneficiary and sponsor.
 
 [Back to project overview and team](../../README.md) | [Database migrations](../migrations/) | [API documentation](../../api/README.md)
-
-![Database ERD from the Task 3 report](../../docs/images/database-erd.webp)
-
-The ERD is the report's baseline, not a substitute for current migrations. The later deletion migration changes `donations.donor_id` to nullable with `ON DELETE SET NULL`. Open the image separately for larger text. [Image provenance](../../docs/images/SOURCES.md).
 
 ## Files and intended data
 

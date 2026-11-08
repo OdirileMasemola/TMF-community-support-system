@@ -11,8 +11,6 @@ paths = subprocess.check_output(
     ["rg", "--files", "-g", "README*", "-g", "!**/node_modules/**"],
     cwd=ROOT, text=True,
 ).splitlines()
-# Also validate the image provenance document linked from the READMEs.
-paths.append("docs/images/SOURCES.md")
 failures = []
 checked = 0
 for name in paths:

@@ -1,4 +1,4 @@
-<p align="center"><img src="../../../public/tmf-logo.png" width="160" alt="TMF logo"></p>
+<p align="center"><img src="../../../../docs/images/tmf-logo.png" width="160" alt="TMF logo"></p>
 
 # TMF Website Image Assets
 
@@ -11,7 +11,7 @@ This folder holds images imported by the React website: foundation branding, the
 | Asset | Location relative to this folder | Use |
 | --- | --- | --- |
 | [TMF source logo](logo.jpeg) | `logo.jpeg` | Imported website branding. |
-| [Public TMF logo](../../../public/tmf-logo.png) | `../../../public/tmf-logo.png` | Public/static branding and README logo. |
+| [Shared documentation logo](../../../../docs/images/tmf-logo.png) | `../../../../docs/images/tmf-logo.png` | Consistent, high-resolution README branding. |
 | [Mobile brand logo](../../../../mobile/assets/brand/logo.jpeg) | `../../../../mobile/assets/brand/logo.jpeg` | Mobile branding. |
 | [Website hero](hero.webp) | `hero.webp` | Main public-site imagery. |
 | [Campaign images](campaigns/) | `campaigns/` | Existing campaign photographs. |
@@ -21,9 +21,8 @@ This folder holds images imported by the React website: foundation branding, the
 
 ## Documentation screenshots
 
-![Implemented website volunteer portal from the Task 3 report](../../../../docs/images/web-volunteer-opportunities.webp)
-
-Documentation screenshots are stored centrally in [docs/images](../../../../docs/images/), rather than bundled into the application. They were extracted from the Task 3 report and optimised as WebP. [SOURCES.md](../../../../docs/images/SOURCES.md) records each image and its limitations. This screenshot shows a real volunteer screen; it is not a public-page wireframe.
+<p align="center"><img src="../../../../docs/images/web-volunteer-opportunities.png" width="800" alt="Website volunteer opportunities"></p>
+<p align="center"><em>Volunteer opportunities, applications, assignments and hours.</em></p>
 
 ## Design and usage conventions
 

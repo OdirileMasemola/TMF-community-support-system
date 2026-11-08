@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/brand/logo.jpeg" width="160" alt="TMF logo"></p>
+<p align="center"><img src="../docs/images/tmf-logo.png" width="160" alt="TMF logo"></p>
 
 # TMF Dashboard Mobile App
 
@@ -6,9 +6,8 @@ TMF Dashboard is the Android-focused mobile companion to the Themba Molefe Found
 
 [Project overview and team](../README.md) | [Website](../web/README.md) | [REST API](../api/README.md)
 
-<p align="center"><img src="../docs/images/mobile-welcome.webp" width="280" alt="TMF Dashboard Android welcome screen"> <img src="../docs/images/mobile-notification-preferences.webp" width="280" alt="TMF Dashboard notification settings"></p>
-
-Real Android screenshots from the Task 3 report. They show the earlier interface, not proof that every latest-release feature has been tested. [Image provenance](../docs/images/SOURCES.md).
+<p align="center"><img src="../docs/images/mobile-welcome.png" width="280" alt="TMF Dashboard Android welcome screen"> <img src="../docs/images/mobile-notification-preferences.png" width="280" alt="TMF Dashboard notification settings"></p>
+<p align="center"><em>TMF Dashboard welcome screen and notification preferences.</em></p>
 
 ## Purpose and five role portals
 
@@ -30,7 +29,7 @@ Sign-in uses the same Supabase account as the website. Google sign-up creates a 
 - Phone-sized cards, role-specific bottom navigation, recognisable TMF branding, light/dark/system themes and clear validation/loading/error states.
 - Privacy choices belong in Settings; authorisation is also checked by API roles and database RLS.
 
-See the [shared architecture](../README.md#technology-and-architecture). The report diagram's Expo 54 label is historical; `package.json` now uses Expo 57.
+See the [shared architecture](../README.md#technology-and-architecture).
 
 ## Password recovery
 

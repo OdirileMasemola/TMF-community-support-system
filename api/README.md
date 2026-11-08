@@ -1,4 +1,4 @@
-<p align="center"><img src="../web/public/tmf-logo.png" width="160" alt="TMF logo"></p>
+<p align="center"><img src="../docs/images/tmf-logo.png" width="160" alt="TMF logo"></p>
 
 # TMF Community Support API
 
@@ -211,16 +211,11 @@ All errors use one shape, with no stack traces:
 { "error": { "code": "NOT_FOUND", "message": "Route GET /api/unknown not found" } }
 ```
 
-
 ## Project context and architecture
 
 [Back to the TMF project overview and team](../README.md) | [Web client](../web/README.md) | [Mobile client](../mobile/README.md)
 
 The API supports the five portal roles: administrator, donor, volunteer, beneficiary and sponsor. Clients sign in through Supabase and pass their access token; routes apply role checks and queries use the caller's token, preserving RLS. Authentication, storage and selected client RPCs do not all pass through this API.
-
-![TMF client, REST API and Supabase architecture](../docs/images/system-architecture.webp)
-
-This diagram comes from the Task 3 report. Its mobile SDK 54 label is historical; the current client uses Expo SDK 57. See [image provenance](../docs/images/SOURCES.md).
 
 ### Recovery, notification preferences and deletion
 
@@ -233,6 +228,7 @@ This diagram comes from the Task 3 report. Its mobile SDK 54 label is historical
 
 [The shared CI workflow](../.github/workflows/ci.yml) runs on pushes and pull requests targeting `main`. The API job uses Node 22 and runs `npm ci`, `npm run typecheck`, `npm test` and `npm run build`. Tests use configured dummy Supabase values and test doubles; they are not proof of live database behaviour. Parallel jobs enforce web lint/build/tests and mobile type-check/Jest/export checks.
 
-![Successful checks captured in the Task 3 report](../docs/images/github-actions-checks.webp)
+<p align="center"><img src="../docs/images/github-actions-checks.png" width="800" alt="GitHub Actions build and test checks"></p>
+<p align="center"><em>GitHub Actions build and test checks.</em></p>
 
 The screenshot is historical. GitHub holds source history, migrations and releases. Latest project release: **v1.0.5**, on [GitHub Releases](https://github.com/OdirileMasemola/TMF-community-support-system/releases). The separate Android workflow builds APK/AAB artifacts with optional upload-key signing and a debug fallback; see [mobile build details](../mobile/README.md#android-builds-and-signing). The app is prepared for submission but **not published on Google Play**; workflow configuration does not establish signing secrets or store compliance.

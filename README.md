@@ -1,4 +1,4 @@
-<p align="center"><img src="web/public/tmf-logo.png" width="160" alt="TMF logo"></p>
+<p align="center"><img src="docs/images/tmf-logo.png" width="160" alt="TMF logo"></p>
 
 # Themba Molefe Foundation Community Support System
 
@@ -14,17 +14,14 @@ Developed by **ROS** for **XISD6329**, the project combines a React website, an 
 
 ## Website and mobile preview
 
-![TMF website registration page](docs/images/website-registration.webp)
+<p align="center"><img src="docs/images/website-registration.png" width="800" alt="TMF website registration page"></p>
+<p align="center"><em>Website registration with Google and email options.</em></p>
 
-The implemented website registration page, including Google sign-up and email registration.
+<p align="center"><img src="docs/images/web-volunteer-opportunities.png" width="800" alt="Volunteer opportunities in the web management system"></p>
+<p align="center"><em>Volunteer opportunities, applications, assignments and hours.</em></p>
 
-![Volunteer opportunities in the web management system](docs/images/web-volunteer-opportunities.webp)
-
-The volunteer portal separates browsing opportunities, applications, assignments and recorded hours.
-
-<p align="center"><img src="docs/images/mobile-welcome.webp" width="280" alt="TMF Dashboard welcome screen on Android"> <img src="docs/images/mobile-notification-preferences.webp" width="280" alt="Mobile settings showing theme and notification preferences"></p>
-
-These are real screenshots extracted from the Task 3 report, not new captures of the latest release. See [image provenance and limitations](docs/images/SOURCES.md).
+<p align="center"><img src="docs/images/mobile-welcome.png" width="280" alt="TMF Dashboard welcome screen on Android"> <img src="docs/images/mobile-notification-preferences.png" width="280" alt="Mobile settings showing theme and notification preferences"></p>
+<p align="center"><em>TMF Dashboard welcome screen and notification preferences.</em></p>
 
 ## Purpose and features
 
@@ -66,13 +63,7 @@ Shared features include email/password sign-in, Google authentication, role-base
 | REST API | Node.js 22, Fastify 5, TypeScript, JSON Schema, Swagger/OpenAPI, Vitest | [API README](api/README.md) |
 | Backend | Supabase Auth, PostgreSQL, RLS, Storage, SQL migrations | [Migrations](supabase/migrations/) and [seed documentation](supabase/seed/README.md) |
 
-![TMF clients, REST API and Supabase architecture from the report](docs/images/system-architecture.webp)
-
-The report's architecture diagram labels an older **Expo SDK 54** baseline; the current mobile package uses **SDK 57**. Clients sign in through Supabase Auth and send bearer tokens to the REST API for operational requests. The API validates the token and queries as the caller, so RLS applies. Authentication, file uploads and some reads/RPC calls also use Supabase directly. Client defaults point to the Azure API; the web is configured for Vercel. Deployment availability was not re-tested here.
-
-![Database entity relationship diagram from the report](docs/images/database-erd.webp)
-
-The ERD records the report's database baseline: profiles, role profiles and community-support records. It predates account deletion: the newer migration makes `donations.donor_id` nullable with `ON DELETE SET NULL`. Use the SQL migrations as the current schema source; open the image separately to read the larger diagram.
+Clients sign in through Supabase Auth and send bearer tokens to the REST API for operational requests. The API validates the token and queries as the caller, so RLS applies. Authentication, file uploads and some reads/RPC calls also use Supabase directly. Client defaults point to the Azure API; the web is configured for Vercel. Deployment availability was not re-tested here.
 
 ## Repository structure
 
@@ -82,7 +73,7 @@ mobile/              Expo dashboard app
 api/                 Fastify REST API and route tests
 supabase/migrations/ Database schema and security changes
 supabase/seed/       Controlled test accounts and sample data
-docs/images/         Optimised report screenshots and provenance
+docs/images/         README screenshots and shared logo
 .github/workflows/   CI and Android build definitions
 ```
 
@@ -150,9 +141,8 @@ GitHub stores source code, SQL migrations, documentation, commit history and tag
 | API — Build and Check API | Node 22, `npm ci`, TypeScript type-check, Vitest tests and compiled build. Tests use test configuration/mocks. |
 | Mobile — Build and Check Mobile | Node 22, `npm ci`, TypeScript type-check, Jest in CI mode and Android JavaScript export. This job is not a signed native build. |
 
-![Successful GitHub checks captured in the Task 3 report](docs/images/github-actions-checks.webp)
-
-This historical screenshot records successful checks at capture time; it is not proof that every later commit passed. The current YAML files define the checks described above.
+<p align="center"><img src="docs/images/github-actions-checks.png" width="800" alt="GitHub Actions build and test checks"></p>
+<p align="center"><em>GitHub Actions build and test checks.</em></p>
 
 ### Android APK and AAB workflow
 
@@ -173,7 +163,7 @@ Download **v1.0.5** from [GitHub Releases](https://github.com/OdirileMasemola/TM
 
 Repository preparation includes Android package `org.tmf.dashboard`, compile/target **API 36**, APK/AAB automation, optional upload-key signing, privacy-policy and account-deletion pages, and an in-app delete action. The Android configuration blocks microphone recording, legacy external-storage read/write, broad image/video/audio media access and system-alert-window permissions. The system photo picker is used without broad storage permission requests.
 
-Before claiming full store readiness, verify the upload-key signature and release/versionCode progression, deploy and test the deletion migration, test recovery and Google sign-in on the final build, and complete the Play Console's current listing, data-safety and policy requirements. The report's fee screen is evidence of the registration cost, not proof of publication or policy acceptance.
+Before claiming full store readiness, verify the upload-key signature and release/versionCode progression, deploy and test the deletion migration, test recovery and Google sign-in on the final build, and complete the Play Console's current listing, data-safety and policy requirements.
 
 To check all README image and relative file links locally, run `python3 scripts/check-readme-links.py` from the repository root.
 

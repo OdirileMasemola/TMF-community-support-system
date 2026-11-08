@@ -1,4 +1,4 @@
-<p align="center"><img src="public/tmf-logo.png" width="160" alt="TMF logo"></p>
+<p align="center"><img src="../docs/images/tmf-logo.png" width="160" alt="TMF logo"></p>
 
 # TMF Website and Management Portals
 
@@ -6,9 +6,8 @@ The website is the Themba Molefe Foundation's public front door and browser-base
 
 [Project overview and team](../README.md) | [Mobile app](../mobile/README.md) | [REST API](../api/README.md)
 
-![Website registration screen](../docs/images/website-registration.webp)
-
-The report screenshot shows **registration**, including Google and email options.
+<p align="center"><img src="../docs/images/website-registration.png" width="800" alt="Website registration screen"></p>
+<p align="center"><em>Website registration with Google and email options.</em></p>
 
 ## Role-based features
 
@@ -20,7 +19,8 @@ The report screenshot shows **registration**, including Google and email options
 | Beneficiary | Assistance requests, supporting documents, decisions and collection information. |
 | Sponsor | Sponsorship commitments, open requests, expressions of interest and history. |
 
-![Volunteer opportunity management on the website](../docs/images/web-volunteer-opportunities.webp)
+<p align="center"><img src="../docs/images/web-volunteer-opportunities.png" width="800" alt="Volunteer opportunity management on the website"></p>
+<p align="center"><em>Volunteer opportunities, applications, assignments and hours.</em></p>
 
 ## Design and technology
 
@@ -61,10 +61,9 @@ Use Node 22.13+ on the 22.x line for a shared project development environment; t
 
 [The shared CI workflow](../.github/workflows/ci.yml) runs on pushes to `main` and pull requests targeting `main`. The web job installs locked dependencies, runs **required lint**, builds with the two `VITE_SUPABASE_*` repository secrets and runs tests. API and mobile checks run in parallel. GitHub holds the source, migrations, history and releases; the website includes [Vercel routing configuration](vercel.json).
 
-![Historical successful GitHub Actions checks](../docs/images/github-actions-checks.webp)
-
-This report screenshot is historical evidence, not the status of the current commit. For Android APK/AAB signing and debug fallback, see [mobile build documentation](../mobile/README.md#android-builds-and-signing). Latest project release: **v1.0.5**, available on [GitHub Releases](https://github.com/OdirileMasemola/TMF-community-support-system/releases). Google Play preparation is documented at the root; the app is **not published**.
+<p align="center"><img src="../docs/images/github-actions-checks.png" width="800" alt="GitHub Actions build and test checks"></p>
+<p align="center"><em>GitHub Actions build and test checks.</em></p>
 
 ## Images
 
-Screenshots come from the Task 3 report and have been compressed for documentation. They may show an earlier build. See [image sources](../docs/images/SOURCES.md) and [website asset conventions](src/assets/images/README.md).
+The checks shown are a historical example, not the current commit status. For Android signing and releases, see [the mobile README](../mobile/README.md#android-builds-and-signing) and [GitHub Releases](https://github.com/OdirileMasemola/TMF-community-support-system/releases). Latest project release: **v1.0.5**.
