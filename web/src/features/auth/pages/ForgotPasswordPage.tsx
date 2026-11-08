@@ -4,7 +4,7 @@ import { MailCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { validateEmail } from "@/features/auth/lib/passwordRecovery";
 import { toAuthUserMessage } from "@/lib/errors";
 

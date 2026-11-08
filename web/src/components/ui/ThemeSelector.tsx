@@ -1,6 +1,6 @@
 import { Moon, Sun } from "lucide-react";
 import { themePresets } from "@/theme/themePresets";
-import { useTheme } from "@/theme/ThemeProvider";
+import { useTheme } from "@/theme/use-theme";
 import { cn } from "@/lib/utils";
 
 type ThemeSelectorProps = {

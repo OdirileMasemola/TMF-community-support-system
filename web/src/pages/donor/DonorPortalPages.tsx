@@ -28,7 +28,7 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from "@/component
 import { Input } from "@/components/ui/Input";
 import campaignFallbackImage from "@/assets/images/campaigns/Food Support Drive.webp";
 import { bankingDetails } from "@/data/donationData";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { toUserMessage } from "@/lib/errors";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useRoleProfile } from "@/hooks/useRoleProfile";
@@ -128,7 +128,7 @@ export function DonorDonatePage() {
     queryFn: () => fetchCampaigns({ publicOnly: true }),
   });
 
-  const campaigns = campaignsQuery.data ?? [];
+  const campaigns = useMemo(() => campaignsQuery.data ?? [], [campaignsQuery.data]);
 
   useEffect(() => {
     if (!campaignId && campaigns[0]?.id) {
@@ -334,7 +334,7 @@ export function DonorCampaignsPage() {
     queryFn: () => fetchCampaigns({ publicOnly: true }),
   });
 
-  const campaigns = campaignsQuery.data ?? [];
+  const campaigns = useMemo(() => campaignsQuery.data ?? [], [campaignsQuery.data]);
 
   return (
     <AdminPageShell label="Your support" title="Browse campaigns" description="Explore current foundation campaigns and choose a cause to support.">
@@ -467,8 +467,8 @@ export function DonorProofOfPaymentPage() {
     queryFn: () => fetchDonorProofs(roleProfileId!),
   });
 
-  const donations = donationsQuery.data ?? [];
-  const proofs = proofsQuery.data ?? [];
+  const donations = useMemo(() => donationsQuery.data ?? [], [donationsQuery.data]);
+  const proofs = useMemo(() => proofsQuery.data ?? [], [proofsQuery.data]);
 
   useEffect(() => {
     if (!donationId && donations[0]?.id) {

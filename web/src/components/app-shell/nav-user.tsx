@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import type { UserRole } from "@/types/app.types";
 
 function roleProfilePath(role: UserRole | undefined): string | null {

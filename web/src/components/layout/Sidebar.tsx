@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
 import { Bell, ChartNoAxesColumn, HandCoins, HeartHandshake, LayoutDashboard, Megaphone, ShieldCheck, Users } from "lucide-react";
 import type { NavItem } from "@/types/app.types";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
 const navItems: NavItem[] = [

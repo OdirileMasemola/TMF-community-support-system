@@ -2,11 +2,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ForgotPasswordPage } from "@/features/auth/pages/ForgotPasswordPage";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 // Supabase never loads: the auth context is replaced with plain mocks, so no
 // email is ever requested from a real project.
-vi.mock("@/features/auth/hooks/useAuth", () => ({ useAuth: vi.fn() }));
+vi.mock("@/features/auth/hooks/use-auth", () => ({ useAuth: vi.fn() }));
 
 const requestPasswordReset = vi.fn();
 

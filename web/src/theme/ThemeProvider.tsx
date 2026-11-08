@@ -1,14 +1,8 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ThemeContext } from "@/theme/theme-context";
 import type { ThemeName } from "@/theme/themeTypes";
 
 const STORAGE_KEY = "tmf-theme";
-
-type ThemeContextValue = {
-  theme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
-};
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function isThemeName(value: string | null): value is ThemeName {
   return value === "light" || value === "dark";
@@ -34,12 +28,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = (next: ThemeName) => setThemeState(next);
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
-}
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
-  }
-  return context;
 }

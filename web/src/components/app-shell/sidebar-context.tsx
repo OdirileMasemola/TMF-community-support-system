@@ -1,14 +1,7 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, type PropsWithChildren } from "react";
-
-type SidebarContextValue = {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-  toggle: () => void;
-};
-
-const SidebarContext = createContext<SidebarContextValue | null>(null);
+import { useMemo, useState, type PropsWithChildren } from "react";
+import { SidebarContext } from "@/components/app-shell/sidebar-context-value";
 
 export function SidebarProvider({ children }: PropsWithChildren) {
   const [collapsed, setCollapsed] = useState(false);
@@ -22,12 +15,4 @@ export function SidebarProvider({ children }: PropsWithChildren) {
   );
 
   return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>;
-}
-
-export function useSidebar() {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within SidebarProvider");
-  }
-  return context;
 }

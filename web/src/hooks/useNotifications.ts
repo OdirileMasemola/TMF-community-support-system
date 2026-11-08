@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import { fetchNotifications, markAllNotificationsRead, markNotificationRead } from "@/services/notifications";
 

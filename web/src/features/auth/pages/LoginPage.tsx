@@ -7,7 +7,7 @@ import { AuthDivider } from "@/features/auth/components/AuthDivider";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
 import { toAuthUserMessage } from "@/lib/errors";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export function LoginPage() {
   const { signIn, signInWithGoogle } = useAuth();

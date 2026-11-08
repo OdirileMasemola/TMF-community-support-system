@@ -16,7 +16,7 @@ import { DataState } from "@/components/shared/DataState";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { sponsorQuickActions } from "@/data/sponsorDashboardData";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useRoleProfile } from "@/hooks/useRoleProfile";
 import { resolveCampaignImage } from "@/lib/campaignImages";
@@ -102,7 +102,7 @@ export function SponsorDashboardPage() {
     queryFn: () => fetchOpenSponsorshipRequests(),
   });
 
-  const sponsorships = sponsorshipsQuery.data ?? [];
+  const sponsorships = useMemo(() => sponsorshipsQuery.data ?? [], [sponsorshipsQuery.data]);
   const requests = requestsQuery.data ?? [];
 
   const organisationName = sponsorProfile?.organisation_name || profile?.full_name || "Sponsor";

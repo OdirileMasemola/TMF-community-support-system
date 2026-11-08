@@ -60,7 +60,9 @@ export const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "ChartContainer";
 
-export const ChartTooltip = RechartsPrimitive.Tooltip;
+export function ChartTooltip(props: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) {
+  return <RechartsPrimitive.Tooltip {...props} />;
+}
 
 export const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,

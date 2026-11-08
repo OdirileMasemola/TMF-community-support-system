@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { roleHomePath } from "@/lib/display";
 import { LoadingState } from "@/components/ui/Spinner";
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Spinner } from "@/components/ui/Spinner";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import {
   describeRecoveryLinkError,
   MIN_PASSWORD_LENGTH,

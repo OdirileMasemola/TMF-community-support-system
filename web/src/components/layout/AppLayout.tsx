@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 import { Sidebar } from "./Sidebar";
 import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export function AppLayout() {
   const { profile, signOut } = useAuth();

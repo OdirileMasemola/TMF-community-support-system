@@ -18,7 +18,7 @@ import { DataState } from "@/components/shared/DataState";
 import { Button } from "@/components/ui/Button";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 import { donorQuickActions } from "@/data/donorDashboardData";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useRoleProfile } from "@/hooks/useRoleProfile";
 import {
   campaignProgress,
@@ -63,9 +63,9 @@ export function DonorDashboardPage() {
     queryFn: () => fetchCampaigns({ publicOnly: true }),
   });
 
-  const donations = donationsQuery.data ?? [];
-  const proofs = proofsQuery.data ?? [];
-  const campaigns = campaignsQuery.data ?? [];
+  const donations = useMemo(() => donationsQuery.data ?? [], [donationsQuery.data]);
+  const proofs = useMemo(() => proofsQuery.data ?? [], [proofsQuery.data]);
+  const campaigns = useMemo(() => campaignsQuery.data ?? [], [campaignsQuery.data]);
 
   const fullName = profile?.full_name?.trim() || "Donor";
   const firstName = fullName.split(" ")[0] || "Donor";

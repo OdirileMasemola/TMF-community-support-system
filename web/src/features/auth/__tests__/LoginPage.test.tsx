@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import { LoginPage } from "@/features/auth/pages/LoginPage";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
-vi.mock("@/features/auth/hooks/useAuth", () => ({ useAuth: vi.fn() }));
+vi.mock("@/features/auth/hooks/use-auth", () => ({ useAuth: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
 describe("LoginPage", () => {

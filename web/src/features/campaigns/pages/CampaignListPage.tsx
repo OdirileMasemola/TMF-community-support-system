@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { LoadingState } from "@/components/ui/Spinner";
 
 export function CampaignListPage() {

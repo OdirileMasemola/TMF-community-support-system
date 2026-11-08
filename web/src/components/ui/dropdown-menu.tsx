@@ -2,12 +2,29 @@ import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "@/lib/utils";
 
-export const DropdownMenu = DropdownMenuPrimitive.Root;
-export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
-export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
-export const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
-export const DropdownMenuSub = DropdownMenuPrimitive.Sub;
-export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
+export function DropdownMenu(props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+  return <DropdownMenuPrimitive.Root {...props} />;
+}
+
+export function DropdownMenuTrigger(props: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
+  return <DropdownMenuPrimitive.Trigger {...props} />;
+}
+
+export function DropdownMenuGroup(props: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
+  return <DropdownMenuPrimitive.Group {...props} />;
+}
+
+export function DropdownMenuPortal(props: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
+  return <DropdownMenuPrimitive.Portal {...props} />;
+}
+
+export function DropdownMenuSub(props: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
+  return <DropdownMenuPrimitive.Sub {...props} />;
+}
+
+export function DropdownMenuRadioGroup(props: React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) {
+  return <DropdownMenuPrimitive.RadioGroup {...props} />;
+}
 
 export const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import {
   fetchAdministratorProfile,

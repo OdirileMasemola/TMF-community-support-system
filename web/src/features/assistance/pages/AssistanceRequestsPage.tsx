@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export function AssistanceRequestsPage() {
   const { profile } = useAuth();

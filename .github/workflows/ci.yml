@@ -36,10 +36,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Lint is informational for now: the repo has no eslint config file yet.
       - name: Run lint
-        continue-on-error: true
-        run: npm run lint --if-present
+        run: npm run lint
 
       # Build runs "tsc -b && vite build", so this type-checks and bundles.
       - name: Build application

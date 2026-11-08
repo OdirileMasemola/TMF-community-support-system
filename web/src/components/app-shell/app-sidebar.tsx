@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { PanelLeft, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { navGroups as adminNavGroups, type SidebarNavGroup } from "@/components/app-shell/app-shared";
-import { useSidebar } from "@/components/app-shell/sidebar-context";
+import { useSidebar } from "@/components/app-shell/use-sidebar";
 import { cn } from "@/lib/utils";
 import logoImage from "@/assets/images/logo.jpeg";
 

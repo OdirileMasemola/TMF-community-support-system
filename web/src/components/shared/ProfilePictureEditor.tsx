@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { getInitials } from "@/lib/display";
 import { toUserMessage } from "@/lib/errors";
 import { updateProfile } from "@/services/profiles";

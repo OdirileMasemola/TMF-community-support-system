@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { fetchUserSettings, updateUserSettings, type SettingsPatch, type UserSettings } from "@/services/settings";
 
 const settingsKey = (userId: string | undefined) => ["user-settings", userId] as const;

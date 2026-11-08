@@ -1,46 +1,17 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type PropsWithChildren } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PropsWithChildren } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate, type NavigateFunction } from "react-router-dom";
+import { AuthContext, type AuthProfile } from "@/features/auth/hooks/auth-context";
 import { createClient, getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { roleHomePath } from "@/lib/display";
 import { ensureRoleProfile, fetchProfile } from "@/services/profiles";
 import { isPublicSignupRole, type UserRole } from "@/types/app.types";
-import type { AccountStatus } from "@/types/database.types";
-
-type Profile = {
-  id: string;
-  full_name: string;
-  email: string;
-  phone_number: string | null;
-  role: UserRole;
-  account_status: AccountStatus;
-  avatar_url: string | null;
-  avatar_change_count: number;
-};
-
-type AuthContextValue = {
-  session: Session | null;
-  profile: Profile | null;
-  isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (values: { fullName: string; email: string; phoneNumber: string; password: string; role: UserRole }) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-  completeProfile: (values: { fullName: string; phoneNumber: string; role: UserRole; organisationName?: string }) => Promise<void>;
-  /** Asks Supabase to email a password-reset link. Resolves the same way whether or not the address is registered. */
-  requestPasswordReset: (email: string) => Promise<void>;
-  /** Sets a new password for the current (recovery) session. */
-  updatePassword: (newPassword: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
-};
 
 /** Where Supabase sends the user after they click the reset link in their email. */
 export const PASSWORD_RESET_PATH = "/reset-password";
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
-function toProfile(data: NonNullable<Awaited<ReturnType<typeof fetchProfile>>>): Profile {
+function toProfile(data: NonNullable<Awaited<ReturnType<typeof fetchProfile>>>): AuthProfile {
   return {
     id: data.id,
     full_name: data.full_name,
@@ -55,7 +26,7 @@ function toProfile(data: NonNullable<Awaited<ReturnType<typeof fetchProfile>>>):
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<AuthProfile | null>(null);
   const [isLoading, setIsLoading] = useState(() => isSupabaseConfigured());
   const navigate = useNavigateSafe();
   const queryClient = useQueryClient();
@@ -67,7 +38,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, [navigate]);
 
   const loadProfile = useCallback(
-    async (userId: string): Promise<Profile | null> => {
+    async (userId: string): Promise<AuthProfile | null> => {
       try {
         const data = await queryClient.fetchQuery({
           queryKey: ["profile", userId],
@@ -344,14 +315,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
-  return context;
 }
 
 function useNavigateSafe(): NavigateFunction {

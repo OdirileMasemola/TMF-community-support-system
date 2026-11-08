@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import type { UserRole } from "@/types/app.types";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { Card } from "@/components/ui/Card";
 
 type RoleGateProps = PropsWithChildren<{

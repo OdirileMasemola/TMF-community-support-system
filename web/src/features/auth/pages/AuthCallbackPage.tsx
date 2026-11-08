@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { toAuthUserMessage } from "@/lib/errors";
 import { createClient } from "@/lib/supabaseClient";
 import { roleHomePath } from "@/lib/display";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 // Handles the OAuth callback: exchange code for session, then route by profile status.
 export function AuthCallbackPage() {

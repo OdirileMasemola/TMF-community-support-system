@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import type { UserRole } from "@/types/app.types";
 import { LoadingState } from "@/components/ui/Spinner";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { roleHomePath } from "@/lib/display";
 
 type RoleProtectedRouteProps = {

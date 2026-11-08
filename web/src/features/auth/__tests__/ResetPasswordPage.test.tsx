@@ -2,10 +2,10 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ResetPasswordPage } from "@/features/auth/pages/ResetPasswordPage";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { getSupabaseClientOrNull } from "@/lib/supabaseClient";
 
-vi.mock("@/features/auth/hooks/useAuth", () => ({ useAuth: vi.fn() }));
+vi.mock("@/features/auth/hooks/use-auth", () => ({ useAuth: vi.fn() }));
 vi.mock("@/lib/supabaseClient", () => ({ getSupabaseClientOrNull: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
