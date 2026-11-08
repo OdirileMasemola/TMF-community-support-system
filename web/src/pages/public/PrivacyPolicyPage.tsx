@@ -18,6 +18,10 @@ const sections = [
     body: "Account and programme data is stored with our database and file storage provider. Access is restricted by account role. Profile photos and campaign images may be shown publicly on the website. Private documents, such as proof of payment, are not published.",
   },
   {
+    title: "Deleting your account",
+    body: "You can delete your account at any time from Settings in the TMF Dashboard app. Your profile, settings and notifications are deleted, and donation records are kept without your name. See the account deletion page at /account-deletion for the full details.",
+  },
+  {
     title: "Contact",
     body: "If you have a question about this policy or your information, contact the Themba Molefe Foundation at hope.molefe@icloud.com or +27 72 076 9116.",
   },
@@ -43,7 +47,7 @@ export function PrivacyPolicyPage() {
               <p className="mt-3 text-sm leading-7 text-muted-foreground">{section.body}</p>
             </article>
           ))}
-          <p className="text-xs text-muted-foreground">Last updated September 2026.</p>
+          <p className="text-xs text-muted-foreground">Last updated November 2026.</p>
         </div>
       </section>
     </>
