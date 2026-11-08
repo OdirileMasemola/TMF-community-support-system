@@ -118,12 +118,7 @@ export default function DonorDonateScreen() {
   });
 
   const pickProof = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      setFormError("Photo access is needed to attach your proof of payment.");
-      return;
-    }
-
+    // The system photo picker needs no storage permission, so none is requested
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       quality: 0.7,

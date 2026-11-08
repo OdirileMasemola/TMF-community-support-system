@@ -94,12 +94,7 @@ export default function BeneficiaryRequestScreen() {
   });
 
   const pickDocument = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      setError("Photo access is needed to attach a supporting document.");
-      return;
-    }
-
+    // The system photo picker needs no storage permission, so none is requested
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ["images"], quality: 0.7 });
     if (result.canceled) return;
 
