@@ -1,36 +1,53 @@
-# TMF M2 "Database ready": seed data (applied to live on 2026-10-08; verify PASS=88 FAIL=0)
+<p align="center"><img src="../../web/public/tmf-logo.png" width="160" alt="TMF logo"></p>
 
-Plan stories: US2.5.1 (test Auth accounts for every role), US2.5.2 (seed.sql, at least 10 rows per table), US2.5.3 (verification).
+# TMF Database Seed Data
+
+This folder supplies controlled sample data for the Themba Molefe Foundation Community Support System. It supports testing of all five roles: administrator, donor, volunteer, beneficiary and sponsor.
+
+[Back to project overview and team](../../README.md) | [Database migrations](../migrations/) | [API documentation](../../api/README.md)
+
+![Database ERD from the Task 3 report](../../docs/images/database-erd.webp)
+
+The ERD is the report's baseline, not a substitute for current migrations. The later deletion migration changes `donations.donor_id` to nullable with `ON DELETE SET NULL`. Open the image separately for larger text. [Image provenance](../../docs/images/SOURCES.md).
+
+## Files and intended data
 
 | File | Purpose |
-|---|---|
-| `01_seed_auth_users.sql` | 42 confirmed email/password accounts in `auth.users` + `auth.identities`. Contains the placeholder `__SET_TEST_PASSWORD_HERE__` and **no real password**. |
-| `02_seed.sql` | Public-schema seed data. One transaction, fixed UUIDs, idempotent. |
-| `03_seed_verify.sql` | A single read-only SELECT: row counts, FK orphans, seed isolation, CHECK re-validation and business rules. |
-| `04_seed_cleanup.sql` | Removes seed rows and seed users only. Refuses to run if non-seed rows reference seed rows. |
-| `accounts.tsv` | Email, role, whether the account can log in, and account status. |
-| `gen/` | Generator (`python3 gen/build.py`) that writes the files above. |
-| `harness/` | Local test harness: `run_seed.sh`, a realistic Auth shim, a simulation of the live starting state and a snapshot query. |
+| --- | --- |
+| [01_seed_auth_users.sql](01_seed_auth_users.sql) | Creates 42 confirmed test accounts and email identities. Uses a test-password placeholder; no actual shared password is documented here. |
+| [02_seed.sql](02_seed.sql) | Seeds public-schema data with fixed UUIDs in one transaction; designed for repeatable inserts. |
+| [03_seed_verify.sql](03_seed_verify.sql) | Read-only checks for counts, relationships, seed isolation and business rules. |
+| [04_seed_cleanup.sql](04_seed_cleanup.sql) | Removes seed data/accounts and refuses cleanup where non-seed records depend on seed records. This is destructive and requires approval. |
+| [accounts.tsv](accounts.tsv) | Lists test-account emails, roles, login eligibility and status. |
 
-How seed rows are identified:
-- Every seed id matches `5eed____-5eed-4eed-8eed-5eed5eed5eed`.
-- Every seed account email matches `seed.%@example.com`.
-- Seed contact-form senders use `seed.contact.*@example.com`.
-- Receipt numbers start with `TMF-SEED-`.
-- `reports.metadata` contains `"seed": true`.
+The intended spread is **2 administrators and 10 each of the other four roles**. Fourteen accounts receive the disposable test password: both administrators and the first three accounts per other role. The remaining 28 have an empty password hash and are data-only, not password-login accounts. Domain records include campaigns, donations/proofs, assistance requests/documents, volunteer work and sponsorships.
 
-## Accounts (42: 14 can log in, 28 are data-only)
+Seed identifiers use `5eed____-5eed-4eed-8eed-5eed5eed5eed`; emails use `seed.%@example.com`, receipts start with `TMF-SEED-`, and seeded report metadata contains `"seed": true`. These conventions distinguish demonstration records from operational data.
 
-The role spread is 2 administrators and 10 each of donor, beneficiary, volunteer and sponsor. Both administrators and the first 3 accounts of every other role get the shared test password. The other 28 accounts have `encrypted_password = ''`, so nobody can log in to them. They exist only so that every role-profile table reaches 10 rows.
+## Controlled execution
 
-## Applying on live (applied 2026-10-08; re-run only with explicit approval)
+These are SQL scripts, not an npm component. There is no tracked `gen/` generator or `harness/` directory in this checkout, despite historical script-header references to a generator.
 
-Use the SQL Editor (it runs as `postgres`). No service-role key is needed.
-1. Optional read-only pre-check: `select table_name, column_name, is_nullable, column_default, is_generated from information_schema.columns where table_schema = 'auth' and table_name in ('users', 'identities') order by 1, 2;`. Script 01 also checks these columns itself and aborts if any are missing.
-2. Open `01_seed_auth_users.sql` and replace the placeholder (it appears once, in the `with pw(v)` line) with a disposable test-only password. Run the script, then close the tab without saving.
-   - Writes to `auth.users` and `auth.identities`.
-   - The `handle_new_user` trigger adds `profiles` rows (pending; administrators are downgraded to beneficiary) and the role profiles.
-   - The user_settings trigger adds the `user_settings` rows.
-3. Run `02_seed.sql`. It promotes the two administrators (adds `administrator_profiles` and removes the beneficiary profile the trigger gave them), activates the accounts and inserts the rest of the data.
-4. Run `03_seed_verify.sql` and expect `SUMMARY | RESULTS | PASS`.
-5. To remove everything, run `04_seed_cleanup.sql`. Files that seed accounts upload to Storage have to be deleted in the Storage UI.
+Use an authorised Supabase SQL Editor session with the required database privileges. **Do not re-seed or clean up a live project without explicit approval.** Prefer a disposable test project.
+
+1. Confirm the schema and Auth tables match the script prerequisites. Script 01 checks Auth columns and conflicting IDs/emails before inserting.
+2. In the SQL Editor only, replace the `__SET_TEST_PASSWORD_HERE__` value in the `with pw(v)` line of script 01 with a disposable test-only password, run the script and close the tab without saving that password to source control. The file also contains a safety-check reference to the placeholder; do not treat that check as a real credential.
+3. Run script 02. It activates the intended accounts, promotes the two test administrators and inserts related public records.
+4. Run script 03 and review every result plus the `SUMMARY | RESULTS | PASS` row. Do not assume an older pass still represents the current database.
+5. Only with approval, use script 04 to remove seed records. Uploaded Storage objects require separate controlled cleanup; SQL row removal does not prove uploaded files were removed.
+
+The Task 3 report records seed application on **8 October 2026** and a successful verification. That is historical evidence; this README update did not execute SQL or re-verify the live database.
+
+## Settings, notifications and account deletion
+
+Seed profiles have `user_settings`. [Preference enforcement](../migrations/20261008150000_enforce_notification_preferences.sql) checks those settings before inserting in-app notifications. Request preferences cover application, assistance and contact notifications; campaign and donation notifications use their own switches. Missing settings default to enabled.
+
+[Account self-deletion](../migrations/20261108120000_account_self_deletion.sql) is separate from seed cleanup. It deletes the signed-in user's account, blocks administrator self-deletion and retains donation rows without a donor link. `donations.donor_id` references **donor_profiles(id)**, not `profiles(id)` directly. Deployment and a successful live self-deletion were not verified in this update.
+
+Two migration files share the `20261008150000` prefix. Review/reconcile migration history before automated replay. Do not rename or apply migrations blindly against a live database.
+
+## GitHub and verification boundaries
+
+GitHub keeps the SQL scripts and migration history alongside client/API code. [CI](../../.github/workflows/ci.yml) runs required web lint/build/tests, API type-check/tests/build and mobile type-check/tests/export. It does **not** apply these seed scripts or prove production database state. API tests use test doubles, including [notification preference tests](../../api/tests/notificationPreferences.test.ts).
+
+For client recovery, privacy pages, Android signing and the latest **v1.0.5** release, see [the project README](../../README.md) and [GitHub Releases](https://github.com/OdirileMasemola/TMF-community-support-system/releases). Google Play status is prepared, not published.
