@@ -1,6 +1,7 @@
 name: Android APK
 
-# Builds an installable Android APK from mobile/ and uploads it as a workflow artifact.
+# Builds an installable Android APK and a Play Store bundle (AAB) from mobile/ and
+# uploads both as workflow artifacts.
 # Runs on demand and when mobile code changes on main. It is deliberately NOT run on
 # pull requests: the existing CI workflow covers PR checks, and this build is slow.
 on:
@@ -34,6 +35,11 @@ jobs:
     env:
       EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
       EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      # Optional Play upload key. When these are missing the build falls back to the debug key.
+      ANDROID_UPLOAD_KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
       # Fail in seconds, with a clear message, instead of building an APK that cannot sign in.
@@ -79,17 +85,45 @@ jobs:
       - name: Generate Android project (Expo prebuild)
         run: npx expo prebuild --platform android --no-install
 
-      # Release build, signed with the debug key from the Expo template: installable on a
-      # phone, not for the Play Store. arm64-v8a covers practically every current phone and
-      # keeps the build time down.
+      # Writes the upload keystore from the secret and builds the signing flags.
+      # The keystore only exists on the runner and is never committed.
+      - name: Prepare release signing
+        id: signing
+        run: |
+          if [ -n "$ANDROID_UPLOAD_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_UPLOAD_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+            {
+              echo "flags=-Pandroid.injected.signing.store.file=$RUNNER_TEMP/upload.jks -Pandroid.injected.signing.store.password=$ANDROID_KEYSTORE_PASSWORD -Pandroid.injected.signing.key.alias=$ANDROID_KEY_ALIAS -Pandroid.injected.signing.key.password=$ANDROID_KEY_PASSWORD"
+              echo "key=upload"
+            } >> "$GITHUB_OUTPUT"
+            echo "Signing with the Play upload key."
+          else
+            echo "key=debug" >> "$GITHUB_OUTPUT"
+            echo "::warning::No upload key secrets set, so the build is signed with the debug key and cannot go to the Play Store."
+          fi
+
+      # Installable APK for testing on a phone (arm64-v8a keeps the build time down)
       - name: Build release APK
         working-directory: mobile/android
-        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a ${{ steps.signing.outputs.flags }}
+
+      # App bundle for the Play Store, with every architecture included
+      - name: Build release AAB
+        working-directory: mobile/android
+        run: ./gradlew bundleRelease --no-daemon ${{ steps.signing.outputs.flags }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: tmf-mobile-apk
+          name: tmf-mobile-apk-${{ steps.signing.outputs.key }}
           path: mobile/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: tmf-mobile-aab-${{ steps.signing.outputs.key }}
+          path: mobile/android/app/build/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14
