@@ -1,5 +1,6 @@
 import { useState, type ComponentType } from "react";
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import { Monitor, Moon, Sun } from "lucide-react-native";
 import { useAuth } from "@/auth/AuthProvider";
@@ -8,6 +9,8 @@ import { AppButton, Badge, LoadingState, PageHeading, Screen, SectionCard } from
 import { usePendingAction } from "@/hooks/usePendingAction";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { formatStatusLabel } from "@/lib/display";
+import { ACCOUNT_DELETION_PAGE_URL, PRIVACY_POLICY_PAGE_URL } from "@/lib/links";
+import { deleteOwnAccount } from "@/services/account";
 import type { SettingsPatch } from "@/services/settings";
 import { portalNameFor, portalSegmentFor } from "@/navigation/portalTabs";
 import { useTheme, useThemedStyles, type ThemeMode } from "@/theme/ThemeProvider";
@@ -45,6 +48,7 @@ export function SettingsScreen() {
   const styles = useThemedStyles(createStyles);
   const { settings, query, save, isSaving } = useUserSettings();
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const segment = portalSegmentFor(profile?.role);
 
@@ -65,6 +69,38 @@ export function SettingsScreen() {
       { theme_preference: next },
       "Your theme is saved on this device, but not to your account. Please try again later.",
     );
+  }
+
+  async function deleteAccount() {
+    setDeleting(true);
+    try {
+      await deleteOwnAccount();
+      // Clears the app state and returns to the welcome screen
+      await signOut();
+    } catch (error) {
+      Alert.alert(
+        "Could not delete your account",
+        error instanceof Error && error.message ? error.message : "Check your connection and try again.",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  function confirmDeleteAccount() {
+    // Asks twice in plain words because this cannot be undone
+    Alert.alert(
+      "Delete your account?",
+      "This permanently deletes your profile, settings and notifications. Donation records are kept without your name for the foundation's financial records. This cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete account", style: "destructive", onPress: () => void deleteAccount() },
+      ],
+    );
+  }
+
+  function openPage(url: string) {
+    WebBrowser.openBrowserAsync(url).catch(() => undefined);
   }
 
   return (
@@ -160,6 +196,21 @@ export function SettingsScreen() {
           onPress={() => {
             if (segment) router.push(`/${segment}/profile` as never);
           }}
+        />
+      </SectionCard>
+
+      <SectionCard title="Privacy">
+        <AppButton label="Privacy policy" variant="ghost" onPress={() => openPage(PRIVACY_POLICY_PAGE_URL)} />
+        <AppButton
+          label="How account deletion works"
+          variant="ghost"
+          onPress={() => openPage(ACCOUNT_DELETION_PAGE_URL)}
+        />
+        <AppButton
+          label="Delete account"
+          variant="outline"
+          onPress={confirmDeleteAccount}
+          loading={deleting}
         />
       </SectionCard>
 
