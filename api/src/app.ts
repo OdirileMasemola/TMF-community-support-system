@@ -7,6 +7,7 @@ import { registerRateLimit } from './plugins/rateLimit.js';
 import { registerSupabase } from './plugins/supabase.js';
 import { registerSwagger } from './plugins/swagger.js';
 import { createSupabaseAuthProvider } from './modules/auth/auth.service.js';
+import type { EmailDomainRouteOptions } from './modules/emailDomains/emailDomain.routes.js';
 import { registerRoutes } from './routes/index.js';
 import { buildLoggerOptions } from './shared/logger/logger.js';
 import type { AuthProvider } from './shared/types/auth.types.js';
@@ -23,6 +24,15 @@ export interface BuildAppOptions {
    * fetch). Defaults to a publishable-key client that sends the caller's access token.
    */
   createUserClient?: (accessToken: string) => SupabaseClient;
+  /** Overrides the email domain store and DNS validator (tests only: in-memory data, mocked DNS). */
+  emailDomains?: EmailDomainRouteOptions;
+}
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    /** Validated configuration (no secrets are ever logged or returned). */
+    appConfig: AppConfig;
+  }
 }
 
 /**
@@ -35,6 +45,7 @@ export async function buildApp(config: AppConfig, options: BuildAppOptions = {})
   });
 
   registerErrorHandlers(app);
+  app.decorate('appConfig', config);
 
   await registerCors(app, config);
   await registerRateLimit(app, config);
@@ -45,7 +56,7 @@ export async function buildApp(config: AppConfig, options: BuildAppOptions = {})
   app.decorateRequest('user', null);
 
   app.addSchema(errorResponseSchema);
-  await registerRoutes(app);
+  await registerRoutes(app, { emailDomains: options.emailDomains });
 
   return app;
 }

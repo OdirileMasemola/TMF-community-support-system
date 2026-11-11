@@ -3,6 +3,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
 import { AppButton, Card, LoadingState } from "@/components/ui";
+import { REGISTRATION_COPY, isExpiredLinkError } from "@/auth/registration";
+import { ResendConfirmation } from "@/components/ResendConfirmation";
 import { useThemedStyles } from "@/theme/ThemeProvider";
 import { spacing, typography, type ThemeColors } from "@/theme/tokens";
 
@@ -19,17 +21,31 @@ const WAIT_MS = 10_000;
 export default function AuthCallbackScreen() {
   const { session } = useAuth();
   const router = useRouter();
-  const params = useLocalSearchParams<{ error?: string; error_description?: string }>();
+  const params = useLocalSearchParams<{ error?: string; error_code?: string; error_description?: string }>();
   const styles = useThemedStyles(createStyles);
   const [timedOut, setTimedOut] = useState(false);
 
-  const providerError = params.error_description ?? params.error;
+  const providerError = params.error_description ?? params.error ?? params.error_code;
+  const linkExpired = isExpiredLinkError(params);
 
   useEffect(() => {
     if (session || providerError) return;
     const timer = setTimeout(() => setTimedOut(true), WAIT_MS);
     return () => clearTimeout(timer);
   }, [session, providerError]);
+
+  if (linkExpired) {
+    return (
+      <View style={styles.container}>
+        <Card style={styles.card}>
+          <Text style={styles.eyebrow}>Link expired</Text>
+          <Text style={styles.body}>{REGISTRATION_COPY.expired}</Text>
+          <ResendConfirmation />
+          <AppButton label="Back to sign in" variant="ghost" onPress={() => router.replace("/login")} />
+        </Card>
+      </View>
+    );
+  }
 
   if (!providerError && !timedOut) {
     return <LoadingState label="Finishing sign-in…" />;

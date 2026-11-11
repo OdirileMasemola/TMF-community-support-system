@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
+import { ResendConfirmation } from "@/components/ResendConfirmation";
 import { KeyboardAwareScreen } from "@/components/KeyboardAwareScreen";
 import { AppButton, Card, ChipSelect, Divider, GoogleButton, PageHeading, TextField } from "@/components/ui";
 import { validateRegistration, MIN_PASSWORD_LENGTH, type PublicSignupRole } from "@/lib/validation";
@@ -66,7 +67,7 @@ export default function RegisterScreen() {
     try {
       const result = await signUp({ fullName, email, phoneNumber, password, role, organisationName });
       if (result.needsEmailConfirmation) {
-        setConfirmationEmail(email.trim());
+        setConfirmationEmail(result.email ?? email.trim());
       }
       // Otherwise the user is signed in and the role gate in app/_layout.tsx opens their portal.
     } catch (submitError) {
@@ -95,9 +96,10 @@ export default function RegisterScreen() {
           <Text style={styles.eyebrow}>Almost there</Text>
           <Text style={styles.title}>Check your email</Text>
           <Text style={styles.body}>
-            We sent a confirmation link to {confirmationEmail}. Open it to activate your account, then come back
-            and sign in with your email and password.
+            Please check your inbox to verify your email address. We sent a confirmation link to {confirmationEmail}.
+            Open it to activate your account, then come back and sign in with your email and password.
           </Text>
+          <ResendConfirmation email={confirmationEmail} startCoolingDown />
           <AppButton label="Back to sign in" onPress={() => router.replace("/login")} />
         </Card>
       </View>

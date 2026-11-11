@@ -6,6 +6,11 @@ import {
   DEFAULT_LOG_LEVEL,
   DEFAULT_PORT,
   DEFAULT_RATE_LIMIT_MAX,
+  DEFAULT_EMAIL_CHECK_RATE_LIMIT_MAX,
+  DEFAULT_EMAIL_DNS_CACHE_TTL_SECONDS,
+  DEFAULT_EMAIL_DNS_TIMEOUT_MS,
+  MAX_EMAIL_DNS_TIMEOUT_MS,
+  MIN_ATTESTATION_SECRET_LENGTH,
 } from './constants.js';
 
 export const NODE_ENVS = ['development', 'test', 'production'] as const;
@@ -27,6 +32,17 @@ export interface AppConfig {
   corsOrigins: string[];
   rateLimitMax: number;
   apiVersion: string;
+  /** Requests per client per minute to the public registration email check. */
+  emailCheckRateLimitMax: number;
+  /** Upper bound for one email domain DNS check (MX + A/AAAA), in ms. */
+  emailDnsTimeoutMs: number;
+  /** How long a positive DNS result is cached, in seconds (negative results: a sixth of this, min 60s). */
+  emailDnsCacheTtlSeconds: number;
+  /**
+   * HMAC secret shared with the Supabase Auth hook (Vault secret 'email_signup_attestation_secret').
+   * Optional: without it the API issues no attestation and the hook does not require one.
+   */
+  emailSignupAttestationSecret: string | null;
 }
 
 /** Thrown when configuration is missing or invalid. Messages never contain secret values. */
@@ -118,8 +134,31 @@ export function loadConfig(env: Env = process.env): AppConfig {
     errors.push('RATE_LIMIT_MAX must be a positive integer');
   }
 
+  const emailCheckRateLimitMax = parsePositiveInt(read(env, 'EMAIL_CHECK_RATE_LIMIT_MAX'), DEFAULT_EMAIL_CHECK_RATE_LIMIT_MAX);
+  if (emailCheckRateLimitMax === undefined) {
+    errors.push('EMAIL_CHECK_RATE_LIMIT_MAX must be a positive integer');
+  }
+
+  const emailDnsTimeoutMs = parsePositiveInt(read(env, 'EMAIL_DNS_TIMEOUT_MS'), DEFAULT_EMAIL_DNS_TIMEOUT_MS);
+  if (emailDnsTimeoutMs === undefined || emailDnsTimeoutMs > MAX_EMAIL_DNS_TIMEOUT_MS) {
+    errors.push(`EMAIL_DNS_TIMEOUT_MS must be an integer between 1 and ${MAX_EMAIL_DNS_TIMEOUT_MS}`);
+  }
+
+  const emailDnsCacheTtlSeconds = parsePositiveInt(read(env, 'EMAIL_DNS_CACHE_TTL_SECONDS'), DEFAULT_EMAIL_DNS_CACHE_TTL_SECONDS);
+  if (emailDnsCacheTtlSeconds === undefined) {
+    errors.push('EMAIL_DNS_CACHE_TTL_SECONDS must be a positive integer');
+  }
+
+  const emailSignupAttestationSecret = read(env, 'EMAIL_SIGNUP_ATTESTATION_SECRET') ?? null;
+  if (emailSignupAttestationSecret !== null && emailSignupAttestationSecret.length < MIN_ATTESTATION_SECRET_LENGTH) {
+    errors.push(`EMAIL_SIGNUP_ATTESTATION_SECRET must be at least ${MIN_ATTESTATION_SECRET_LENGTH} characters`);
+  }
+
   if (
     errors.length > 0 ||
+    emailCheckRateLimitMax === undefined ||
+    emailDnsTimeoutMs === undefined ||
+    emailDnsCacheTtlSeconds === undefined ||
     port === undefined ||
     rateLimitMax === undefined ||
     supabaseUrl === undefined ||
@@ -139,6 +178,10 @@ export function loadConfig(env: Env = process.env): AppConfig {
     corsOrigins,
     rateLimitMax,
     apiVersion: read(env, 'API_VERSION') ?? DEFAULT_API_VERSION,
+    emailCheckRateLimitMax,
+    emailDnsTimeoutMs,
+    emailDnsCacheTtlSeconds,
+    emailSignupAttestationSecret,
   };
 }
 

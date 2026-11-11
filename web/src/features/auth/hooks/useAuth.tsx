@@ -7,6 +7,10 @@ import { createClient, getSupabaseClientOrNull, isSupabaseConfigured } from "@/l
 import { roleHomePath } from "@/lib/display";
 import { ensureRoleProfile, fetchProfile } from "@/services/profiles";
 import { isPublicSignupRole, type UserRole } from "@/types/app.types";
+import { registerWithEmail, resendSignupConfirmation, type RegistrationResult } from "@/features/auth/lib/registration";
+
+/** Where the confirmation (and Google) links land; also where an expired link is handled. */
+export const AUTH_CALLBACK_PATH = "/auth/callback";
 
 /** Where Supabase sends the user after they click the reset link in their email. */
 export const PASSWORD_RESET_PATH = "/reset-password";
@@ -158,23 +162,28 @@ export function AuthProvider({ children }: PropsWithChildren) {
         throw new Error("Registration is temporarily unavailable. Please try again later.");
       }
 
-      const { error } = await supabase.auth.signUp({
-        email: values.email,
-        password: values.password,
-        options: {
-          data: {
-            full_name: values.fullName,
-            phone_number: values.phoneNumber,
-            role: values.role,
-          },
-        },
+      // API check (format, mail DNS, domain policy) first, then Supabase signUp.
+      const result: RegistrationResult = await registerWithEmail(supabase, values, {
+        emailRedirectTo: `${window.location.origin}${AUTH_CALLBACK_PATH}`,
       });
 
-      if (error) throw error;
-      navigate("/login");
+      if (result.userId) {
+        // Email confirmation is switched off in Supabase: the user is already signed in.
+        const nextProfile = await loadProfile(result.userId);
+        navigate(roleHomePath(nextProfile?.role));
+      }
+      return result;
     },
-    [navigate],
+    [loadProfile, navigate],
   );
+
+  const resendConfirmation = useCallback(async (email: string) => {
+    const supabase = getSupabaseClientOrNull();
+    if (!supabase) {
+      throw new Error("Email verification is temporarily unavailable. Please try again later.");
+    }
+    await resendSignupConfirmation(supabase, email, `${window.location.origin}${AUTH_CALLBACK_PATH}`);
+  }, []);
 
   const signInWithGoogle = useCallback(async () => {
     if (!isSupabaseConfigured()) {
@@ -292,6 +301,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       isLoading,
       signIn,
       signUp,
+      resendConfirmation,
       signInWithGoogle,
       completeProfile,
       requestPasswordReset,
@@ -305,6 +315,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       isLoading,
       signIn,
       signUp,
+      resendConfirmation,
       signInWithGoogle,
       completeProfile,
       requestPasswordReset,

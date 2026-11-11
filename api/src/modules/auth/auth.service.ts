@@ -47,7 +47,9 @@ export function createSupabaseAuthProvider(deps: SupabaseAuthDeps): AuthProvider
         throw authServiceUnavailable(error);
       }
 
-      return { id: data.user.id, email: data.user.email };
+      const confirmedAt = data.user.email_confirmed_at;
+      // Only set when Supabase reports a confirmation; absent means not confirmed.
+      return { id: data.user.id, email: data.user.email, ...(confirmedAt ? { emailConfirmedAt: confirmedAt } : {}) };
     },
 
     async getProfile(userId: UserId, accessToken: string): Promise<AuthProfile | null> {

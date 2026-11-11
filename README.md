@@ -44,6 +44,7 @@ Shared features include email/password sign-in, Google authentication, role-base
 - **Account self-deletion:** the mobile Settings screen calls `delete_own_account()`. [The deletion migration](supabase/migrations/20261108120000_account_self_deletion.sql) deletes the calling account and cascaded profile records while retaining donation rows without the donor link. Administrators cannot self-delete. This requires the migration to be deployed; live deletion was not verified in this documentation update.
 - **Privacy information:** public [privacy policy](web/src/pages/public/PrivacyPolicyPage.tsx) and [account-deletion page](web/src/pages/public/AccountDeletionPage.tsx), served at `/privacy-policy` and `/account-deletion`, are linked from mobile Settings.
 - **Quality checks:** web lint is required in CI alongside web, API and mobile tests and builds.
+- **Email domain management and verification:** registration checks every address on the server (format, mail DNS with MX and A/AAAA fallback, and an administrator-managed open/restricted domain policy) before Supabase sends its confirmation email; a Supabase Auth hook enforces the same rules for direct sign-up calls. Administrators manage domains under **Administration → Email Domains**. Accounts count as verified only once Supabase confirms the address. This needs [the migration](supabase/migrations/20261112120000_email_domain_management.sql) applied and Supabase/Resend settings changed by the owner; see [docs/email-domain-management.md](docs/email-domain-management.md).
 
 ## Design considerations
 

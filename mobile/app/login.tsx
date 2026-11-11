@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/auth/AuthProvider";
+import { ResendConfirmation } from "@/components/ResendConfirmation";
 import { KeyboardAwareScreen } from "@/components/KeyboardAwareScreen";
 import { AppButton, Divider, GoogleButton, TextField } from "@/components/ui";
 import { useThemedStyles } from "@/theme/ThemeProvider";
@@ -19,6 +20,8 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  /** Set when Supabase refused the sign-in because the address is not confirmed yet. */
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const passwordRef = useRef<TextInput>(null);
@@ -27,6 +30,7 @@ export default function LoginScreen() {
 
   async function handleSubmit() {
     setError(null);
+    setUnconfirmedEmail(null);
 
     if (!email.trim() || !password) {
       setError("Enter your email address and password.");
@@ -38,7 +42,12 @@ export default function LoginScreen() {
       await signIn(email.trim(), password);
       // Navigation is handled by the role gate in app/_layout.tsx.
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Sign in failed. Please try again.");
+      if (submitError instanceof Error && /email not confirmed/i.test(submitError.message)) {
+        setUnconfirmedEmail(email.trim());
+        setError("Please check your inbox to verify your email address.");
+      } else {
+        setError(submitError instanceof Error ? submitError.message : "Sign in failed. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -133,6 +142,7 @@ export default function LoginScreen() {
             </Pressable>
 
             {error ? <Text style={styles.error}>{error}</Text> : null}
+            {unconfirmedEmail ? <ResendConfirmation email={unconfirmedEmail} /> : null}
 
             <AppButton
               label={isSubmitting ? "Signing in…" : "Sign in"}
