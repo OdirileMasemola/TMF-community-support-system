@@ -25,3 +25,11 @@ export const DEFAULT_LOG_LEVEL = 'info';
 /** Default maximum number of requests per client per rate-limit window. */
 export const DEFAULT_RATE_LIMIT_MAX = 100;
 export const RATE_LIMIT_TIME_WINDOW = '1 minute';
+
+/** Registration email check (POST /api/v1/auth/registration/email-check). */
+export const DEFAULT_EMAIL_CHECK_RATE_LIMIT_MAX = 10;
+export const DEFAULT_EMAIL_DNS_TIMEOUT_MS = 3000;
+export const MAX_EMAIL_DNS_TIMEOUT_MS = 10000;
+export const DEFAULT_EMAIL_DNS_CACHE_TTL_SECONDS = 3600;
+/** Shortest accepted EMAIL_SIGNUP_ATTESTATION_SECRET. */
+export const MIN_ATTESTATION_SECRET_LENGTH = 32;

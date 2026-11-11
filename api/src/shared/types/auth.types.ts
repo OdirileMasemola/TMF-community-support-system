@@ -42,8 +42,12 @@ export function isPermittedAccountStatus(value: unknown): value is PermittedAcco
 /** Supabase auth user id (UUID). */
 export type UserId = User['id'];
 
-/** The subset of the Supabase `User` the API relies on after the token is verified. */
-export type VerifiedSupabaseUser = Pick<User, 'id' | 'email'>;
+/**
+ * The subset of the Supabase `User` the API relies on after the token is verified.
+ * `emailConfirmedAt` is Supabase Auth's email_confirmed_at (null/absent = not confirmed). It is
+ * never derived from user_metadata.email_verified, which a client can write.
+ */
+export type VerifiedSupabaseUser = Pick<User, 'id' | 'email'> & { emailConfirmedAt?: string | null };
 
 /** The authorization-relevant fields of the caller's `public.profiles` row. */
 export interface AuthProfile {

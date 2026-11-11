@@ -95,6 +95,10 @@ The server reads `api/.env` if it exists (Node's built-in env-file loader). In A
 | `CORS_ORIGINS` | no | empty | Comma-separated allowed origins. Empty = any origin in development/test, none in production. `*` is rejected in production |
 | `RATE_LIMIT_MAX` | no | `100` | Max requests per client per minute |
 | `API_VERSION` | no | `0.1.0` | Version label shown in the API docs |
+| `EMAIL_CHECK_RATE_LIMIT_MAX` | no | `10` | Max registration email checks per client per minute |
+| `EMAIL_DNS_TIMEOUT_MS` | no | `3000` | Mail DNS lookup timeout (max 10000) |
+| `EMAIL_DNS_CACHE_TTL_SECONDS` | no | `3600` | How long a successful mail DNS result is cached |
+| `EMAIL_SIGNUP_ATTESTATION_SECRET` | no | empty | At least 32 characters; must equal the Supabase Vault secret `email_signup_attestation_secret`. When set, the email check issues the attestation the Auth hook verifies |
 
 The server exits on startup with a clear message if a required variable is missing or invalid
 (secret values are never printed).
@@ -170,6 +174,13 @@ The server exits on startup with a clear message if a required variable is missi
 | GET | `/api/v1/admin/dashboard` | Totals (administrator): users by role and status, campaigns, donations (incl. the sum of successful money donations), pending proofs, assistance requests awaiting review, pending applications, sponsorships, open sponsorship requests, scheduled events |
 | GET | `/api/v1/admin/users?role=&status=&search=&page=&pageSize=` | Users (administrator), newest first; `search` matches full name or email (letters, digits, spaces and `@ . ' + _ -`) |
 | PATCH | `/api/v1/admin/users/:id/status` | Set `account_status` (pending/active/suspended) of another user (administrator); 409 for your own account |
+| POST | `/api/v1/auth/registration/email-check` | Public, rate limited. Format, mail DNS and domain policy check before sign-up; returns the normalised address and attestation, or 422/503 |
+| GET | `/api/v1/auth/verification-status` | Signed-in user's email verification state, read from Supabase `email_confirmed_at` |
+| GET/POST | `/api/v1/admin/email-domains` | List (filter by `policy_type`, `status`, `search`) or add an email domain rule (administrator) |
+| PATCH/DELETE | `/api/v1/admin/email-domains/:id` | Change policy type, status or notes, or remove a rule (administrator) |
+| POST | `/api/v1/admin/email-domains/:id/dns-check` | Re-check and store the domain's mail DNS status (administrator) |
+| GET/PUT | `/api/v1/admin/email-domain-policy` | Read or set the registration mode, `open` or `restricted` (administrator) |
+| GET | `/api/v1/admin/email-domain-audit` | Recent domain/policy changes (administrator) |
 
 ```json
 { "status": "ok", "service": "TMF Community Support API", "timestamp": "2026-01-01T00:00:00.000Z" }
@@ -223,6 +234,10 @@ The API supports the five portal roles: administrator, donor, volunteer, benefic
 - `/api/v1/me/settings` reads and saves notification switches. [The enforcement migration](../supabase/migrations/20261008150000_enforce_notification_preferences.sql) makes generated in-app notifications honour those choices. Disabling a category should suppress its notification, not block the underlying donation/request update. See [notification preference tests](tests/notificationPreferences.test.ts).
 - Mobile self-deletion calls the Supabase RPC directly; it is not an API DELETE route. [The deletion migration](../supabase/migrations/20261108120000_account_self_deletion.sql) is required, retains donations without a donor link and blocks administrator self-deletion. Live deployment was not verified during this README update.
 - Public `/privacy-policy` and `/account-deletion` pages are served by the web client.
+
+### Email domain management
+
+Registration emails are checked by `POST /api/v1/auth/registration/email-check` (format, mail DNS via Node `dns/promises`, domain policy) and the same rules are enforced in Supabase by the `hook_before_user_created` Auth hook, so calling Supabase `signUp` directly cannot skip them. See [docs/email-domain-management.md](../docs/email-domain-management.md) for the flow, security controls and the Supabase settings the owner must change.
 
 ### GitHub Actions and releases
 

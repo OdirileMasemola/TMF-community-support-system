@@ -5,6 +5,7 @@ import { assistanceRoutes } from '../modules/assistance/assistance.routes.js';
 import { authRoutes } from '../modules/auth/auth.routes.js';
 import { campaignRoutes } from '../modules/campaigns/campaign.routes.js';
 import { donationRoutes } from '../modules/donations/donation.routes.js';
+import { emailDomainRoutes, type EmailDomainRouteOptions } from '../modules/emailDomains/emailDomain.routes.js';
 import { eventRoutes } from '../modules/events/event.routes.js';
 import { reportRoutes } from '../modules/reports/report.routes.js';
 import { healthRoutes } from '../modules/health/health.routes.js';
@@ -17,7 +18,11 @@ import { volunteerRoutes } from '../modules/volunteers/volunteer.routes.js';
  * Versioned v1 routes (/api/v1/...). Add modules here, e.g.
  * `await app.register(someModuleRoutes, { prefix: '/some-module' });`
  */
-async function v1Routes(app: FastifyInstance): Promise<void> {
+export interface RouteOptions {
+  emailDomains?: EmailDomainRouteOptions;
+}
+
+async function v1Routes(app: FastifyInstance, options: RouteOptions): Promise<void> {
   await app.register(authRoutes, { prefix: '/auth' });
   await app.register(campaignRoutes, { prefix: '/campaigns' });
   await app.register(meRoutes, { prefix: '/me' });
@@ -33,13 +38,15 @@ async function v1Routes(app: FastifyInstance): Promise<void> {
   await app.register(eventRoutes, { prefix: '/events' });
   await app.register(reportRoutes, { prefix: '/reports' });
   await app.register(adminRoutes, { prefix: '/admin' });
+  // Spans /auth/registration/email-check, /auth/verification-status and /admin/email-domain*.
+  await app.register(emailDomainRoutes, options.emailDomains ?? {});
 }
 
 /** Registers all route modules. */
-export async function registerRoutes(app: FastifyInstance): Promise<void> {
+export async function registerRoutes(app: FastifyInstance, options: RouteOptions = {}): Promise<void> {
   // Unversioned operational routes.
   await app.register(healthRoutes, { prefix: API_PREFIX });
 
   // Versioned business routes.
-  await app.register(v1Routes, { prefix: API_V1_PREFIX });
+  await app.register(v1Routes, { prefix: API_V1_PREFIX, ...options });
 }

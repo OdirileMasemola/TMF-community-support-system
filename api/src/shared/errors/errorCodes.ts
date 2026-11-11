@@ -15,6 +15,14 @@ export const ErrorCodes = {
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+  /** Registration email check: the address is not a valid email address. */
+  INVALID_EMAIL: 'INVALID_EMAIL',
+  /** Registration email check: the domain has no mail DNS (MX, or A/AAAA fallback). */
+  EMAIL_DOMAIN_UNDELIVERABLE: 'EMAIL_DOMAIN_UNDELIVERABLE',
+  /** Registration email check: the domain is blocked, or not approved in restricted mode. */
+  EMAIL_DOMAIN_RESTRICTED: 'EMAIL_DOMAIN_RESTRICTED',
+  /** Registration email check: DNS could not be queried right now (temporary). */
+  EMAIL_DOMAIN_CHECK_UNAVAILABLE: 'EMAIL_DOMAIN_CHECK_UNAVAILABLE',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
