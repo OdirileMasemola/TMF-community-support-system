@@ -99,6 +99,24 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   return (await response.json()) as T;
 }
 
+/**
+ * Calls a public API route without an access token (e.g. the registration email check, which runs
+ * before the person has an account). Same error handling as apiRequest.
+ */
+export async function publicApiData<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+    method: "POST",
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    const error = await errorFromResponse(response);
+    if (import.meta.env.DEV) console.error(`[API] POST ${path}`, error);
+    throw error;
+  }
+  return ((await response.json()) as DataResponse<T>).data;
+}
+
 export async function apiData<T>(path: string, options?: RequestOptions): Promise<T> {
   const payload = await apiRequest<DataResponse<T>>(path, options);
   return payload.data;

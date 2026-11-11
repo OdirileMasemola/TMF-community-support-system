@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/Input";
 import { AuthDivider } from "@/features/auth/components/AuthDivider";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
+import { ResendConfirmation } from "@/features/auth/components/ResendConfirmation";
 import { toAuthUserMessage } from "@/lib/errors";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 
@@ -15,16 +16,21 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  /** Set when Supabase refused the sign-in because the address is not confirmed yet. */
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
+    setUnconfirmedEmail(null);
 
     try {
       await signIn(email.trim(), password);
       toast.success("Welcome back!");
     } catch (error) {
-      toast.error(toAuthUserMessage(error));
+      const message = toAuthUserMessage(error);
+      if (message === "Please confirm your email address before signing in.") setUnconfirmedEmail(email.trim());
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -88,6 +94,13 @@ export function LoginPage() {
           {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
       </form>
+
+      {unconfirmedEmail ? (
+        <div className="grid gap-2 rounded-lg border border-border p-3">
+          <p className="text-sm text-foreground">Please check your inbox to verify your email address.</p>
+          <ResendConfirmation email={unconfirmedEmail} />
+        </div>
+      ) : null}
     </AuthPageShell>
   );
 }

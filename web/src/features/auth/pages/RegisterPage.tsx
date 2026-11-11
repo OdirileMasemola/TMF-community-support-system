@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/Input";
 import { AuthDivider } from "@/features/auth/components/AuthDivider";
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell";
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
+import { ResendConfirmation } from "@/features/auth/components/ResendConfirmation";
+import { REGISTRATION_COPY } from "@/features/auth/lib/registration";
 import { toAuthUserMessage } from "@/lib/errors";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { cn } from "@/lib/utils";
@@ -28,16 +30,26 @@ export function RegisterPage() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setFormError(null);
     setIsSubmitting(true);
 
     try {
-      await signUp({ fullName, email, phoneNumber, password, role });
-      toast.success("Account created. Check your email if confirmation is enabled.");
+      // The API checks the address (format, mail DNS, domain policy) before Supabase signUp.
+      const result = await signUp({ fullName, email, phoneNumber, password, role });
+      if (result.needsEmailConfirmation) {
+        setConfirmationEmail(result.email);
+      } else {
+        toast.success("Account created.");
+      }
     } catch (error) {
-      toast.error(toAuthUserMessage(error));
+      const message = toAuthUserMessage(error);
+      setFormError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -55,6 +67,33 @@ export function RegisterPage() {
   }
 
   const isBusy = isSubmitting || isGoogleLoading;
+
+  if (confirmationEmail) {
+    return (
+      <AuthPageShell
+        label="Almost there"
+        title="Check your"
+        highlightedTitle="email"
+        subtitle={REGISTRATION_COPY.checkInbox}
+        footer={
+          <p className="text-center text-sm text-muted-foreground">
+            Already verified?{" "}
+            <Link className="font-semibold text-primary hover:underline" to="/login">
+              Sign in
+            </Link>
+          </p>
+        }
+      >
+        <div className="grid gap-4">
+          <p className="text-sm text-foreground">
+            We sent a verification link to <span className="font-semibold">{confirmationEmail}</span>. Open it to
+            activate your account, then sign in. Your account stays unverified until you do.
+          </p>
+          <ResendConfirmation email={confirmationEmail} startCoolingDown />
+        </div>
+      </AuthPageShell>
+    );
+  }
 
   return (
     <AuthPageShell
@@ -133,6 +172,12 @@ export function RegisterPage() {
           required
           minLength={8}
         />
+
+        {formError ? (
+          <p role="alert" className="text-sm text-primary">
+            {formError}
+          </p>
+        ) : null}
 
         <Button type="submit" disabled={isBusy} loading={isSubmitting} className="w-full">
           {isSubmitting ? "Creating account..." : "Create account"}

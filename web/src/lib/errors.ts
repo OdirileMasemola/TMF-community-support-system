@@ -23,6 +23,9 @@ export function toUserMessage(fallback = "Something went wrong while loading dat
 
 /** Auth errors that are safe to show; everything else is generic. */
 export function toAuthUserMessage(error: unknown): string {
+  // Registration errors already carry safe, user-facing copy (see features/auth/lib/registration.ts).
+  if (error instanceof Error && error.name === "RegistrationError") return error.message;
+
   const message = rawMessage(error);
   const lower = message.toLowerCase();
 
@@ -34,6 +37,19 @@ export function toAuthUserMessage(error: unknown): string {
   }
   if (/user already registered|already been registered/.test(lower)) {
     return "An account with this email already exists. Try signing in.";
+  }
+  // Registration rules (the API check and the Supabase Auth hook use the same wording).
+  if (/please enter a valid email address|email address .* is invalid|unable to validate email/.test(lower)) {
+    return "Please enter a valid email address.";
+  }
+  if (/not configured to receive email|could not verify this email domain/.test(lower)) {
+    return "This email domain is not configured to receive email.";
+  }
+  if (/email domain is currently restricted/.test(lower)) {
+    return "Registration using this email domain is currently restricted.";
+  }
+  if (/email rate limit|email limit/.test(lower)) {
+    return "We have sent too many emails to this address. Please wait a while before requesting another one.";
   }
   if (/rate limit|too many requests|security purposes/.test(lower)) {
     return "Too many attempts. Please wait a moment and try again.";

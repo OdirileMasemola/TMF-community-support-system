@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import {
+  AtSign,
   BarChart3,
   Bell,
   CalendarDays,
@@ -93,6 +94,11 @@ export const navGroups: SidebarNavGroup[] = [
         title: "Messages",
         path: "/admin/messages",
         icon: <Mail className="size-4" aria-hidden="true" />,
+      },
+      {
+        title: "Email Domains",
+        path: "/admin/email-domains",
+        icon: <AtSign className="size-4" aria-hidden="true" />,
       },
       {
         title: "Settings",
