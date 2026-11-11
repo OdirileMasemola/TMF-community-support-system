@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 import * as Linking from "expo-linking";
+import { registerWithEmail, resendSignupConfirmation } from "@/auth/registration";
 import * as WebBrowser from "expo-web-browser";
 import type { Session } from "@supabase/supabase-js";
 import { createClient, getSupabaseClientOrNull, isSupabaseConfigured } from "@/lib/supabaseClient";
@@ -29,6 +30,8 @@ export type SignUpValues = {
 export type SignUpResult = {
   /** True when Supabase created the account but wants the email address confirmed before signing in. */
   needsEmailConfirmation: boolean;
+  /** The normalised address the confirmation email went to. */
+  email?: string;
 };
 
 type AuthContextValue = {
@@ -41,6 +44,8 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signUp: (values: SignUpValues) => Promise<SignUpResult>;
+  /** Sends the Supabase sign-up confirmation email again. */
+  resendConfirmation: (email: string) => Promise<void>;
   /** Emails a password-reset link that deep-links back into this app. */
   resetPassword: (email: string) => Promise<void>;
   /** Turns the tokens from a reset deep link into a session so the password can be changed. */
@@ -151,8 +156,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   /**
    * Mirrors the web registration: the role and contact details travel as sign-up
    * metadata, and the handle_new_user trigger creates the profile and the role
-   * profile from them. Like the web, no email redirect is passed, so any
-   * confirmation email uses the project's Site URL.
+   * profile from them. As on the web, the TMF API checks the address (format, mail DNS,
+   * domain policy) before Supabase is called; see src/auth/registration.ts.
    */
   const signUp = useCallback(
     async (values: SignUpValues): Promise<SignUpResult> => {
@@ -165,38 +170,26 @@ export function AuthProvider({ children }: PropsWithChildren) {
         throw new Error("Supabase is not configured. Add your credentials to mobile/.env.local and restart Expo.");
       }
 
-      const organisationName = values.organisationName?.trim();
-      const { data, error } = await client.auth.signUp({
-        email: values.email.trim(),
-        password: values.password,
-        options: {
-          data: {
-            full_name: values.fullName.trim(),
-            phone_number: values.phoneNumber.trim() || null,
-            role: values.role,
-            ...(values.role === "sponsor" && organisationName ? { organisation_name: organisationName } : {}),
-          },
-        },
-      });
+      const result = await registerWithEmail(client, values);
 
-      if (error) throw error;
-
-      // With email confirmation on, Supabase does not reveal that an address is
-      // taken: it returns a user with no identities and sends no email.
-      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        throw new Error("An account with this email address already exists. Sign in instead.");
-      }
-
-      if (data.session && data.user?.id) {
+      if (result.userId) {
         // Confirmation is off: the user is signed in straight away.
-        await loadProfile(data.user.id).catch(() => undefined);
-        return { needsEmailConfirmation: false };
+        await loadProfile(result.userId).catch(() => undefined);
+        return { needsEmailConfirmation: false, email: result.email };
       }
 
-      return { needsEmailConfirmation: true };
+      return { needsEmailConfirmation: true, email: result.email };
     },
     [loadProfile],
   );
+
+  const resendConfirmation = useCallback(async (email: string) => {
+    const client = getSupabaseClientOrNull();
+    if (!client) {
+      throw new Error("Supabase is not configured. Add your credentials to mobile/.env.local and restart Expo.");
+    }
+    await resendSignupConfirmation(client, email);
+  }, []);
 
   /**
    * The reset email links back into this app (tmfdashboard://reset-password,
@@ -339,6 +332,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       signIn,
       signInWithGoogle,
       signUp,
+      resendConfirmation,
       resetPassword,
       restoreRecoverySession,
       updatePassword,
@@ -354,6 +348,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       signIn,
       signInWithGoogle,
       signUp,
+      resendConfirmation,
       resetPassword,
       restoreRecoverySession,
       updatePassword,
